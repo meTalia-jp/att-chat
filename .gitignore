@@ -1,0 +1,29 @@
+# Reference-only repositories (provenance snapshots are kept under docs/).
+/sample/
+
+# Installed dependencies and generated output.
+node_modules/
+dist/
+.cache/
+.vite/
+coverage/
+*.tsbuildinfo
+
+# Local data, credentials and temporary files.
+/data/
+/exports/
+.env
+.env.*
+!.env.example
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.log
+*.tmp
+*.temp
+.tmp/
+.tmp-*/
+Thumbs.db
+.DS_Store

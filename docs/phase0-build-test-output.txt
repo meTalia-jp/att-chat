@@ -1,0 +1,27 @@
+✔ 確定前LF正規化と確定後変更拒否 (0.6918ms)
+✔ UTF-16とgrapheme境界 (7.408ms)
+✔ 不正範囲・Turn状態・不一致拒否 (0.2008ms)
+✔ 重複・包含拒否、隣接許可 (0.2006ms)
+✔ JSON往復で位置・メモ・色保持 (0.3288ms)
+✔ source不一致はunresolved、推測移動しない (0.1215ms)
+✔ 未知Turnと範囲外はunresolved (0.1154ms)
+✔ 重複importは両方隔離 (0.1427ms)
+✔ スキーマ・重複ID・CRLF・不正色を拒否 (0.2324ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 76.6549
+vite v8.2.2 building client environment for production...
+transforming...
+✓ 268 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.36 kB │ gzip:   0.27 kB
+dist/assets/index-BuU2cn5W.css    3.52 kB │ gzip:   1.40 kB
+dist/assets/index-D8hH0M-M.js   365.85 kB │ gzip: 113.39 kB
+
+✓ built in 122ms

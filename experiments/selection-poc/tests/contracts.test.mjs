@@ -1,0 +1,15 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { finalizeTurn, anchorProblem, addHighlight, deserialize, serialize, isBoundary } from '../src/contracts.mjs';
+const turn = Object.freeze({ turn_id: 'a', sequence_no: 0, role: 'assistant', status: 'completed', content: '日本語ABC😀e\u0301' });
+const h = { highlight_id: 'h', turn_id: 'a', start_offset: 0, end_offset: 3, source_text: '日本語', target_text: '日本語', color: 'yellow', note: '', created_at: '2026-09-11T00:00:00Z', status: 'resolved' };
+const state = { turns: [turn], highlights: [h] };
+test('確定前LF正規化と確定後変更拒否', () => { const t = finalizeTurn({ ...turn, status: 'generating', content: 'a\r\nb\rc' }); assert.equal(t.content, 'a\nb\nc'); assert(Object.isFrozen(t)); assert.throws(() => finalizeTurn(t)); });
+test('UTF-16とgrapheme境界', () => { assert.equal(anchorProblem(turn, h), null); assert.equal(isBoundary(turn.content, 7), false); assert.equal(isBoundary(turn.content, 9), false); assert.equal(isBoundary(turn.content, 8), true); });
+test('不正範囲・Turn状態・不一致拒否', () => { for (const patch of [{ start_offset: -1 }, { end_offset: 99 }, { end_offset: 0 }, { start_offset: 0.5 }, { source_text: '違う' }]) assert(anchorProblem(turn, { ...h, ...patch })); assert(anchorProblem({ ...turn, status: 'generating' }, h)); assert(anchorProblem({ ...turn, role: 'user' }, h)); });
+test('重複・包含拒否、隣接許可', () => { assert.throws(() => addHighlight(state, h)); assert.throws(() => addHighlight(state, { ...h, end_offset: 2, source_text: '日本', target_text: '日本' })); const next = addHighlight(state, { ...h, highlight_id: 'b', start_offset: 3, end_offset: 6, source_text: 'ABC', target_text: 'ABC' }); assert.equal(next.highlights.length, 2); });
+test('JSON往復で位置・メモ・色保持', () => { const data = deserialize(serialize(state)); assert.equal(data.highlights[0].source_text, '日本語'); assert.equal(data.highlights[0].end_offset, 3); assert(Object.isFrozen(data.turns[0])); });
+test('source不一致はunresolved、推測移動しない', () => { const data = deserialize(serialize({ ...state, highlights: [{ ...h, source_text: '別' }] })); assert.equal(data.highlights[0].status, 'unresolved'); assert.equal(data.highlights[0].start_offset, 0); });
+test('未知Turnと範囲外はunresolved', () => { for (const patch of [{ turn_id: 'missing' }, { end_offset: 999 }]) assert.equal(deserialize(serialize({ ...state, highlights: [{ ...h, ...patch }] })).highlights[0].status, 'unresolved'); });
+test('重複importは両方隔離', () => { const data = deserialize(serialize({ ...state, highlights: [h, { ...h, highlight_id: 'b' }] })); assert(data.highlights.every(x => x.status === 'unresolved')); });
+test('スキーマ・重複ID・CRLF・不正色を拒否', () => { assert.throws(() => deserialize('{}')); assert.throws(() => deserialize(serialize({ ...state, turns: [turn, turn] }))); assert.throws(() => deserialize(serialize({ ...state, highlights: [h, h] }))); assert.throws(() => deserialize(serialize({ ...state, turns: [{ ...turn, content: 'a\r\nb' }] }))); assert.throws(() => deserialize(serialize({ ...state, highlights: [{ ...h, color: 'purple' }] }))); });

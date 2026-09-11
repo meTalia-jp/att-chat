@@ -1,0 +1,23 @@
+{
+  "name": "attchat-selection-poc",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5178 --strictPort",
+    "build": "tsc --noEmit && vite build",
+    "test": "node --test tests/contracts.test.mjs"
+  },
+  "dependencies": {
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "react-markdown": "10.1.0",
+    "remark-gfm": "4.0.1"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "typescript": "7.0.2",
+    "vite": "8.2.2"
+  }
+}

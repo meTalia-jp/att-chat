@@ -1,0 +1,193 @@
+{
+  "tested_at": "2026-09-11T12:24:46.016Z",
+  "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "method": "Observed browser test panel results; details summarized from DOM output. Synthetic Selection tests; physical drags recorded separately.",
+  "passed": 36,
+  "total": 36,
+  "rows": [
+    {
+      "name": "日本語＋英数字",
+      "passed": true,
+      "detail": "turn-a [9,18)"
+    },
+    {
+      "name": "同一Turn内の2番目の同じ語",
+      "passed": true,
+      "detail": "turn-a [29,31)"
+    },
+    {
+      "name": "別Turnの同じ文章",
+      "passed": true,
+      "detail": "turn-b [9,18)"
+    },
+    {
+      "name": "絵文字",
+      "passed": true,
+      "detail": "turn-a [41,43)"
+    },
+    {
+      "name": "ZWJ家族絵文字",
+      "passed": true,
+      "detail": "turn-a [48,59)"
+    },
+    {
+      "name": "結合文字Latin",
+      "passed": true,
+      "detail": "turn-a [65,67)"
+    },
+    {
+      "name": "結合文字かな",
+      "passed": true,
+      "detail": "turn-a [70,72)"
+    },
+    {
+      "name": "サロゲート途中",
+      "passed": true,
+      "detail": "拒否: 文字の途中"
+    },
+    {
+      "name": "結合文字途中",
+      "passed": true,
+      "detail": "拒否: 文字の途中"
+    },
+    {
+      "name": "太字全体",
+      "passed": true,
+      "detail": "turn-a [90,95)"
+    },
+    {
+      "name": "太字の一部",
+      "passed": true,
+      "detail": "turn-a [91,94)"
+    },
+    {
+      "name": "通常文→太字→通常文",
+      "passed": true,
+      "detail": "turn-a [82,100); 原文には内部の ** を含む"
+    },
+    {
+      "name": "リンクラベル全体",
+      "passed": true,
+      "detail": "turn-a [101,107)"
+    },
+    {
+      "name": "リンクラベルの一部",
+      "passed": true,
+      "detail": "turn-a [102,106)"
+    },
+    {
+      "name": "インラインコード",
+      "passed": true,
+      "detail": "turn-a [133,141)"
+    },
+    {
+      "name": "リスト項目",
+      "passed": true,
+      "detail": "turn-a [153,159)"
+    },
+    {
+      "name": "見出し",
+      "passed": true,
+      "detail": "turn-a [2,7)"
+    },
+    {
+      "name": "未対応文字を途中に含む選択",
+      "passed": true,
+      "detail": "拒否: 原文未対応の文字"
+    },
+    {
+      "name": "コードブロック",
+      "passed": true,
+      "detail": "拒否"
+    },
+    {
+      "name": "複数段落",
+      "passed": true,
+      "detail": "拒否"
+    },
+    {
+      "name": "表",
+      "passed": true,
+      "detail": "拒否"
+    },
+    {
+      "name": "Markdownエスケープ",
+      "passed": true,
+      "detail": "拒否: 原文へ正確に変換できない"
+    },
+    {
+      "name": "文字参照",
+      "passed": true,
+      "detail": "拒否: 原文へ正確に変換できない"
+    },
+    {
+      "name": "逆方向選択",
+      "passed": true,
+      "detail": "turn-a [9,18)"
+    },
+    {
+      "name": "Turnまたぎ",
+      "passed": true,
+      "detail": "拒否"
+    },
+    {
+      "name": "生成中Turn",
+      "passed": true,
+      "detail": "拒否"
+    },
+    {
+      "name": "User Turn",
+      "passed": true,
+      "detail": "拒否"
+    },
+    {
+      "name": "同一範囲重複",
+      "passed": true,
+      "detail": "拒否"
+    },
+    {
+      "name": "一部重複",
+      "passed": true,
+      "detail": "拒否"
+    },
+    {
+      "name": "包含",
+      "passed": true,
+      "detail": "拒否"
+    },
+    {
+      "name": "隣接",
+      "passed": true,
+      "detail": "2件描画"
+    },
+    {
+      "name": "4色・複数Turn・メモのJSON復元",
+      "passed": true,
+      "detail": "一致"
+    },
+    {
+      "name": "JSON保存→再読込→同位置→ジャンプ",
+      "passed": true,
+      "detail": "位置・可視範囲・フォーカス一致"
+    },
+    {
+      "name": "幅900→360→再読込→ジャンプ",
+      "passed": true,
+      "detail": "同範囲・可視範囲一致"
+    },
+    {
+      "name": "source_text不一致はunresolved・描画なし",
+      "passed": true,
+      "detail": "推測移動なし"
+    },
+    {
+      "name": "要素境界の選択",
+      "passed": true,
+      "detail": "拒否: 要素境界"
+    }
+  ]
+}
