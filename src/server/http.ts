@@ -42,6 +42,14 @@ export function createAppServer(repo: Repository, distPath: string, generation =
       const cancel = path.match(/^\/api\/conversations\/([^/]+)\/runs\/([^/]+)\/cancel$/);
       if (cancel && req.method === 'POST') { await body(req, []); return send(res, 200, await generation.cancel(cancel[1], cancel[2])); }
       const highlights = path.match(/^\/api\/conversations\/([^/]+)\/highlights(?:\/([^/]+))?$/);
+      const keeps = path.match(/^\/api\/conversations\/([^/]+)\/question-keeps(?:\/([^/]+))?$/);
+      if (keeps) {
+        const id=keeps[1],keepId=keeps[2];
+        if(!keepId && req.method==='GET') return send(res,200,repo.questionKeeps.list(id));
+        if(!keepId && req.method==='POST') return send(res,201,repo.questionKeeps.create(id,await body(req,['highlight_id','question_draft','memo'])));
+        if(keepId && req.method==='PATCH') return send(res,200,repo.questionKeeps.update(id,keepId,await body(req,['question_draft','memo','status'])));
+        if(keepId && req.method==='DELETE') { repo.questionKeeps.delete(id,keepId); res.writeHead(204); res.end(); return; }
+      }
       if (highlights) {
         const id = highlights[1], highlightId = highlights[2];
         if (!highlightId && req.method === 'GET') return send(res, 200, repo.listHighlights(id));

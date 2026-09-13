@@ -65,12 +65,15 @@ test('実サーバープロセス終了→別プロセス起動でHighlightの�
     const created=await post(first.base+`/api/conversations/${c.conversation_id}/highlights`,{
       turn_id:pair.assistant.turn_id,start_offset:0,end_offset:source.length,source_text:source,target_text:source,color:'blue',note:'再起動後も保持'
     });
+    const keep=await post(first.base+`/api/conversations/${c.conversation_id}/question-keeps`,{highlight_id:created.highlight_id,question_draft:'再起動後の質問',memo:'保持'});
     await stop(active); active=undefined;
     const second=await launch(path); active=second.child;
     const response=await fetch(second.base+`/api/conversations/${c.conversation_id}/highlights`);
     assert.equal(response.status,200);
     const after=await response.json();
     assert.deepEqual(after,[created]);
+    const keeps=await(await fetch(second.base+`/api/conversations/${c.conversation_id}/question-keeps`)).json();
+    assert.deepEqual(keeps,[keep]);
     assert.equal(after[0].status,'resolved');
     assert.equal(after[0].start_offset,0);
     assert.equal(after[0].end_offset,source.length);

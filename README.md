@@ -1,4 +1,4 @@
-# METAMI Att-Chat — Phase 2B
+# METAMI Att-Chat — Phase 3A
 
 LM Studioと通信し、会話・発言・生成Run・Assistant本文のマーカーをSQLiteへ保存するローカルアプリです。会話内マーカー一覧、色フィルタ、現在の描画位置へのジャンプを提供します。
 
@@ -33,7 +33,9 @@ npm.cmd start
 
 Phase 1Aの仮操作は折りたたみ欄に残しています。通常チャットはUser/Assistant予約/Run/snapshotの一括保存後に通信します。予約確認後に入力をクリアし、失敗内容はRunと画面で確認できます。通信が途切れて結果が不明な場合は、再送する前に再読込で確認してください。
 
-任意設定 `LM_STUDIO_BASE_URL` はローカルHTTPのみ対応。同じDBを複数サーバーで同時使用しないでください。既存DBへ追加migration 003が適用されるため、更新前のサーバーは終了してから起動します。
+resolvedマーカーの「質問キープ」から質問下書き・メモを保存できます。空欄も可。同じマーカーへ複数件作成でき、pending一覧から編集・取り下げ・削除できます。状態をdismissedに切り替えるとpendingへ戻せます。Highlightを削除すると関連Keepもすべて削除されます。
+
+任意設定 `LM_STUDIO_BASE_URL` はローカルHTTPのみ対応。同じDBを複数サーバーで同時使用しないでください。既存DBへ追加migration 004が適用されるため、更新前のサーバーは終了してから起動します。
 
 ## 検証
 
@@ -56,4 +58,4 @@ npm.cmd run build
 - [Phase 1A結果・制限・判定](docs/phase1a-results.md)
 - [Phase 0結果](docs/phase0-results.md)
 
-Question Keep、Mode B、miniMAP、複合エクスポート、複数マーカー質問は含みません。Phase 2Bで停止しています。
+詳細は [Phase 3A設計・状態遷移](docs/phase3a-design.md) と [検証結果](docs/phase3a-results.md) を参照してください。Question Keepからの質問送信、Mode B、miniMAP、複合エクスポート、複数マーカー質問は含みません。Phase 3Aで停止しています。

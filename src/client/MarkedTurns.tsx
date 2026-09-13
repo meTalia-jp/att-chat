@@ -4,6 +4,7 @@ import { api, apiRequest } from './api.ts';
 import { captureSelection, type HighlightDraft } from './marker.ts';
 import { filterHighlights, highlightColors, locateHighlightElements, orderHighlights } from './marker-list.ts';
 import { TurnMarkdown } from './TurnMarkdown.tsx';
+import { QuestionKeeps } from './QuestionKeeps.tsx';
 
 export function MarkedTurns({ conversationId, turns, reloadToken }: { conversationId: string; turns: Turn[]; reloadToken: number }) {
   const root = useRef<HTMLDivElement>(null), editor = useRef<HTMLElement>(null), pulseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -11,12 +12,14 @@ export function MarkedTurns({ conversationId, turns, reloadToken }: { conversati
   const [color, setColor] = useState<HighlightColor>('yellow'), [note, setNote] = useState(''), [editing, setEditing] = useState<Highlight | null>(null);
   const [enabledColors, setEnabledColors] = useState<Set<HighlightColor>>(() => new Set(highlightColors));
   const [message, setMessage] = useState(''), [error, setError] = useState('');
+  const [keepTarget,setKeepTarget] = useState<Highlight|null>(null);
   const path = `/api/conversations/${conversationId}/highlights`;
   const visible = filterHighlights(orderHighlights(highlights, turns), enabledColors);
 
   useEffect(() => {
     let disposed = false;
     setHighlights([]); setDraft(null); setEditing(null); setMessage(''); setError('');
+    setKeepTarget(null);
     void api<Highlight[]>(path).then(value => { if (!disposed) setHighlights(value); }).catch(reason => { if (!disposed) setError((reason as Error).message); });
     return () => { disposed = true; if (pulseTimer.current) clearTimeout(pulseTimer.current); };
   }, [conversationId, reloadToken]);
@@ -83,9 +86,11 @@ export function MarkedTurns({ conversationId, turns, reloadToken }: { conversati
           <blockquote>{highlight.target_text}</blockquote><p>メモ: {highlight.note || '（なし）'}</p>
           {highlight.status === 'unresolved' ? <><p className="unresolved-reason">unresolved: {highlight.reason ?? '理由不明'}</p><button disabled>ジャンプ不可</button></> : <button onClick={() => jump(highlight)}>このマーカーへジャンプ</button>}
           <button onClick={() => beginEdit(highlight)}>編集</button><button onClick={() => void remove(highlight)}>削除</button>
+          <button disabled={highlight.status!=='resolved'} onClick={()=>setKeepTarget({...highlight})}>質問キープ</button>
         </li>;
       })}</ul>}
     </section>
+    <QuestionKeeps key={conversationId} conversationId={conversationId} highlights={highlights} selected={highlights.find(h=>h.highlight_id===keepTarget?.highlight_id)?keepTarget:null} onClose={()=>setKeepTarget(null)}/>
     <div ref={root} onMouseUp={select} onClick={chooseMarker}><h3>保存された発言</h3>{turns.map(turn => <article key={turn.turn_id} data-turn={turn.turn_id}><b>#{turn.sequence_no} {turn.role} · {turn.status}</b>{turn.role === 'assistant' && turn.status === 'completed' ? <div className="markdown"><TurnMarkdown content={turn.content} highlights={highlights.filter(highlight => highlight.turn_id === turn.turn_id)} /></div> : <pre>{turn.content}</pre>}<small>{turn.turn_id}</small></article>)}</div>
   </>;
 }

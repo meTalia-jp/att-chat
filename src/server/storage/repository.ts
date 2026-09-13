@@ -1,6 +1,7 @@
 import type { DatabaseSync } from 'node:sqlite';
 import { randomUUID } from 'node:crypto';
 import { transaction } from './database.ts';
+import { QuestionKeepRepository } from './question-keeps.ts';
 import type { Conversation, Turn, GenerationRun, ConversationDetail, Highlight, HighlightColor } from '../../shared/contracts.ts';
 
 const highlightColors = new Set<HighlightColor>(['yellow','red','green','blue']);
@@ -24,7 +25,8 @@ function noteInput(value: unknown) {
 }
 export class Repository {
   private db: DatabaseSync;
-  constructor(db: DatabaseSync) { this.db = db; }
+  readonly questionKeeps: QuestionKeepRepository;
+  constructor(db: DatabaseSync) { this.db = db; this.questionKeeps = new QuestionKeepRepository(db, this); }
   listConversations(): Conversation[] { return this.db.prepare('SELECT * FROM conversations ORDER BY updated_at DESC, conversation_id').all() as Conversation[]; }
   getConversation(id: string): Conversation {
     const c = this.db.prepare('SELECT * FROM conversations WHERE conversation_id=?').get(id) as Conversation | undefined;
