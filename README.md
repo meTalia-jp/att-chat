@@ -1,6 +1,6 @@
-# METAMI Att-Chat — Phase 1B
+# METAMI Att-Chat — Phase 2A
 
-LM Studioと通信し、会話・発言・生成RunをSQLiteへ保存するローカルアプリです。Phase 0の選択PoCは独立した基準点として残しています。
+LM Studioと通信し、会話・発言・生成Run・Assistant本文のマーカーをSQLiteへ保存するローカルアプリです。Phase 0の選択PoCは独立した基準点として残しています。
 
 ## 起動
 
@@ -26,11 +26,12 @@ npm.cmd start
 3. 「モデル一覧更新」で一覧を取得し、チャット用モデルを選択。
 4. 「チャット本文」に入力して「送信」。生成中は本文が逐次表示されます。
 5. 「停止」で受信済み部分本文をcancelledとして保存。
-6. 「再読込」またはサーバー終了・再起動後に会話を確認。未終了Runはinterruptedへ整理され、自動再送しません。
+6. completed Assistant本文の対応範囲をドラッグし、色・任意メモを指定してマーカーを登録。マーカーのクリックで色・メモの編集または削除。
+7. 「再読込」またはサーバー終了・再起動後に会話とマーカーを確認。未終了Runはinterruptedへ整理され、自動再送しません。
 
 Phase 1Aの仮操作は折りたたみ欄に残しています。通常チャットはUser/Assistant予約/Run/snapshotの一括保存後に通信します。予約確認後に入力をクリアし、失敗内容はRunと画面で確認できます。通信が途切れて結果が不明な場合は、再送する前に再読込で確認してください。
 
-任意設定 `LM_STUDIO_BASE_URL` はローカルHTTPのみ対応。同じDBを複数サーバーで同時使用しないでください。既存DBへ追加migration 002が適用されるため、更新前のサーバーは終了してから起動します。
+任意設定 `LM_STUDIO_BASE_URL` はローカルHTTPのみ対応。同じDBを複数サーバーで同時使用しないでください。既存DBへ追加migration 003が適用されるため、更新前のサーバーは終了してから起動します。
 
 ## 検証
 
@@ -45,7 +46,10 @@ npm.cmd run build
 - [Phase 1A設計・スキーマ](docs/phase1a-design.md)
 - [Phase 1B設計・状態遷移・制限](docs/phase1b-design.md)
 - [Phase 1B検証結果・判定](docs/phase1b-results.md)
+- [Phase 2A設計・制限](docs/phase2a-design.md)
+- [Phase 2A Markdown対応範囲](docs/phase2a-markdown-support.md)
+- [Phase 2A検証結果・判定](docs/phase2a-results.md)
 - [Phase 1A結果・制限・判定](docs/phase1a-results.md)
 - [Phase 0結果](docs/phase0-results.md)
 
-Question Keep、Mode B、miniMAP、Highlight統合、複合エクスポートは含みません。Phase 1Bで停止しています。
+マーカー一覧・ジャンプ、Question Keep、Mode B、miniMAP、複合エクスポートは含みません。Phase 2Aで停止しています。

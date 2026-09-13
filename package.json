@@ -1,5 +1,8 @@
 {
-  "name": "metami-att-chat", "version": "0.1.0", "private": true, "type": "module",
+  "name": "metami-att-chat",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1 --port 5180 --strictPort",
     "server": "node --experimental-strip-types src/server/main.ts",
@@ -8,6 +11,19 @@
     "build": "tsc --noEmit && vite build",
     "test": "node --experimental-strip-types --test tests/*.test.ts"
   },
-  "dependencies": { "react": "19.2.8", "react-dom": "19.2.8" },
-  "devDependencies": { "@types/react": "19.2.18", "@types/react-dom": "19.2.4", "@types/node": "24.3.0", "typescript": "7.0.2", "vite": "8.2.2" }
+  "dependencies": {
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1"
+  },
+  "devDependencies": {
+    "@types/jsdom": "^21.1.7",
+    "@types/node": "24.3.0",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "jsdom": "^26.1.0",
+    "typescript": "7.0.2",
+    "vite": "8.2.2"
+  }
 }

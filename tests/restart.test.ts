@@ -52,3 +52,27 @@ test('実サーバープロセス終了→別プロセス起動で会話・Turn�
     const after=await (await fetch(second.base+`/api/conversations/${c.conversation_id}`)).json(); assert.deepEqual(after,before); assert.equal(after.runs.length,2);
   } finally { if(active)await stop(active); const target=resolve(dir); if(!target.startsWith(resolve(tmpdir())+sep+'attchat-restart-'))throw new Error('Unsafe cleanup'); rmSync(target,{recursive:true,force:true}); }
 });
+
+test('実サーバープロセス終了→別プロセス起動でHighlightの同一anchorを復元', async () => {
+  const dir=mkdtempSync(join(tmpdir(),'attchat-restart-')), path=join(dir,'app.sqlite'); let active: ChildProcess | undefined;
+  try {
+    const first=await launch(path); active=first.child;
+    const post=async (url:string,data:unknown) => {const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});assert.equal(res.status,201);return res.json();};
+    const c=await post(first.base+'/api/conversations',{title:'マーカー再起動確認'});
+    const u=await post(first.base+`/api/conversations/${c.conversation_id}/turns`,{content:'質問'});
+    const pair=await post(first.base+`/api/conversations/${c.conversation_id}/mock-runs`,{user_turn_id:u.turn_id,content:'日本語ABC 😀 同じ語 同じ語'});
+    const source='日本語ABC';
+    const created=await post(first.base+`/api/conversations/${c.conversation_id}/highlights`,{
+      turn_id:pair.assistant.turn_id,start_offset:0,end_offset:source.length,source_text:source,target_text:source,color:'blue',note:'再起動後も保持'
+    });
+    await stop(active); active=undefined;
+    const second=await launch(path); active=second.child;
+    const response=await fetch(second.base+`/api/conversations/${c.conversation_id}/highlights`);
+    assert.equal(response.status,200);
+    const after=await response.json();
+    assert.deepEqual(after,[created]);
+    assert.equal(after[0].status,'resolved');
+    assert.equal(after[0].start_offset,0);
+    assert.equal(after[0].end_offset,source.length);
+  } finally { if(active)await stop(active); const target=resolve(dir); if(!target.startsWith(resolve(tmpdir())+sep+'attchat-restart-'))throw new Error('Unsafe cleanup'); rmSync(target,{recursive:true,force:true}); }
+});

@@ -41,6 +41,14 @@ export function createAppServer(repo: Repository, distPath: string, generation =
       }
       const cancel = path.match(/^\/api\/conversations\/([^/]+)\/runs\/([^/]+)\/cancel$/);
       if (cancel && req.method === 'POST') { await body(req, []); return send(res, 200, await generation.cancel(cancel[1], cancel[2])); }
+      const highlights = path.match(/^\/api\/conversations\/([^/]+)\/highlights(?:\/([^/]+))?$/);
+      if (highlights) {
+        const id = highlights[1], highlightId = highlights[2];
+        if (!highlightId && req.method === 'GET') return send(res, 200, repo.listHighlights(id));
+        if (!highlightId && req.method === 'POST') return send(res, 201, repo.createHighlight(id, await body(req, ['turn_id','start_offset','end_offset','source_text','target_text','color','note'])));
+        if (highlightId && req.method === 'PATCH') return send(res, 200, repo.updateHighlight(id, highlightId, await body(req, ['color','note'])));
+        if (highlightId && req.method === 'DELETE') { repo.deleteHighlight(id, highlightId); res.writeHead(204, { 'Cache-Control': 'no-store' }); res.end(); return; }
+      }
       if (path === '/api/conversations') {
         if (req.method === 'GET') return send(res, 200, repo.listConversations());
         if (req.method === 'POST') return send(res, 201, repo.createConversation((await body(req, ['title'])).title));

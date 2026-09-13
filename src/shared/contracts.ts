@@ -7,3 +7,9 @@ export type GenerationRun = {
   started_at: string; finished_at: string | null; outcome: string; error: Record<string, unknown> | null;
 };
 export type ConversationDetail = { conversation: Conversation; turns: Turn[]; runs: GenerationRun[] };
+export type HighlightColor = 'yellow' | 'red' | 'green' | 'blue';
+export type Highlight = {
+  highlight_id: string; turn_id: string; start_offset: number; end_offset: number;
+  source_text: string; target_text: string; color: HighlightColor; note: string;
+  created_at: string; updated_at: string; status: 'resolved' | 'unresolved'; reason: string | null;
+};
