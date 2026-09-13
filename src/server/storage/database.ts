@@ -10,15 +10,20 @@ export function transaction<T>(db: DatabaseSync, action: () => T): T {
 }
 
 export function migrate(db: DatabaseSync) {
-  const sql = readFileSync(new URL('./migrations/001_initial.sql', import.meta.url), 'utf8').replace(/\r\n?/g, '\n');
-  const checksum = createHash('sha256').update(sql).digest('hex');
+  const migrations = ['001_initial.sql', '002_live_runs.sql'].map((file, i) => {
+    const sql = readFileSync(new URL(`./migrations/${file}`, import.meta.url), 'utf8').replace(/\r\n?/g, '\n');
+    return { version: i + 1, sql, checksum: createHash('sha256').update(sql).digest('hex') };
+  });
   transaction(db, () => {
     db.exec('CREATE TABLE IF NOT EXISTS schema_migrations(version INTEGER PRIMARY KEY, checksum TEXT NOT NULL, applied_at TEXT NOT NULL) STRICT');
     const rows = db.prepare('SELECT version, checksum FROM schema_migrations ORDER BY version').all();
-    if (rows.some(r => r.version !== 1)) throw new Error('Unsupported database migration version');
-    if (rows.length) { if (rows[0].checksum !== checksum) throw new Error('Migration checksum mismatch'); return; }
-    db.exec(sql);
-    db.prepare('INSERT INTO schema_migrations VALUES(1, ?, ?)').run(checksum, new Date().toISOString());
+    if (rows.some((r, i) => r.version !== i + 1 || !migrations[i])) throw new Error('Unsupported database migration version');
+    for (const m of migrations) {
+      const row = rows.find(r => r.version === m.version);
+      if (row) { if (row.checksum !== m.checksum) throw new Error('Migration checksum mismatch'); continue; }
+      db.exec(m.sql);
+      db.prepare('INSERT INTO schema_migrations VALUES(?, ?, ?)').run(m.version, m.checksum, new Date().toISOString());
+    }
   });
 }
 

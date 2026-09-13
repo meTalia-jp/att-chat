@@ -42,11 +42,62 @@ export class Repository {
     this.db.prepare('UPDATE conversations SET updated_at=? WHERE conversation_id=?').run(now, id);
     return this.getTurn(id, turnId);
   }
-  addUserTurn(id: string, content: unknown): Turn { const value = textInput(content, '本文'); return transaction(this.db, () => this.insertTurn(id, 'user', value)); }
-  // All updates are deliberately absent from the public Repository API.
+  addUserTurn(id: string, content: unknown): Turn { const value = textInput(content, '本文'); return transaction(this.db, () => { this.assertIdle(id); return this.insertTurn(id, 'user', value); }); }
+  activeRun(id: string) { return this.listRuns(id).find(r => ['preparing', 'running'].includes(r.outcome)); }
+  private assertIdle(id: string) { if (this.activeRun(id)) throw new InputError('この会話は生成中です', 409); }
+  prepareChat(id: string, content: unknown, model: unknown, requestId: unknown) {
+    const value = textInput(content, '本文'), modelId = textInput(model, 'モデル', 300);
+    if (typeof requestId !== 'string' || !/^[a-zA-Z0-9-]{16,100}$/.test(requestId)) throw new InputError('request_idが不正です');
+    return transaction(this.db, () => {
+      if (this.db.prepare('SELECT 1 FROM chat_requests WHERE request_id=?').get(requestId)) throw new InputError('送信済みrequest_idです。再読込で確認してください', 409);
+      this.assertIdle(id);
+      const history = this.listTurns(id).filter(t => t.status === 'completed').map(t => ({ role: t.role, content: t.content }));
+      const user = this.insertTurn(id, 'user', value);
+      const turnId = randomUUID(), runId = randomUUID(), now = new Date().toISOString();
+      const snapshot = { model: modelId, messages: [...history, { role: 'user', content: value }], stream: true, max_tokens: 2048 };
+      this.db.prepare("INSERT INTO turns VALUES(?,?,?,?,?,'generating',?,NULL)").run(turnId, id, user.sequence_no + 1, 'assistant', '', now);
+      this.db.prepare("INSERT INTO generation_runs VALUES(?,?,?,?,NULL,'chat',?,'lm_studio','completed_turns','1',?,?,NULL,'preparing',NULL)").run(runId, id, user.turn_id, turnId, modelId, JSON.stringify(snapshot), now);
+      this.db.prepare('INSERT INTO chat_requests VALUES(?,?,?)').run(requestId, id, runId);
+      return this.listRuns(id).find(r => r.run_id === runId)!;
+    });
+  }
+  run(id: string, runId: string) {
+    const run = this.listRuns(id).find(r => r.run_id === runId);
+    if (!run) throw new InputError('Runがありません', 404); return run;
+  }
+  startRun(id: string, runId: string) {
+    const result = this.db.prepare("UPDATE generation_runs SET outcome='running' WHERE run_id=? AND conversation_id=? AND outcome='preparing'").run(runId, id);
+    if (result.changes !== 1) throw new InputError('Runを開始できません', 409);
+  }
+  checkpoint(id: string, runId: string, content: string) {
+    const r = this.run(id, runId);
+    if (!['preparing','running'].includes(r.outcome)) throw new InputError('Runは終了済みです', 409);
+    this.db.prepare("UPDATE turns SET content=? WHERE turn_id=? AND status='generating'").run(content.replace(/\r\n?/g, '\n'), r.assistant_turn_id);
+  }
+  finishRun(id: string, runId: string, outcome: 'succeeded' | 'failed' | 'cancelled' | 'interrupted', content: string, error: Record<string, unknown> | null = null) {
+    return transaction(this.db, () => {
+      const r = this.run(id, runId);
+      if (!['preparing','running'].includes(r.outcome)) throw new InputError('Runは終了済みです', 409);
+      const status = outcome === 'succeeded' ? 'completed' : outcome === 'cancelled' ? 'cancelled' : 'failed';
+      const now = new Date().toISOString();
+      this.db.prepare('UPDATE turns SET content=?,status=?,finalized_at=? WHERE turn_id=?').run(content.replace(/\r\n?/g, '\n'), status, now, r.assistant_turn_id);
+      this.db.prepare('UPDATE generation_runs SET outcome=?,finished_at=?,error=? WHERE run_id=?').run(outcome, now, error ? JSON.stringify(error) : null, runId);
+      this.db.prepare('UPDATE conversations SET updated_at=? WHERE conversation_id=?').run(now, id);
+      return this.run(id, runId);
+    });
+  }
+  recoverInterrupted() {
+    const rows = this.db.prepare("SELECT conversation_id,run_id FROM generation_runs WHERE outcome IN ('preparing','running')").all();
+    for (const row of rows) {
+      const id = row.conversation_id as string, runId = row.run_id as string, r = this.run(id, runId);
+      this.finishRun(id, runId, 'interrupted', this.getTurn(id, r.assistant_turn_id).content, { code: 'PROCESS_INTERRUPTED', message: '前回の生成が終了しないままサーバーが停止しました。自動再送しません。' });
+    }
+    return rows.length;
+  }
   addMockRun(id: string, userTurnId: string, content: unknown, retryOf: string | null = null) {
     const value = textInput(content, '仮回答');
     return transaction(this.db, () => {
+      this.assertIdle(id);
       const user = this.getTurn(id, userTurnId);
       if (user.role !== 'user' || user.status !== 'completed') throw new InputError('確定User発言を指定してください');
       if (retryOf && !this.db.prepare('SELECT 1 FROM generation_runs WHERE run_id=? AND conversation_id=? AND user_turn_id=?').get(retryOf, id, userTurnId)) throw new InputError('再試行元が一致しません');
@@ -61,6 +112,7 @@ export class Repository {
   retryMockRun(id: string, runId: string, content: unknown) {
     const run = this.listRuns(id).find(r => r.run_id === runId);
     if (!run) throw new InputError('再試行元Runがありません', 404);
+    if (run.kind !== 'mock') throw new InputError('仮再試行はmock Run専用です');
     return this.addMockRun(id, run.user_turn_id, content, runId);
   }
 }

@@ -6,6 +6,8 @@ import { fileURLToPath } from 'node:url';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve, sep } from 'node:path';
+import { openDatabase } from '../src/server/storage/database.ts';
+import { Repository } from '../src/server/storage/repository.ts';
 
 async function launch(path: string): Promise<{ child: ChildProcess; base: string }> {
   const child = spawn(process.execPath, ['--experimental-strip-types', fileURLToPath(new URL('../src/server/main.ts', import.meta.url))], {env:{...process.env,ATTCHAT_DB:path,ATTCHAT_PORT:'0'},stdio:['ignore','pipe','pipe','ipc'],windowsHide:true});
@@ -18,6 +20,23 @@ async function launch(path: string): Promise<{ child: ChildProcess; base: string
   });
 }
 async function stop(child: ChildProcess) { if (child.exitCode !== null || child.signalCode !== null) return; const exited=once(child,'exit'); child.kill('SIGKILL'); await exited; }
+test('新プロセス起動でpreparing/runningをinterruptedへ整理し自動再送しない', async () => {
+  const dir=mkdtempSync(join(tmpdir(),'attchat-restart-')), path=join(dir,'app.sqlite'); let active: ChildProcess | undefined;
+  try {
+    const db=openDatabase(path), repo=new Repository(db), ids: string[]=[];
+    for (const state of ['preparing','running']) {
+      const id=repo.createConversation(state).conversation_id; ids.push(id);
+      const run=repo.prepareChat(id,'q','test-model',crypto.randomUUID());
+      if(state==='running') { repo.startRun(id,run.run_id); repo.checkpoint(id,run.run_id,'保存済み途中本文'); }
+    }
+    db.close(); const server=await launch(path); active=server.child;
+    for(const id of ids) {
+      const detail=await (await fetch(server.base+`/api/conversations/${id}`)).json();
+      assert.equal(detail.runs.length,1); assert.equal(detail.runs[0].outcome,'interrupted'); assert.equal(detail.turns[1].status,'failed');
+      if(detail.conversation.title==='running')assert.equal(detail.turns[1].content,'保存済み途中本文');
+    }
+  } finally { if(active)await stop(active); const target=resolve(dir); if(!target.startsWith(resolve(tmpdir())+sep+'attchat-restart-'))throw new Error('Unsafe cleanup'); rmSync(target,{recursive:true,force:true}); }
+});
 test('実サーバープロセス終了→別プロセス起動で会話・Turn・Runを完全復元', async () => {
   const dir=mkdtempSync(join(tmpdir(),'attchat-restart-')), path=join(dir,'app.sqlite'); let active: ChildProcess | undefined;
   try {

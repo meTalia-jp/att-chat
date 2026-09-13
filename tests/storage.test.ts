@@ -60,10 +60,10 @@ test('Run INSERT失敗でassistant・sequence・会話更新をロールバッ�
 test('read-onlyエラーを成功扱いしない', () => fixture((db, repo) => { db.exec('PRAGMA query_only=ON'); assert.throws(() => repo.createConversation('no'), /readonly/); assert.equal(repo.listConversations().length, 0); }));
 test('DB close→再openでも全データ復元、migration再実行は一度だけ', () => {
   const area = tempArea(); let db = openDatabase(area.path);
-  try { let repo = new Repository(db); const c = repo.createConversation('persist'), t = repo.addUserTurn(c.conversation_id, '保持'); repo.addMockRun(c.conversation_id, t.turn_id, '回答'); const before = repo.detail(c.conversation_id); db.close(); db = openDatabase(area.path); repo = new Repository(db); assert.deepEqual(repo.detail(c.conversation_id), before); assert.equal(db.prepare('SELECT count(*) AS n FROM schema_migrations').get()!.n, 1); }
+  try { let repo = new Repository(db); const c = repo.createConversation('persist'), t = repo.addUserTurn(c.conversation_id, '保持'); repo.addMockRun(c.conversation_id, t.turn_id, '回答'); const before = repo.detail(c.conversation_id); db.close(); db = openDatabase(area.path); repo = new Repository(db); assert.deepEqual(repo.detail(c.conversation_id), before); assert.equal(db.prepare('SELECT count(*) AS n FROM schema_migrations').get()!.n, 2); }
   finally { db.close(); area.clean(); }
 });
-test('未知migration版・checksum不一致で起動拒否', () => fixture((db) => { db.exec("UPDATE schema_migrations SET checksum='bad'"); assert.throws(() => migrate(db), /checksum/); db.exec('UPDATE schema_migrations SET version=99'); assert.throws(() => migrate(db), /version/); }));
+test('未知migration版・checksum不一致で起動拒否', () => fixture((db) => { db.exec("UPDATE schema_migrations SET checksum='bad'"); assert.throws(() => migrate(db), /checksum/); db.exec('UPDATE schema_migrations SET version=99 WHERE version=2'); assert.throws(() => migrate(db), /version/); }));
 test('migration失敗時に途中DDLを残さない', () => { const db = new DatabaseSync(':memory:'); try { db.exec('CREATE TABLE turns(existing TEXT)'); assert.throws(() => migrate(db)); assert.equal(db.prepare("SELECT count(*) AS n FROM sqlite_master WHERE name IN ('conversations','schema_migrations')").get()!.n, 0); } finally { db.close(); } });
 test('DB制約が会話外参照・役割逆転を拒否', () => fixture((db, repo) => {
   const c = repo.createConversation('c'), b = repo.createConversation('b'), t = repo.addUserTurn(c.conversation_id, 'q'), pair = repo.addMockRun(c.conversation_id, t.turn_id, 'a');

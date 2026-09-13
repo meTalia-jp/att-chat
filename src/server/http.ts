@@ -2,6 +2,8 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 import { readFile } from 'node:fs/promises';
 import { resolve, extname, sep } from 'node:path';
 import { Repository, InputError } from './storage/repository.ts';
+import { GenerationService } from './generation.ts';
+import { ProviderError } from './provider.ts';
 
 async function body(req: IncomingMessage, fields: string[]): Promise<Record<string, unknown>> {
   if (!req.headers['content-type']?.startsWith('application/json')) throw new InputError('JSONで送信してください', 415);
@@ -12,7 +14,7 @@ async function body(req: IncomingMessage, fields: string[]): Promise<Record<stri
   return data;
 }
 function send(res: ServerResponse, status: number, data: unknown) { res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(data)); }
-export function createAppServer(repo: Repository, distPath: string) {
+export function createAppServer(repo: Repository, distPath: string, generation = new GenerationService(repo)) {
   const server = createServer(async (req, res) => {
     try {
       const port = (server.address() as { port: number }).port;
@@ -20,6 +22,25 @@ export function createAppServer(repo: Repository, distPath: string) {
       const origin = req.headers.origin;
       if (origin && ![`http://127.0.0.1:${port}`, `http://localhost:${port}`, 'http://127.0.0.1:5180', 'http://localhost:5180'].includes(origin)) throw new InputError('Originが許可されていません', 403);
       const path = new URL(req.url!, 'http://127.0.0.1').pathname;
+      if (path === '/api/models' && req.method === 'GET') return send(res, 200, { models: await generation.provider.models() });
+      const chat = path.match(/^\/api\/conversations\/([^/]+)\/chat$/);
+      if (chat && req.method === 'POST') {
+        const data = await body(req, ['content', 'model', 'request_id']);
+        const run = repo.prepareChat(chat[1], data.content, data.model, data.request_id);
+        res.writeHead(201, { 'Content-Type': 'application/x-ndjson; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' });
+        const emit = (event: Record<string, unknown>) => {
+          if (!res.destroyed) {
+            res.write(JSON.stringify(event) + '\n');
+            if (res.writableLength > 2_000_000) res.destroy();
+          }
+        };
+        res.once('close', () => { if (!res.writableEnded) generation.disconnect(run.run_id); });
+        emit({ type: 'prepared', run });
+        await generation.execute(run, emit);
+        res.end(); return;
+      }
+      const cancel = path.match(/^\/api\/conversations\/([^/]+)\/runs\/([^/]+)\/cancel$/);
+      if (cancel && req.method === 'POST') { await body(req, []); return send(res, 200, await generation.cancel(cancel[1], cancel[2])); }
       if (path === '/api/conversations') {
         if (req.method === 'GET') return send(res, 200, repo.listConversations());
         if (req.method === 'POST') return send(res, 201, repo.createConversation((await body(req, ['title'])).title));
@@ -47,6 +68,7 @@ export function createAppServer(repo: Repository, distPath: string) {
       res.writeHead(200, { 'Content-Type': ({ '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css' } as Record<string, string>)[extname(file)] ?? 'application/octet-stream', 'X-Content-Type-Options': 'nosniff', 'Cache-Control': 'no-cache' }); res.end(data);
     } catch (error) {
       if (res.headersSent) { res.destroy(); return; }
+      if (error instanceof ProviderError) return send(res, 502, { error: { code: 'PROVIDER_ERROR', message: error.message } });
       const input = error instanceof InputError;
       const busy = /locked|busy/i.test(error instanceof Error ? error.message : '');
       send(res, input ? error.status : busy ? 503 : 500, { error: { code: input ? 'INVALID_REQUEST' : 'STORAGE_ERROR', message: input ? error.message : '保存・取得に失敗しました。成功扱いにはしていません。' } });
