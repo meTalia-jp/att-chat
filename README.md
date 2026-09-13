@@ -1,6 +1,6 @@
-# METAMI Att-Chat — Phase 2A
+# METAMI Att-Chat — Phase 2B
 
-LM Studioと通信し、会話・発言・生成Run・Assistant本文のマーカーをSQLiteへ保存するローカルアプリです。Phase 0の選択PoCは独立した基準点として残しています。
+LM Studioと通信し、会話・発言・生成Run・Assistant本文のマーカーをSQLiteへ保存するローカルアプリです。会話内マーカー一覧、色フィルタ、現在の描画位置へのジャンプを提供します。
 
 ## 起動
 
@@ -27,7 +27,9 @@ npm.cmd start
 4. 「チャット本文」に入力して「送信」。生成中は本文が逐次表示されます。
 5. 「停止」で受信済み部分本文をcancelledとして保存。
 6. completed Assistant本文の対応範囲をドラッグし、色・任意メモを指定してマーカーを登録。マーカーのクリックで色・メモの編集または削除。
-7. 「再読込」またはサーバー終了・再起動後に会話とマーカーを確認。未終了Runはinterruptedへ整理され、自動再送しません。
+7. 「マーカー一覧」で色、引用、メモを確認。色フィルタで表示対象を切り替え、「このマーカーへジャンプ」で本文中の位置へ移動。
+8. unresolvedは理由を表示してジャンプを無効化。一覧の編集・削除からPhase 2Aの操作へ到達。
+9. 「再読込」またはサーバー終了・再起動後に会話とマーカーを確認。未終了Runはinterruptedへ整理され、自動再送しません。
 
 Phase 1Aの仮操作は折りたたみ欄に残しています。通常チャットはUser/Assistant予約/Run/snapshotの一括保存後に通信します。予約確認後に入力をクリアし、失敗内容はRunと画面で確認できます。通信が途切れて結果が不明な場合は、再送する前に再読込で確認してください。
 
@@ -49,7 +51,9 @@ npm.cmd run build
 - [Phase 2A設計・制限](docs/phase2a-design.md)
 - [Phase 2A Markdown対応範囲](docs/phase2a-markdown-support.md)
 - [Phase 2A検証結果・判定](docs/phase2a-results.md)
+- [Phase 2B設計・制限](docs/phase2b-design.md)
+- [Phase 2B検証結果・判定](docs/phase2b-results.md)
 - [Phase 1A結果・制限・判定](docs/phase1a-results.md)
 - [Phase 0結果](docs/phase0-results.md)
 
-マーカー一覧・ジャンプ、Question Keep、Mode B、miniMAP、複合エクスポートは含みません。Phase 2Aで停止しています。
+Question Keep、Mode B、miniMAP、複合エクスポート、複数マーカー質問は含みません。Phase 2Bで停止しています。
