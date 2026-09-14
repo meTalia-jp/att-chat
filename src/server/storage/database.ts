@@ -10,7 +10,7 @@ export function transaction<T>(db: DatabaseSync, action: () => T): T {
 }
 
 export function migrate(db: DatabaseSync) {
-  const migrations = ['001_initial.sql', '002_live_runs.sql', '003_highlights.sql', '004_question_keeps.sql', '005_keep_runs.sql'].map((file, i) => {
+  const migrations = ['001_initial.sql', '002_live_runs.sql', '003_highlights.sql', '004_question_keeps.sql', '005_keep_runs.sql', '006_branch_questions.sql'].map((file, i) => {
     const sql = readFileSync(new URL(`./migrations/${file}`, import.meta.url), 'utf8').replace(/\r\n?/g, '\n');
     return { version: i + 1, sql, checksum: createHash('sha256').update(sql).digest('hex') };
   });

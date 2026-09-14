@@ -8,7 +8,7 @@ import { QuestionKeeps } from './QuestionKeeps.tsx';
 import type { GenerationRun } from '../shared/contracts.ts';
 import type { QuestionKeep } from '../shared/question-keep.ts';
 
-export function MarkedTurns({ conversationId, turns, reloadToken, runs, onAsk, sending }: { conversationId: string; turns: Turn[]; reloadToken: number; runs: GenerationRun[]; onAsk: (keep: QuestionKeep) => void; sending: boolean }) {
+export function MarkedTurns({ conversationId, turns, reloadToken, runs, onAsk, sending }: { conversationId: string; turns: Turn[]; reloadToken: number; runs: GenerationRun[]; onAsk: (keep: QuestionKeep, newConversation?: boolean) => void; sending: boolean }) {
   const root = useRef<HTMLDivElement>(null), editor = useRef<HTMLElement>(null), pulseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [highlights, setHighlights] = useState<Highlight[]>([]), [draft, setDraft] = useState<HighlightDraft | null>(null);
   const [color, setColor] = useState<HighlightColor>('yellow'), [note, setNote] = useState(''), [editing, setEditing] = useState<Highlight | null>(null);

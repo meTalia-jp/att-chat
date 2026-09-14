@@ -24,10 +24,10 @@ export function createAppServer(repo: Repository, distPath: string, generation =
       const path = new URL(req.url!, 'http://127.0.0.1').pathname;
       if (path === '/api/models' && req.method === 'GET') return send(res, 200, { models: await generation.provider.models() });
       const chat = path.match(/^\/api\/conversations\/([^/]+)\/chat$/);
-      const ask = path.match(/^\/api\/conversations\/([^/]+)\/question-keeps\/([^/]+)\/ask$/);
+      const ask = path.match(/^\/api\/conversations\/([^/]+)\/question-keeps\/([^/]+)\/(ask|ask-new)$/);
       if ((chat || ask) && req.method === 'POST') {
         const data = await body(req, ask ? ['user_question', 'model', 'request_id'] : ['content', 'model', 'request_id']);
-        const run = repo.prepareChat((chat || ask)![1], ask ? data.user_question : data.content, data.model, data.request_id, ask?.[2]);
+        const run = repo.prepareChat((chat || ask)![1], ask ? data.user_question : data.content, data.model, data.request_id, ask?.[2], ask?.[3] === 'ask-new');
         res.writeHead(201, { 'Content-Type': 'application/x-ndjson; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' });
         const emit = (event: Record<string, unknown>) => {
           if (!res.destroyed) {
@@ -43,6 +43,8 @@ export function createAppServer(repo: Repository, distPath: string, generation =
       const cancel = path.match(/^\/api\/conversations\/([^/]+)\/runs\/([^/]+)\/cancel$/);
       if (cancel && req.method === 'POST') { await body(req, []); return send(res, 200, await generation.cancel(cancel[1], cancel[2])); }
       const highlights = path.match(/^\/api\/conversations\/([^/]+)\/highlights(?:\/([^/]+))?$/);
+      const questionRuns = path.match(/^\/api\/conversations\/([^/]+)\/question-runs$/);
+      if (questionRuns && req.method === 'GET') return send(res,200,repo.listQuestionRuns(questionRuns[1]));
       const keeps = path.match(/^\/api\/conversations\/([^/]+)\/question-keeps(?:\/([^/]+))?$/);
       if (keeps) {
         const id=keeps[1],keepId=keeps[2];

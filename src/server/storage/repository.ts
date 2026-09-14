@@ -55,6 +55,13 @@ export class Repository {
     }) as GenerationRun[];
   }
   detail(id: string): ConversationDetail { return { conversation: this.getConversation(id), turns: this.listTurns(id), runs: this.listRuns(id) }; }
+  listQuestionRuns(sourceId: string): GenerationRun[] {
+    this.getConversation(sourceId);
+    const rows = this.db.prepare(`SELECT r.conversation_id,r.run_id FROM run_question_references q
+      JOIN generation_runs r ON r.run_id=q.run_id JOIN turns t ON t.turn_id=q.source_turn_id
+      WHERE t.conversation_id=? ORDER BY r.started_at,r.rowid`).all(sourceId);
+    return rows.map(row => this.run(row.conversation_id as string,row.run_id as string));
+  }
   private highlightProblem(turn: Turn | undefined, start: number, end: number, source: string) {
     if (!turn) return '参照Turnがありません';
     if (turn.role !== 'assistant' || turn.status !== 'completed') return '確定assistant Turnのみ対象です';
@@ -127,7 +134,9 @@ export class Repository {
   addUserTurn(id: string, content: unknown): Turn { const value = textInput(content, '本文'); return transaction(this.db, () => { this.assertIdle(id); return this.insertTurn(id, 'user', value); }); }
   activeRun(id: string) { return this.listRuns(id).find(r => ['preparing', 'running'].includes(r.outcome)); }
   private assertIdle(id: string) { if (this.activeRun(id)) throw new InputError('この会話は生成中です', 409); }
-  prepareChat(id: string, content: unknown, model: unknown, requestId: unknown, keepId?: string) {
+  prepareChat(id: string, content: unknown, model: unknown, requestId: unknown, keepId?: string, newConversation = false) {
+    if (newConversation && !keepId) throw new InputError('分岐には質問キープが必要です');
+    const sourceId = id;
     const value = textInput(content, '本文', keepId ? 10_000 : 100_000), modelId = textInput(model, 'モデル', 300);
     if (typeof requestId !== 'string' || !/^[a-zA-Z0-9-]{16,100}$/.test(requestId)) throw new InputError('request_idが不正です');
     return transaction(this.db, () => {
@@ -137,6 +146,13 @@ export class Repository {
       if (keep && !['pending','asked'].includes(keep.status)) throw new InputError('取り下げたキープは送信できません',409);
       const highlight = keep ? this.getHighlight(id, keep.highlight_id) : null;
       if (highlight && highlight.status !== 'resolved') throw new InputError('元マーカーが解決不能のため質問できません',409);
+      if (keep && this.db.prepare(`SELECT 1 FROM run_question_references q JOIN generation_runs r ON r.run_id=q.run_id WHERE q.keep_id=? AND r.outcome IN ('preparing','running')`).get(keep.keep_id)) throw new InputError('このキープは生成中です',409);
+      if (newConversation) {
+        id = randomUUID();
+        const title = '質問: ' + Array.from(value.trim().replace(/\s+/g,' ')).slice(0,80).join('');
+        const created = new Date().toISOString();
+        this.db.prepare('INSERT INTO conversations VALUES(?,?,?,?)').run(id,title,created,created);
+      }
       const history = keep ? [] : this.listTurns(id).filter(t => t.status === 'completed').map(t => ({ role: t.role, content: t.content }));
       const user = this.insertTurn(id, 'user', value);
       const turnId = randomUUID(), runId = randomUUID(), now = new Date().toISOString();
@@ -144,9 +160,10 @@ export class Repository {
         { role: 'user', content: `[引用]\n${highlight.target_text}\n\n[質問]\n${value}` }] : [...history, { role: 'user', content: value }];
       const snapshot = { model: modelId, messages, stream: true, max_tokens: 2048 };
       this.db.prepare("INSERT INTO turns VALUES(?,?,?,?,?,'generating',?,NULL)").run(turnId, id, user.sequence_no + 1, 'assistant', '', now);
-      this.db.prepare("INSERT INTO generation_runs VALUES(?,?,?,?,NULL,?,?,'lm_studio',?,'1',?,?,NULL,'preparing',NULL)").run(runId, id, user.turn_id, turnId, keep ? 'highlight_question' : 'chat', modelId, keep ? 'quote_question_only' : 'completed_turns', JSON.stringify(snapshot), now);
+      this.db.prepare("INSERT INTO generation_runs VALUES(?,?,?,?,NULL,?,?,'lm_studio',?,?,?,?,NULL,'preparing',NULL)").run(runId, id, user.turn_id, turnId, keep ? 'highlight_question' : 'chat', modelId, keep ? 'quote_question_only' : 'completed_turns', newConversation ? '2' : '1', JSON.stringify(snapshot), now);
       if (keep && highlight) {
-        const reference = { highlight_id: highlight.highlight_id, source_turn_id: highlight.turn_id, start_offset: highlight.start_offset, end_offset: highlight.end_offset, source_text: highlight.source_text, target_text: highlight.target_text };
+        const reference = { highlight_id: highlight.highlight_id, source_turn_id: highlight.turn_id, start_offset: highlight.start_offset, end_offset: highlight.end_offset, source_text: highlight.source_text, target_text: highlight.target_text,
+          ...(newConversation ? { snapshot_version: 2, source_conversation_id: sourceId, source_highlight_id: highlight.highlight_id } : {}) };
         this.db.prepare('INSERT INTO run_question_references VALUES(?,?,?,?,?,?)').run(runId,keep.keep_id,highlight.highlight_id,highlight.turn_id,value,JSON.stringify(reference));
       }
       this.db.prepare('INSERT INTO chat_requests VALUES(?,?,?)').run(requestId, id, runId);
@@ -161,9 +178,10 @@ export class Repository {
     transaction(this.db, () => {
       const run = this.run(id, runId);
       if (run.keep_id) {
-        const keep = this.questionKeeps.get(id, run.keep_id);
+        const sourceId = run.reference_snapshot?.source_conversation_id ?? id;
+        const keep = this.questionKeeps.get(sourceId, run.keep_id);
         if (!['pending','asked'].includes(keep.status)) throw new InputError('キープは送信対象外です',409);
-        if (this.getHighlight(id,keep.highlight_id).status !== 'resolved') throw new InputError('元マーカーが解決不能のため質問できません',409);
+        if (this.getHighlight(sourceId,keep.highlight_id).status !== 'resolved') throw new InputError('元マーカーが解決不能のため質問できません',409);
         if (keep.status === 'pending') {
           const now = new Date(Math.max(Date.now(),Date.parse(keep.updated_at)+1)).toISOString();
           this.db.prepare("UPDATE question_keeps SET status='asked',asked_at=?,updated_at=? WHERE keep_id=?").run(now,now,keep.keep_id);

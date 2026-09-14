@@ -1,4 +1,4 @@
-# METAMI Att-Chat — Phase 3B-1
+# METAMI Att-Chat — Phase 3B-2
 
 LM Studioと通信し、会話・発言・生成Run・Assistant本文のマーカーをSQLiteへ保存するローカルアプリです。会話内マーカー一覧、色フィルタ、現在の描画位置へのジャンプを提供します。
 
@@ -37,7 +37,9 @@ resolvedマーカーの「質問キープ」から質問下書き・メモを保
 
 pendingキープの「このチャットで聞く」から引用と質問を確認・編集し、選択モデルへ送信できます。回答は現在会話末尾へ追加します。askedは送信開始を意味し、成功／失敗／停止の結果は関連Runで確認できます。asked一覧から同じKeepへ再質問できます。送信時の質問編集は元の下書きを変更しません。
 
-任意設定 `LM_STUDIO_BASE_URL` はローカルHTTPのみ対応。同じDBを複数サーバーで同時使用しないでください。既存DBへ追加migration 005が適用されるため、更新前のサーバーは終了してから起動します。
+pending / askedの「新しいチャットで聞く」では、引用と質問だけを使って新しい会話を作ります。送信予約後に新会話へ切り替わり、回答を表示します。元マーカー・Keepは元会話に残り、元Keepの関連Run表示には分岐先の結果も含まれます。
+
+任意設定 `LM_STUDIO_BASE_URL` はローカルHTTPのみ対応。同じDBを複数サーバーで同時使用しないでください。既存DBへ追加migration 006が適用されるため、更新前のサーバーは終了してから起動します。
 
 ## 検証
 
@@ -60,4 +62,4 @@ npm.cmd run build
 - [Phase 1A結果・制限・判定](docs/phase1a-results.md)
 - [Phase 0結果](docs/phase0-results.md)
 
-詳細は [Phase 3B-1設計・状態遷移・snapshot](docs/phase3b1-design.md) と [検証結果](docs/phase3b1-results.md) を参照してください。過去の [Phase 3A設計](docs/phase3a-design.md) と [結果](docs/phase3a-results.md) は基準記録です。新しいチャットで聞く、正式Mode B、miniMAP、複合エクスポート、複数マーカー質問は含みません。Phase 3B-1で停止しています。
+詳細は [Phase 3B-2分岐設計・snapshot](docs/phase3b2-design.md) と [検証結果](docs/phase3b2-results.md) を参照してください。[Phase 3B-1設計](docs/phase3b1-design.md)・[検証結果](docs/phase3b1-results.md)、[Phase 3A設計](docs/phase3a-design.md)・[結果](docs/phase3a-results.md) は基準記録です。正式Mode B、miniMAP、複合エクスポート、複数マーカー質問は含みません。Phase 3B-2で停止しています。

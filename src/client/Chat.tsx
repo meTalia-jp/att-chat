@@ -3,11 +3,12 @@ import { api } from './api.ts';
 import type { ConversationDetail, GenerationRun } from '../shared/contracts.ts';
 import type { QuestionKeep } from '../shared/question-keep.ts';
 
-export function Chat({ detail, refresh, onBusy, question, onCloseQuestion }: { detail: ConversationDetail; refresh: () => Promise<void>; onBusy: (value: boolean) => void; question: QuestionKeep | null; onCloseQuestion: () => void }) {
+export function Chat({ detail, refresh, onBusy, question, onCloseQuestion }: { detail: ConversationDetail; refresh: (id?: string) => Promise<void>; onBusy: (value: boolean) => void; question: (QuestionKeep & { newConversation?: boolean }) | null; onCloseQuestion: () => void }) {
   const [models, setModels] = useState<string[]>([]), [model, setModel] = useState('');
   const [input, setInput] = useState(''), [text, setText] = useState(''), [busy, setBusy] = useState(false);
   const [runId, setRunId] = useState(''), [status, setStatus] = useState(''), [error, setError] = useState('');
-  const lock = useRef(false), request = useRef<{ id: string; input: string; model: string; keepId?: string } | null>(null);
+  const lock = useRef(false), request = useRef<{ id: string; input: string; model: string; keepId?: string; newConversation?: boolean } | null>(null);
+  const destination = useRef(detail.conversation.conversation_id);
   const panel = useRef<HTMLElement>(null);
   const [quote, setQuote] = useState('');
   const base = `/api/conversations/${detail.conversation.conversation_id}`;
@@ -17,6 +18,10 @@ export function Chat({ detail, refresh, onBusy, question, onCloseQuestion }: { d
     catch (e) { setModels([]); setModel(''); setError((e as Error).message); }
   }
   useEffect(() => { void loadModels(); }, []);
+  useEffect(() => {
+    // Keep the same stream owner mounted when a prepared branch becomes selected.
+    if (!lock.current) { setInput(''); setText(''); setRunId(''); setStatus(''); setError(''); request.current=null; destination.current=detail.conversation.conversation_id; }
+  }, [detail.conversation.conversation_id]);
   useEffect(() => {
     if (!question) { setQuote(''); return; }
     setInput(question.question_draft); setQuote(''); setError(''); panel.current?.scrollIntoView({block:'start'});
@@ -32,10 +37,11 @@ export function Chat({ detail, refresh, onBusy, question, onCloseQuestion }: { d
   async function send() {
     if (lock.current || active || !model || !input.trim()) return;
     lock.current = true; setBusy(true); onBusy(true); setText(''); setError(''); setStatus('準備中');
-    if (!request.current || request.current.input !== input || request.current.model !== model || request.current.keepId !== question?.keep_id) request.current = { id: crypto.randomUUID(), input, model, keepId: question?.keep_id };
+    destination.current=detail.conversation.conversation_id;
+    if (!request.current || request.current.input !== input || request.current.model !== model || request.current.keepId !== question?.keep_id || request.current.newConversation !== question?.newConversation) request.current = { id: crypto.randomUUID(), input, model, keepId: question?.keep_id, newConversation: question?.newConversation };
     let prepared = false;
     try {
-      const res = await fetch(question ? `${base}/question-keeps/${question.keep_id}/ask` : `${base}/chat`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...(question ? { user_question: input } : { content: input }), model, request_id: request.current.id }) });
+      const res = await fetch(question ? `${base}/question-keeps/${question.keep_id}/${question.newConversation ? 'ask-new' : 'ask'}` : `${base}/chat`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...(question ? { user_question: input } : { content: input }), model, request_id: request.current.id }) });
       if (!res.ok) { const value = await res.json(); throw new Error(value.error?.message ?? `HTTP ${res.status}`); }
       if (!res.body) throw new Error('streamがありません');
       const reader = res.body.getReader(), decoder = new TextDecoder(); let buffer = '', terminal = false;
@@ -46,7 +52,15 @@ export function Chat({ detail, refresh, onBusy, question, onCloseQuestion }: { d
           let end;
           while ((end = buffer.indexOf('\n')) >= 0) {
             const event = JSON.parse(buffer.slice(0, end)); buffer = buffer.slice(end + 1);
-            if (event.type === 'prepared') { prepared = true; setRunId((event.run as GenerationRun).run_id); setInput(''); }
+            if (event.type === 'prepared') {
+              prepared = true; const saved=event.run as GenerationRun;
+              destination.current=saved.conversation_id; setRunId(saved.run_id); setInput('');
+              if (question?.newConversation) {
+                onCloseQuestion();
+                try { await refresh(saved.conversation_id); }
+                catch (e) { setError(`分岐先 ${saved.conversation_id} の表示更新失敗: ${(e as Error).message}`); }
+              }
+            }
             if (event.type === 'running') setStatus(question ? '生成中 — Keepは質問送信開始済み（asked）' : '生成中');
             if (event.type === 'delta') setText(t => t + event.text);
             if (event.type === 'terminal') { terminal = true; setStatus(event.outcome); if (event.outcome === 'failed') setError(event.message); }
@@ -57,16 +71,16 @@ export function Chat({ detail, refresh, onBusy, question, onCloseQuestion }: { d
       } finally { await reader.cancel().catch(() => {}); reader.releaseLock(); }
     } catch (e) { setStatus('成功未確認'); setError((e as Error).message); }
     finally {
-      try { await refresh(); } catch (e) { setError(`DB再取得失敗: ${(e as Error).message}`); }
+      try { await refresh(destination.current); } catch (e) { setError(`DB再取得失敗: ${(e as Error).message}`); }
       if (prepared) { request.current = null; onCloseQuestion(); }
       setBusy(false); onBusy(false); setRunId(''); lock.current = false;
     }
   }
   async function stop() {
-    try { const r = await api<GenerationRun>(`${base}/runs/${runId || active?.run_id}/cancel`, {}); setStatus(r.outcome); await refresh(); }
+    try { const r = await api<GenerationRun>(`/api/conversations/${runId ? destination.current : detail.conversation.conversation_id}/runs/${runId || active?.run_id}/cancel`, {}); setStatus(r.outcome); await refresh(r.conversation_id); }
     catch (e) { setError((e as Error).message); }
   }
-  return <section ref={panel}><h3>{question ? 'このチャットで聞く — 質問の確認' : 'LM Studioチャット'}</h3>
+  return <section ref={panel}><h3>{question ? `${question.newConversation ? '新しいチャットで聞く' : 'このチャットで聞く'} — 質問の確認` : 'LM Studioチャット'}</h3>
     {question && <><blockquote>{quote}</blockquote><p>この引用と確定した質問だけを送ります。通常の会話履歴は含めません。下書きは変更しません。</p><button disabled={busy} onClick={() => { onCloseQuestion(); setInput(''); }}>質問確認を閉じる</button></>}
     <button disabled={busy} onClick={() => void loadModels()}>モデル一覧更新</button>
     <label>モデル<select value={model} disabled={busy || !!active} onChange={e => setModel(e.target.value)}><option value="">モデルを選択</option>{models.map(m => <option key={m} value={m}>{m}</option>)}</select></label>

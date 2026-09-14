@@ -5,9 +5,10 @@ import { api, apiRequest } from './api.ts';
 
 export function QuestionKeeps({ conversationId, highlights, selected, onClose, runs, onAsk, sending }: {
   conversationId: string; highlights: Highlight[]; selected: Highlight | null; onClose: () => void;
-  runs: GenerationRun[]; onAsk: (keep: QuestionKeep) => void; sending: boolean;
+  runs: GenerationRun[]; onAsk: (keep: QuestionKeep, newConversation?: boolean) => void; sending: boolean;
 }) {
   const [keeps,setKeeps]=useState<QuestionKeep[]>([]),[editing,setEditing]=useState<QuestionKeep|null>(null);
+  const [questionRuns,setQuestionRuns]=useState<GenerationRun[]>([]);
   const [draft,setDraft]=useState(''),[memo,setMemo]=useState(''),[filter,setFilter]=useState<KeepStatus>('pending');
   const [error,setError]=useState(''),[message,setMessage]=useState(''),[busy,setBusy]=useState(false);
   const lock=useRef(false), panel=useRef<HTMLElement>(null);
@@ -15,8 +16,9 @@ export function QuestionKeeps({ conversationId, highlights, selected, onClose, r
   useEffect(()=>{
     let disposed=false;
     void api<QuestionKeep[]>(path).then(value=>{if(!disposed)setKeeps(value)}).catch(e=>{if(!disposed)setError(e.message)});
+    void api<GenerationRun[]>(`/api/conversations/${conversationId}/question-runs`).then(value=>{if(!disposed)setQuestionRuns(value)}).catch(e=>{if(!disposed)setError(e.message)});
     return()=>{disposed=true};
-  },[path,highlights]);
+  },[path,highlights,runs,conversationId]);
   useEffect(()=>{if(selected){setEditing(null);setDraft('');setMemo('');setError('');panel.current?.scrollIntoView({block:'start'})}},[selected]);
   useEffect(()=>{if(editing&&!highlights.some(h=>h.highlight_id===editing.highlight_id))setEditing(null)},[highlights,editing]);
   async function action(fn:()=>Promise<void>) {
@@ -50,7 +52,8 @@ export function QuestionKeeps({ conversationId, highlights, selected, onClose, r
       return <li key={keep.keep_id}><blockquote>{h.target_text}</blockquote><p>質問: {keep.question_draft||'（下書きなし）'}</p><p>メモ: {keep.memo||'（なし）'}</p><p>{keep.status}</p>
         {h.status==='unresolved'&&<p>元マーカーが解決不能のため質問できません — {h.reason}</p>}
         {keep.status!=='dismissed'&&<button disabled={busy||sending||h.status!=='resolved'} onClick={()=>onAsk({...keep})}>{keep.status==='asked'?'このチャットでもう一度聞く':'このチャットで聞く'}</button>}
-        {keep.status==='asked'&&<p>質問送信開始済み · 関連Run {runs.filter(r=>r.keep_id===keep.keep_id).length}件 · 最新結果: {runs.filter(r=>r.keep_id===keep.keep_id).at(-1)?.outcome??'Runを再読込してください'}</p>}
+        {keep.status!=='dismissed'&&<button disabled={busy||sending||h.status!=='resolved'} onClick={()=>onAsk({...keep},true)}>新しいチャットで聞く</button>}
+        {keep.status==='asked'&&<p>質問送信開始済み · 関連Run {questionRuns.filter(r=>r.keep_id===keep.keep_id).length}件 · 最新結果: {questionRuns.filter(r=>r.keep_id===keep.keep_id).at(-1)?.outcome??'Runを再読込してください'} · 最新質問先: {questionRuns.filter(r=>r.keep_id===keep.keep_id).at(-1)?.conversation_id}</p>}
         {keep.status!=='asked'&&<><button disabled={busy} onClick={()=>{onClose();setEditing(keep);setDraft(keep.question_draft);setMemo(keep.memo)}}>キープ編集</button>
           <button disabled={busy} onClick={()=>void action(()=>changeStatus(keep,keep.status==='pending'?'dismissed':'pending'))}>{keep.status==='pending'?'取り下げ':'pendingに戻す'}</button></>}
         <button disabled={busy} onClick={()=>void action(async()=>{await apiRequest(`${path}/${keep.keep_id}`,'DELETE');setKeeps(v=>v.filter(k=>k.keep_id!==keep.keep_id));if(editing?.keep_id===keep.keep_id)setEditing(null);setMessage('キープを削除しました')})}>キープ削除</button>
