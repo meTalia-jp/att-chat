@@ -5,8 +5,10 @@ import { captureSelection, type HighlightDraft } from './marker.ts';
 import { filterHighlights, highlightColors, locateHighlightElements, orderHighlights } from './marker-list.ts';
 import { TurnMarkdown } from './TurnMarkdown.tsx';
 import { QuestionKeeps } from './QuestionKeeps.tsx';
+import type { GenerationRun } from '../shared/contracts.ts';
+import type { QuestionKeep } from '../shared/question-keep.ts';
 
-export function MarkedTurns({ conversationId, turns, reloadToken }: { conversationId: string; turns: Turn[]; reloadToken: number }) {
+export function MarkedTurns({ conversationId, turns, reloadToken, runs, onAsk, sending }: { conversationId: string; turns: Turn[]; reloadToken: number; runs: GenerationRun[]; onAsk: (keep: QuestionKeep) => void; sending: boolean }) {
   const root = useRef<HTMLDivElement>(null), editor = useRef<HTMLElement>(null), pulseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [highlights, setHighlights] = useState<Highlight[]>([]), [draft, setDraft] = useState<HighlightDraft | null>(null);
   const [color, setColor] = useState<HighlightColor>('yellow'), [note, setNote] = useState(''), [editing, setEditing] = useState<Highlight | null>(null);
@@ -90,7 +92,7 @@ export function MarkedTurns({ conversationId, turns, reloadToken }: { conversati
         </li>;
       })}</ul>}
     </section>
-    <QuestionKeeps key={conversationId} conversationId={conversationId} highlights={highlights} selected={highlights.find(h=>h.highlight_id===keepTarget?.highlight_id)?keepTarget:null} onClose={()=>setKeepTarget(null)}/>
+    <QuestionKeeps key={conversationId} conversationId={conversationId} highlights={highlights} selected={highlights.find(h=>h.highlight_id===keepTarget?.highlight_id)?keepTarget:null} onClose={()=>setKeepTarget(null)} runs={runs} onAsk={onAsk} sending={sending}/>
     <div ref={root} onMouseUp={select} onClick={chooseMarker}><h3>保存された発言</h3>{turns.map(turn => <article key={turn.turn_id} data-turn={turn.turn_id}><b>#{turn.sequence_no} {turn.role} · {turn.status}</b>{turn.role === 'assistant' && turn.status === 'completed' ? <div className="markdown"><TurnMarkdown content={turn.content} highlights={highlights.filter(highlight => highlight.turn_id === turn.turn_id)} /></div> : <pre>{turn.content}</pre>}<small>{turn.turn_id}</small></article>)}</div>
   </>;
 }

@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import type { Highlight } from '../shared/contracts.ts';
+import type { Highlight, GenerationRun } from '../shared/contracts.ts';
 import type { KeepStatus, QuestionKeep } from '../shared/question-keep.ts';
 import { api, apiRequest } from './api.ts';
 
-export function QuestionKeeps({ conversationId, highlights, selected, onClose }: {
+export function QuestionKeeps({ conversationId, highlights, selected, onClose, runs, onAsk, sending }: {
   conversationId: string; highlights: Highlight[]; selected: Highlight | null; onClose: () => void;
+  runs: GenerationRun[]; onAsk: (keep: QuestionKeep) => void; sending: boolean;
 }) {
   const [keeps,setKeeps]=useState<QuestionKeep[]>([]),[editing,setEditing]=useState<QuestionKeep|null>(null);
   const [draft,setDraft]=useState(''),[memo,setMemo]=useState(''),[filter,setFilter]=useState<KeepStatus>('pending');
@@ -47,7 +48,9 @@ export function QuestionKeeps({ conversationId, highlights, selected, onClose }:
     <ul>{keeps.filter(k=>k.status===filter&&highlights.some(h=>h.highlight_id===k.highlight_id)).map(keep=>{
       const h=highlights.find(h=>h.highlight_id===keep.highlight_id)!;
       return <li key={keep.keep_id}><blockquote>{h.target_text}</blockquote><p>質問: {keep.question_draft||'（下書きなし）'}</p><p>メモ: {keep.memo||'（なし）'}</p><p>{keep.status}</p>
-        {h.status==='unresolved'&&<p>参照マーカー: unresolved — {h.reason}</p>}
+        {h.status==='unresolved'&&<p>元マーカーが解決不能のため質問できません — {h.reason}</p>}
+        {keep.status!=='dismissed'&&<button disabled={busy||sending||h.status!=='resolved'} onClick={()=>onAsk({...keep})}>{keep.status==='asked'?'このチャットでもう一度聞く':'このチャットで聞く'}</button>}
+        {keep.status==='asked'&&<p>質問送信開始済み · 関連Run {runs.filter(r=>r.keep_id===keep.keep_id).length}件 · 最新結果: {runs.filter(r=>r.keep_id===keep.keep_id).at(-1)?.outcome??'Runを再読込してください'}</p>}
         {keep.status!=='asked'&&<><button disabled={busy} onClick={()=>{onClose();setEditing(keep);setDraft(keep.question_draft);setMemo(keep.memo)}}>キープ編集</button>
           <button disabled={busy} onClick={()=>void action(()=>changeStatus(keep,keep.status==='pending'?'dismissed':'pending'))}>{keep.status==='pending'?'取り下げ':'pendingに戻す'}</button></>}
         <button disabled={busy} onClick={()=>void action(async()=>{await apiRequest(`${path}/${keep.keep_id}`,'DELETE');setKeeps(v=>v.filter(k=>k.keep_id!==keep.keep_id));if(editing?.keep_id===keep.keep_id)setEditing(null);setMessage('キープを削除しました')})}>キープ削除</button>

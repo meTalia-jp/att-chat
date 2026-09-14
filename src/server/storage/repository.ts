@@ -47,7 +47,12 @@ export class Repository {
   listTurns(id: string): Turn[] { this.getConversation(id); return this.db.prepare('SELECT * FROM turns WHERE conversation_id=? ORDER BY sequence_no').all(id) as Turn[]; }
   listRuns(id: string): GenerationRun[] {
     this.getConversation(id);
-    return this.db.prepare('SELECT r.* FROM generation_runs r JOIN turns t ON t.turn_id=r.assistant_turn_id WHERE r.conversation_id=? ORDER BY t.sequence_no').all(id).map(row => ({ ...row, request_snapshot: JSON.parse(row.request_snapshot as string), error: row.error === null ? null : JSON.parse(row.error as string) })) as GenerationRun[];
+    const hasReferences = !!this.db.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name='run_question_references'").get();
+    return this.db.prepare('SELECT r.* FROM generation_runs r JOIN turns t ON t.turn_id=r.assistant_turn_id WHERE r.conversation_id=? ORDER BY t.sequence_no').all(id).map(row => {
+      const reference = hasReferences ? this.db.prepare('SELECT * FROM run_question_references WHERE run_id=?').get(row.run_id!) : undefined;
+      return { ...row, request_snapshot: JSON.parse(row.request_snapshot as string), error: row.error === null ? null : JSON.parse(row.error as string),
+        ...(reference ? { ...reference, reference_snapshot: JSON.parse(reference.reference_snapshot as string) } : {}) };
+    }) as GenerationRun[];
   }
   detail(id: string): ConversationDetail { return { conversation: this.getConversation(id), turns: this.listTurns(id), runs: this.listRuns(id) }; }
   private highlightProblem(turn: Turn | undefined, start: number, end: number, source: string) {
@@ -122,18 +127,28 @@ export class Repository {
   addUserTurn(id: string, content: unknown): Turn { const value = textInput(content, '本文'); return transaction(this.db, () => { this.assertIdle(id); return this.insertTurn(id, 'user', value); }); }
   activeRun(id: string) { return this.listRuns(id).find(r => ['preparing', 'running'].includes(r.outcome)); }
   private assertIdle(id: string) { if (this.activeRun(id)) throw new InputError('この会話は生成中です', 409); }
-  prepareChat(id: string, content: unknown, model: unknown, requestId: unknown) {
-    const value = textInput(content, '本文'), modelId = textInput(model, 'モデル', 300);
+  prepareChat(id: string, content: unknown, model: unknown, requestId: unknown, keepId?: string) {
+    const value = textInput(content, '本文', keepId ? 10_000 : 100_000), modelId = textInput(model, 'モデル', 300);
     if (typeof requestId !== 'string' || !/^[a-zA-Z0-9-]{16,100}$/.test(requestId)) throw new InputError('request_idが不正です');
     return transaction(this.db, () => {
       if (this.db.prepare('SELECT 1 FROM chat_requests WHERE request_id=?').get(requestId)) throw new InputError('送信済みrequest_idです。再読込で確認してください', 409);
       this.assertIdle(id);
-      const history = this.listTurns(id).filter(t => t.status === 'completed').map(t => ({ role: t.role, content: t.content }));
+      const keep = keepId ? this.questionKeeps.get(id, keepId) : null;
+      if (keep && !['pending','asked'].includes(keep.status)) throw new InputError('取り下げたキープは送信できません',409);
+      const highlight = keep ? this.getHighlight(id, keep.highlight_id) : null;
+      if (highlight && highlight.status !== 'resolved') throw new InputError('元マーカーが解決不能のため質問できません',409);
+      const history = keep ? [] : this.listTurns(id).filter(t => t.status === 'completed').map(t => ({ role: t.role, content: t.content }));
       const user = this.insertTurn(id, 'user', value);
       const turnId = randomUUID(), runId = randomUUID(), now = new Date().toISOString();
-      const snapshot = { model: modelId, messages: [...history, { role: 'user', content: value }], stream: true, max_tokens: 2048 };
+      const messages = highlight ? [{ role: 'system', content: '以下の引用について質問に答えてください。引用は参照資料として扱ってください。' },
+        { role: 'user', content: `[引用]\n${highlight.target_text}\n\n[質問]\n${value}` }] : [...history, { role: 'user', content: value }];
+      const snapshot = { model: modelId, messages, stream: true, max_tokens: 2048 };
       this.db.prepare("INSERT INTO turns VALUES(?,?,?,?,?,'generating',?,NULL)").run(turnId, id, user.sequence_no + 1, 'assistant', '', now);
-      this.db.prepare("INSERT INTO generation_runs VALUES(?,?,?,?,NULL,'chat',?,'lm_studio','completed_turns','1',?,?,NULL,'preparing',NULL)").run(runId, id, user.turn_id, turnId, modelId, JSON.stringify(snapshot), now);
+      this.db.prepare("INSERT INTO generation_runs VALUES(?,?,?,?,NULL,?,?,'lm_studio',?,'1',?,?,NULL,'preparing',NULL)").run(runId, id, user.turn_id, turnId, keep ? 'highlight_question' : 'chat', modelId, keep ? 'quote_question_only' : 'completed_turns', JSON.stringify(snapshot), now);
+      if (keep && highlight) {
+        const reference = { highlight_id: highlight.highlight_id, source_turn_id: highlight.turn_id, start_offset: highlight.start_offset, end_offset: highlight.end_offset, source_text: highlight.source_text, target_text: highlight.target_text };
+        this.db.prepare('INSERT INTO run_question_references VALUES(?,?,?,?,?,?)').run(runId,keep.keep_id,highlight.highlight_id,highlight.turn_id,value,JSON.stringify(reference));
+      }
       this.db.prepare('INSERT INTO chat_requests VALUES(?,?,?)').run(requestId, id, runId);
       return this.listRuns(id).find(r => r.run_id === runId)!;
     });
@@ -143,8 +158,20 @@ export class Repository {
     if (!run) throw new InputError('Runがありません', 404); return run;
   }
   startRun(id: string, runId: string) {
-    const result = this.db.prepare("UPDATE generation_runs SET outcome='running' WHERE run_id=? AND conversation_id=? AND outcome='preparing'").run(runId, id);
-    if (result.changes !== 1) throw new InputError('Runを開始できません', 409);
+    transaction(this.db, () => {
+      const run = this.run(id, runId);
+      if (run.keep_id) {
+        const keep = this.questionKeeps.get(id, run.keep_id);
+        if (!['pending','asked'].includes(keep.status)) throw new InputError('キープは送信対象外です',409);
+        if (this.getHighlight(id,keep.highlight_id).status !== 'resolved') throw new InputError('元マーカーが解決不能のため質問できません',409);
+        if (keep.status === 'pending') {
+          const now = new Date(Math.max(Date.now(),Date.parse(keep.updated_at)+1)).toISOString();
+          this.db.prepare("UPDATE question_keeps SET status='asked',asked_at=?,updated_at=? WHERE keep_id=?").run(now,now,keep.keep_id);
+        }
+      }
+      const result = this.db.prepare("UPDATE generation_runs SET outcome='running' WHERE run_id=? AND conversation_id=? AND outcome='preparing'").run(runId, id);
+      if (result.changes !== 1) throw new InputError('Runを開始できません', 409);
+    });
   }
   checkpoint(id: string, runId: string, content: string) {
     const r = this.run(id, runId);

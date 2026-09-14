@@ -17,7 +17,7 @@ try {
     try { repo.recoverInterrupted(); }
     catch (error) { console.error('中断Runを整理できないため起動を停止します:', error); server.close(() => db.close()); process.exitCode = 1; return; }
     const actual = (server.address() as { port: number }).port;
-    console.log(`Att-Chat Phase 3A http://127.0.0.1:${actual} DB=${dbPath}`);
+    console.log(`Att-Chat Phase 3B-1 http://127.0.0.1:${actual} DB=${dbPath}`);
     process.send?.({ port: actual });
   });
   let closing = false;

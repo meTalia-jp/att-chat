@@ -20,6 +20,30 @@ async function launch(path: string): Promise<{ child: ChildProcess; base: string
   });
 }
 async function stop(child: ChildProcess) { if (child.exitCode !== null || child.signalCode !== null) return; const exited=once(child,'exit'); child.kill('SIGKILL'); await exited; }
+test('Keep質問は別プロセス再起動でasked/Run/Turn/引用を保持しrunningをinterruptedへ整理', async () => {
+  const dir=mkdtempSync(join(tmpdir(),'attchat-restart-')),path=join(dir,'app.sqlite');let active:ChildProcess|undefined;
+  try {
+    const db=openDatabase(path),repo=new Repository(db),ids:string[]=[];
+    for(const state of ['succeeded','running','preparing']) {
+      const id=repo.createConversation(state).conversation_id;ids.push(id);
+      const user=repo.addUserTurn(id,'元質問'),assistant=repo.addMockRun(id,user.turn_id,'引用').assistant;
+      const h=repo.createHighlight(id,{turn_id:assistant.turn_id,start_offset:0,end_offset:2,source_text:'引用',target_text:'引用',color:'yellow'});
+      const k=repo.questionKeeps.create(id,{highlight_id:h.highlight_id,question_draft:'下書き'});
+      const run=repo.prepareChat(id,'確定質問','test-model',crypto.randomUUID(),k.keep_id);
+      if(state!=='preparing'){repo.startRun(id,run.run_id);repo.checkpoint(id,run.run_id,'途中')}
+      if(state==='succeeded')repo.finishRun(id,run.run_id,'succeeded','回答');
+    }
+    const before=ids.map(id=>JSON.parse(JSON.stringify({detail:repo.detail(id),keeps:repo.questionKeeps.list(id)})));db.close();
+    const first=await launch(path);active=first.child;
+    const read=async(base:string,id:string)=>({detail:await(await fetch(`${base}/api/conversations/${id}`)).json(),keeps:await(await fetch(`${base}/api/conversations/${id}/question-keeps`)).json()});
+    const after=await Promise.all(ids.map(id=>read(first.base,id)));
+    assert.deepEqual(after[0],before[0]);
+    for(const i of [1,2]){assert.equal(after[i].detail.runs.at(-1).outcome,'interrupted');assert.deepEqual(after[i].detail.runs.at(-1).reference_snapshot,before[i].detail.runs.at(-1).reference_snapshot);assert.deepEqual(after[i].keeps,before[i].keeps)}
+    assert.equal(after[1].keeps[0].status,'asked');assert.equal(after[2].keeps[0].status,'pending');
+    await stop(active);active=undefined;const second=await launch(path);active=second.child;
+    assert.deepEqual(await Promise.all(ids.map(id=>read(second.base,id))),after);
+  } finally {if(active)await stop(active);const target=resolve(dir);if(!target.startsWith(resolve(tmpdir())+sep+'attchat-restart-'))throw new Error('Unsafe cleanup');rmSync(target,{recursive:true,force:true})}
+});
 test('新プロセス起動でpreparing/runningをinterruptedへ整理し自動再送しない', async () => {
   const dir=mkdtempSync(join(tmpdir(),'attchat-restart-')), path=join(dir,'app.sqlite'); let active: ChildProcess | undefined;
   try {

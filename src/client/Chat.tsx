@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { api } from './api.ts';
 import type { ConversationDetail, GenerationRun } from '../shared/contracts.ts';
+import type { QuestionKeep } from '../shared/question-keep.ts';
 
-export function Chat({ detail, refresh, onBusy }: { detail: ConversationDetail; refresh: () => Promise<void>; onBusy: (value: boolean) => void }) {
+export function Chat({ detail, refresh, onBusy, question, onCloseQuestion }: { detail: ConversationDetail; refresh: () => Promise<void>; onBusy: (value: boolean) => void; question: QuestionKeep | null; onCloseQuestion: () => void }) {
   const [models, setModels] = useState<string[]>([]), [model, setModel] = useState('');
   const [input, setInput] = useState(''), [text, setText] = useState(''), [busy, setBusy] = useState(false);
   const [runId, setRunId] = useState(''), [status, setStatus] = useState(''), [error, setError] = useState('');
-  const lock = useRef(false), request = useRef<{ id: string; input: string; model: string } | null>(null);
+  const lock = useRef(false), request = useRef<{ id: string; input: string; model: string; keepId?: string } | null>(null);
+  const panel = useRef<HTMLElement>(null);
+  const [quote, setQuote] = useState('');
   const base = `/api/conversations/${detail.conversation.conversation_id}`;
   const active = detail.runs.find(r => ['preparing','running'].includes(r.outcome));
   async function loadModels() {
@@ -14,13 +17,25 @@ export function Chat({ detail, refresh, onBusy }: { detail: ConversationDetail; 
     catch (e) { setModels([]); setModel(''); setError((e as Error).message); }
   }
   useEffect(() => { void loadModels(); }, []);
+  useEffect(() => {
+    if (!question) { setQuote(''); return; }
+    setInput(question.question_draft); setQuote(''); setError(''); panel.current?.scrollIntoView({block:'start'});
+    let disposed = false;
+    void api<import('../shared/contracts.ts').Highlight[]>(`${base}/highlights`).then(items => {
+      if (disposed) return;
+      const h = items.find(item => item.highlight_id === question.highlight_id);
+      setQuote(h?.status === 'resolved' ? h.target_text : '');
+      if (!h || h.status !== 'resolved') setError('元マーカーが解決不能のため質問できません');
+    }).catch(e => { if (!disposed) setError(e.message); });
+    return () => { disposed = true; };
+  }, [question, base]);
   async function send() {
     if (lock.current || active || !model || !input.trim()) return;
     lock.current = true; setBusy(true); onBusy(true); setText(''); setError(''); setStatus('準備中');
-    if (!request.current || request.current.input !== input || request.current.model !== model) request.current = { id: crypto.randomUUID(), input, model };
+    if (!request.current || request.current.input !== input || request.current.model !== model || request.current.keepId !== question?.keep_id) request.current = { id: crypto.randomUUID(), input, model, keepId: question?.keep_id };
     let prepared = false;
     try {
-      const res = await fetch(`${base}/chat`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: input, model, request_id: request.current.id }) });
+      const res = await fetch(question ? `${base}/question-keeps/${question.keep_id}/ask` : `${base}/chat`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...(question ? { user_question: input } : { content: input }), model, request_id: request.current.id }) });
       if (!res.ok) { const value = await res.json(); throw new Error(value.error?.message ?? `HTTP ${res.status}`); }
       if (!res.body) throw new Error('streamがありません');
       const reader = res.body.getReader(), decoder = new TextDecoder(); let buffer = '', terminal = false;
@@ -32,7 +47,7 @@ export function Chat({ detail, refresh, onBusy }: { detail: ConversationDetail; 
           while ((end = buffer.indexOf('\n')) >= 0) {
             const event = JSON.parse(buffer.slice(0, end)); buffer = buffer.slice(end + 1);
             if (event.type === 'prepared') { prepared = true; setRunId((event.run as GenerationRun).run_id); setInput(''); }
-            if (event.type === 'running') setStatus('生成中');
+            if (event.type === 'running') setStatus(question ? '生成中 — Keepは質問送信開始済み（asked）' : '生成中');
             if (event.type === 'delta') setText(t => t + event.text);
             if (event.type === 'terminal') { terminal = true; setStatus(event.outcome); if (event.outcome === 'failed') setError(event.message); }
             if (event.type === 'storage_error') throw new Error(event.message);
@@ -43,7 +58,7 @@ export function Chat({ detail, refresh, onBusy }: { detail: ConversationDetail; 
     } catch (e) { setStatus('成功未確認'); setError((e as Error).message); }
     finally {
       try { await refresh(); } catch (e) { setError(`DB再取得失敗: ${(e as Error).message}`); }
-      if (prepared) request.current = null;
+      if (prepared) { request.current = null; onCloseQuestion(); }
       setBusy(false); onBusy(false); setRunId(''); lock.current = false;
     }
   }
@@ -51,12 +66,13 @@ export function Chat({ detail, refresh, onBusy }: { detail: ConversationDetail; 
     try { const r = await api<GenerationRun>(`${base}/runs/${runId || active?.run_id}/cancel`, {}); setStatus(r.outcome); await refresh(); }
     catch (e) { setError((e as Error).message); }
   }
-  return <section><h3>LM Studioチャット</h3>
+  return <section ref={panel}><h3>{question ? 'このチャットで聞く — 質問の確認' : 'LM Studioチャット'}</h3>
+    {question && <><blockquote>{quote}</blockquote><p>この引用と確定した質問だけを送ります。通常の会話履歴は含めません。下書きは変更しません。</p><button disabled={busy} onClick={() => { onCloseQuestion(); setInput(''); }}>質問確認を閉じる</button></>}
     <button disabled={busy} onClick={() => void loadModels()}>モデル一覧更新</button>
     <label>モデル<select value={model} disabled={busy || !!active} onChange={e => setModel(e.target.value)}><option value="">モデルを選択</option>{models.map(m => <option key={m} value={m}>{m}</option>)}</select></label>
     {!models.length && <p>利用可能なモデルがありません。LM Studioの起動と設定を確認してください。</p>}
-    <label>チャット本文<textarea value={input} disabled={busy || !!active} onChange={e => setInput(e.target.value)} /></label>
-    <button disabled={busy || !!active || !model || !input.trim()} onClick={() => void send()}>送信</button>
+    <label>{question ? '送信する質問文' : 'チャット本文'}<textarea value={input} maxLength={question ? 10000 : 100000} disabled={busy || !!active} onChange={e => setInput(e.target.value)} /></label>
+    <button disabled={busy || !!active || !model || !input.trim() || (!!question && !quote)} onClick={() => void send()}>送信</button>
     <button disabled={!runId && !active} onClick={() => void stop()}>停止</button>
     <p role="status">{status || (active ? '生成中Runがあります' : '')}</p>{error && <p role="alert">{error}</p>}
     {text && <pre aria-label="streaming本文">{text.replace(/\r\n?/g, '\n')}</pre>}
