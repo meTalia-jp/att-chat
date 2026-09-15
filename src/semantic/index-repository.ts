@@ -135,4 +135,19 @@ export class SemanticIndexRepository {
     if (!result.ok) throw new Error(result.error.code);
     return result.vector;
   }
+  /** Server-only data retrieval. Ranking belongs to SemanticSearchService. */
+  searchCandidates(space: string, conversationId: string | null, role: 'all'|'user'|'assistant', excludeTurn: string) {
+    this.getSpace(space);
+    const rows=this.db.prepare(`SELECT t.turn_id,t.conversation_id,c.title conversation_title,t.sequence_no,t.role,t.content,e.source_hash
+      FROM turn_embeddings e JOIN turns t USING(turn_id) JOIN conversations c USING(conversation_id)
+      WHERE e.space_id=? AND e.status='ready' AND t.status='completed' AND t.turn_id<>?
+      AND (? IS NULL OR t.conversation_id=?) AND (?='all' OR t.role=?)`).all(space,excludeTurn,conversationId,conversationId,role,role);
+    let invalid=0;
+    const candidates:Array<{vector:Float32Array;turn_id:string;conversation_id:string;conversation_title:string;sequence_no:number;role:'user'|'assistant';content:string;source_hash:string}>=[];
+    for(const row of rows) {
+      try { const vector=this.readVector(row.turn_id as string,space); if(vector)candidates.push({...row,vector} as typeof candidates[number]); else invalid++; }
+      catch(error) { if((error as Error).message!=='INVALID_VECTOR')throw error; invalid++; }
+    }
+    return {candidates,invalid};
+  }
 }

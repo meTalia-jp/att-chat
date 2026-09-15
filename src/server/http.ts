@@ -4,6 +4,7 @@ import { resolve, extname, sep } from 'node:path';
 import { Repository, InputError } from './storage/repository.ts';
 import { GenerationService } from './generation.ts';
 import { ProviderError } from './provider.ts';
+import { SearchError, type SemanticSearchService } from '../semantic/search.ts';
 
 async function body(req: IncomingMessage, fields: string[]): Promise<Record<string, unknown>> {
   if (!req.headers['content-type']?.startsWith('application/json')) throw new InputError('JSONで送信してください', 415);
@@ -14,7 +15,7 @@ async function body(req: IncomingMessage, fields: string[]): Promise<Record<stri
   return data;
 }
 function send(res: ServerResponse, status: number, data: unknown) { res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(data)); }
-export function createAppServer(repo: Repository, distPath: string, generation = new GenerationService(repo)) {
+export function createAppServer(repo: Repository, distPath: string, generation = new GenerationService(repo), semantic?:SemanticSearchService) {
   const server = createServer(async (req, res) => {
     try {
       const port = (server.address() as { port: number }).port;
@@ -22,6 +23,16 @@ export function createAppServer(repo: Repository, distPath: string, generation =
       const origin = req.headers.origin;
       if (origin && ![`http://127.0.0.1:${port}`, `http://localhost:${port}`, 'http://127.0.0.1:5180', 'http://localhost:5180'].includes(origin)) throw new InputError('Originが許可されていません', 403);
       const path = new URL(req.url!, 'http://127.0.0.1').pathname;
+      const related=path.match(/^\/api\/conversations\/([^/]+)\/highlights\/([^/]+)\/related-turns$/);
+      if(related && req.method==='POST') {
+        const data=await body(req,['variant','role','scope','top_k']);
+        if(!semantic)throw new SearchError('意味検索は未設定です');
+        const controller=new AbortController();
+        const timeout=setTimeout(()=>controller.abort(),30000);
+        const closed=()=>{if(!res.writableEnded)controller.abort();}; res.once('close',closed);
+        try {return send(res,200,await semantic.search(related[1],related[2],data,controller.signal));}
+        finally {clearTimeout(timeout);res.off('close',closed);}
+      }
       if (path === '/api/models' && req.method === 'GET') return send(res, 200, { models: await generation.provider.models() });
       const chat = path.match(/^\/api\/conversations\/([^/]+)\/chat$/);
       const ask = path.match(/^\/api\/conversations\/([^/]+)\/question-keeps\/([^/]+)\/(ask|ask-new)$/);
@@ -87,6 +98,7 @@ export function createAppServer(repo: Repository, distPath: string, generation =
       res.writeHead(200, { 'Content-Type': ({ '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css' } as Record<string, string>)[extname(file)] ?? 'application/octet-stream', 'X-Content-Type-Options': 'nosniff', 'Cache-Control': 'no-cache' }); res.end(data);
     } catch (error) {
       if (res.headersSent) { res.destroy(); return; }
+      if(error instanceof SearchError)return send(res,error.status,{error:{code:'SEMANTIC_SEARCH_ERROR',message:error.message}});
       if (error instanceof ProviderError) return send(res, 502, { error: { code: 'PROVIDER_ERROR', message: error.message } });
       const input = error instanceof InputError;
       const busy = /locked|busy/i.test(error instanceof Error ? error.message : '');

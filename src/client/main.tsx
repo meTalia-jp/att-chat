@@ -6,10 +6,23 @@ import './style.css';
 import { Chat } from './Chat.tsx';
 import { MarkedTurns } from './MarkedTurns.tsx';
 import type { QuestionKeep } from '../shared/question-keep.ts';
+import { jumpToTurn } from './turn-navigation.ts';
+import type { RelatedTurn } from '../shared/semantic-search.ts';
 
 function App() {
   const [list, setList] = useState<Conversation[]>([]), [detail, setDetail] = useState<ConversationDetail | null>(null);
   const [reloadToken, setReloadToken] = useState(0);
+  const [jumpTarget,setJumpTarget]=useState<RelatedTurn|null>(null);
+  useEffect(()=>{
+    if(!jumpTarget || detail?.conversation.conversation_id!==jumpTarget.conversation_id)return;
+    try{const clear=jumpToTurn(document,jumpTarget.turn_id);const timer=setTimeout(clear,1800);return()=>{clearTimeout(timer);clear();};}
+    catch(e){setError((e as Error).message);}
+  },[detail,jumpTarget]);
+  async function relatedJump(result:RelatedTurn){
+    if(busy)return;
+    if(detail?.conversation.conversation_id!==result.conversation_id)await refresh(result.conversation_id);
+    setJumpTarget({...result});
+  }
   const [question, setQuestion] = useState<(QuestionKeep & { newConversation?: boolean }) | null>(null);
   useEffect(() => { setQuestion(null); }, [detail?.conversation.conversation_id]);
   const [title, setTitle] = useState(''), [content, setContent] = useState(''), [reply, setReply] = useState('保存確認用の仮Assistant回答です。');
@@ -38,7 +51,7 @@ function App() {
         <label>回答対象のUser発言<select value={userId} disabled={busy} onChange={e => setUserId(e.target.value)}><option value="">User発言を選択</option>{detail.turns.filter(t => t.role === 'user').map(t => <option key={t.turn_id} value={t.turn_id}>#{t.sequence_no} {t.content.slice(0, 60)}</option>)}</select></label>
         <label>仮Assistant本文<textarea value={reply} onChange={e => setReply(e.target.value)} disabled={busy} /></label>
         <button disabled={busy || !userId || !reply.trim()} onClick={() => void action(async () => { await api(`${base}/mock-runs`, { user_turn_id: userId, content: reply }); await refresh(detail.conversation.conversation_id); setMessage('仮Assistant発言とRunを保存しました'); })}>仮Assistant Turn追加</button>
-        </details><MarkedTurns key={detail.conversation.conversation_id} conversationId={detail.conversation.conversation_id} turns={detail.turns} reloadToken={reloadToken} runs={detail.runs} onAsk={(keep,newConversation=false)=>setQuestion({...keep,newConversation})} sending={busy || detail.runs.some(r => ['preparing','running'].includes(r.outcome))} />
+        </details><MarkedTurns key={detail.conversation.conversation_id} conversationId={detail.conversation.conversation_id} turns={detail.turns} reloadToken={reloadToken} runs={detail.runs} onAsk={(keep,newConversation=false)=>setQuestion({...keep,newConversation})} sending={busy || detail.runs.some(r => ['preparing','running'].includes(r.outcome))} onRelatedJump={relatedJump} />
         <h3>GenerationRun（保存確認）</h3>{detail.runs.map(r => <section key={r.run_id}>
           <p>{r.outcome} · {r.provider} · {r.run_id}</p>
           {r.error && <p>{String(r.error.message ?? r.error.code)}</p>}

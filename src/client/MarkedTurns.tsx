@@ -7,8 +7,10 @@ import { TurnMarkdown } from './TurnMarkdown.tsx';
 import { QuestionKeeps } from './QuestionKeeps.tsx';
 import type { GenerationRun } from '../shared/contracts.ts';
 import type { QuestionKeep } from '../shared/question-keep.ts';
+import { RelatedTurns } from './RelatedTurns.tsx';
+import type { RelatedTurn } from '../shared/semantic-search.ts';
 
-export function MarkedTurns({ conversationId, turns, reloadToken, runs, onAsk, sending }: { conversationId: string; turns: Turn[]; reloadToken: number; runs: GenerationRun[]; onAsk: (keep: QuestionKeep, newConversation?: boolean) => void; sending: boolean }) {
+export function MarkedTurns({ conversationId, turns, reloadToken, runs, onAsk, sending, onRelatedJump }: { conversationId: string; turns: Turn[]; reloadToken: number; runs: GenerationRun[]; onAsk: (keep: QuestionKeep, newConversation?: boolean) => void; sending: boolean; onRelatedJump?:(result:RelatedTurn)=>Promise<void> }) {
   const root = useRef<HTMLDivElement>(null), editor = useRef<HTMLElement>(null), pulseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [highlights, setHighlights] = useState<Highlight[]>([]), [draft, setDraft] = useState<HighlightDraft | null>(null);
   const [color, setColor] = useState<HighlightColor>('yellow'), [note, setNote] = useState(''), [editing, setEditing] = useState<Highlight | null>(null);
@@ -76,6 +78,7 @@ export function MarkedTurns({ conversationId, turns, reloadToken, runs, onAsk, s
       {(draft || editing) && <><p>選択: {(draft ?? editing)!.target_text}</p><label>色<select value={color} onChange={event => setColor(event.target.value as HighlightColor)}>{highlightColors.map(value => <option key={value}>{value}</option>)}</select></label><label>メモ<textarea value={note} maxLength={10000} onChange={event => setNote(event.target.value)} /></label>{draft ? <button onClick={() => void register()}>登録</button> : <><button onClick={() => void update()}>更新</button><button onClick={() => void remove()}>削除</button></>}</>}
       <p role="status">{message}</p>{error && <p role="alert">{error}</p>}
     </section>
+    {editing && onRelatedJump && <RelatedTurns key={editing.highlight_id} conversationId={conversationId} highlight={editing} onJump={onRelatedJump} sending={sending}/>}
     <section className="marker-list" aria-label="会話内のマーカー一覧">
       <h3>マーカー一覧</h3>
       <fieldset><legend>色別表示フィルタ</legend>{highlightColors.map(value => <label className="color-filter" key={value}><input type="checkbox" checked={enabledColors.has(value)} onChange={() => toggleColor(value)} /><span className={`color-swatch mark-${value}`} aria-hidden="true" />{value}</label>)}</fieldset>
@@ -88,6 +91,7 @@ export function MarkedTurns({ conversationId, turns, reloadToken, runs, onAsk, s
           <blockquote>{highlight.target_text}</blockquote><p>メモ: {highlight.note || '（なし）'}</p>
           {highlight.status === 'unresolved' ? <><p className="unresolved-reason">unresolved: {highlight.reason ?? '理由不明'}</p><button disabled>ジャンプ不可</button></> : <button onClick={() => jump(highlight)}>このマーカーへジャンプ</button>}
           <button onClick={() => beginEdit(highlight)}>編集</button><button onClick={() => void remove(highlight)}>削除</button>
+          {onRelatedJump && <button disabled={highlight.status!=='resolved'} onClick={()=>beginEdit(highlight)}>Related Turns</button>}
           <button disabled={highlight.status!=='resolved'} onClick={()=>setKeepTarget({...highlight})}>質問キープ</button>
         </li>;
       })}</ul>}
