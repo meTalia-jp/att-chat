@@ -18,11 +18,13 @@
     "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
+    "@huggingface/tokenizers": "0.2.0",
     "@types/jsdom": "^21.1.7",
     "@types/node": "24.3.0",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.4",
     "jsdom": "^26.1.0",
+    "onnxruntime-node": "1.21.0",
     "typescript": "7.0.2",
     "vite": "8.2.2"
   }
