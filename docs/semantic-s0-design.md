@@ -1,0 +1,37 @@
+# Phase S0 Semantic Index契約
+
+基準: de8ce95d77265413d76e3d21fcff01b694b2b076。
+
+Semantic Indexは確定原文から再生成できる派生データ。Conversation / Turn / Run / Highlight / Keep / snapshotが正本であり、索引失敗で正本の保存成功を取り消さない。
+
+## Provider境界
+
+contracts.tsにEmbeddingPurpose、EmbeddingSpaceSpec、EmbeddingModelInfo、EmbeddingResult、EmbeddingProviderを定義。Providerはquery/document別の入力加工・token上限判定・vector生成・AbortSignal・解放を担当する。失敗はcode/retryableの構造化結果とし、本文や認証情報をエラーへ含めない。
+
+将来Semantic Search → EmbeddingService → EmbeddingProviderとする。S0ではService本体は実装せず、validation.tsが将来のServiceの返却検証境界となる。実Providerの予期しないthrowやtimeoutも将来Service側で構造化する。既存GenerationServiceとは接続しない。
+
+localityはin_process_local（プロセス内ローカル）、loopback（ローカルサービス）、external（外部送信）を区別する宣言情報。S0では通信・権限処理を実装しない。実Providerの送信先と宣言の一致検証は後続Phaseで必要。
+
+query/documentは同一space内で役割の異なる入力。モデル固有prefixは仕様に固定し、用途に応じて適用する。S0のinput_token_limitはprefix等を含む実入力の上限。truncateは禁止、超過はINPUT_TOO_LONG。成功にはtruncated:falseが必須。
+
+## Space識別
+
+space_spec_version=1。provider/model/revision/tokenizer/quantization_artifact/dimensions/pooling/normalization/query・document prefix/preprocessing/long_text_policy/input_token_limitを明示的に抽出してcanonical serializationする。
+
+objectキーをUTF-16の既定sort順で再帰整列し、JSON primitive表現、区切りに余分な空白なし、UTF-8でSHA-256。fingerprintは小文字hex、space_idはembedding-space-v1:にfingerprintを付ける。配列順は維持。undefinedや非有限数等のJSON外入力は拒否。Unicode正規化・trimは行わない。仕様キー以外の表示名・日時・APIキー等は抽出しない。
+
+このserializerはS0の平坦仕様とprefix object用であり、任意オブジェクトグラフや循環参照の汎用シリアライザではない。未知のspec version、truncate等の未対応policyは別空間生成でなく拒否。将来の拡張ではversionと対応実装を追加する。
+
+revision、tokenizer、artifactは固定識別子を渡す契約。S0では実ファイル存在やrevisionの真正性を検証しない。APIキーをmodel等の識別子へ入れてはならない。実モデル選定・成果物checksum・locality運用はS1以降。
+
+## 検証
+
+validateEmbeddingは期待ModelInfoのspace_id、正の整数dimensions、Float32Array長、全成分有限、非ゼロを検証。input_tokensも非負整数・上限内、truncated:falseを要求。承認vectorはcopyしてProviderが後から元配列を変更しても影響しない。
+
+同次元でもspace_idが違えばSPACE_MISMATCH。similarity計算は実装しない。正規化精度検証やModelInfo自体の認証はS0対象外で、期待ModelInfoは呼出側が選択した信頼済み仕様とする。
+
+## Fake Providerと範囲
+
+fakeはtests/fixturesのみ。SHA-256由来の決定的な非ゼロFloat32列を返す。意味は表現しない。prefix込みUnicode code point数をfake token数とするため、実tokenizerの精度・上限測定には使用しない。異常vector、Provider失敗、上限超過、cancelを生成する。external/loopbackを指定しても実通信はない。
+
+S0は実モデル・DB・worker・検索・UI・送信統合を使用しない。新dependenciesなし。Node標準cryptoのみ使用。検証は自動テストで行い、確認画面は追加しない。将来Provider交換はこのinterfaceを実装し、同じvalidationを通す。
