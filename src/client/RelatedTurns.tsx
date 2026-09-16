@@ -1,16 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Highlight } from '../shared/contracts.ts';
 import type { RelatedTurn, SearchOptions, SearchResponse } from '../shared/semantic-search.ts';
+import { TurnContextPanel } from './TurnContextPanel.tsx';
 
 export function RelatedTurns({conversationId,highlight,onJump,sending}:{conversationId:string;highlight:Highlight;onJump:(result:RelatedTurn)=>Promise<void>;sending:boolean}) {
   const [options,setOptions]=useState<SearchOptions>({variant:'Q1',role:'all',scope:'current',top_k:5});
   const [data,setData]=useState<SearchResponse|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState('');
+  const [contextTarget,setContextTarget]=useState<RelatedTurn|null>(null);
   const controller=useRef<AbortController|null>(null);
   useEffect(()=>()=>controller.current?.abort(),[]);
-  function change<K extends keyof SearchOptions>(key:K,value:SearchOptions[K]){setOptions(current=>({...current,[key]:value}));setData(null);}
+  function change<K extends keyof SearchOptions>(key:K,value:SearchOptions[K]){setOptions(current=>({...current,[key]:value}));setData(null);setContextTarget(null);}
   async function search() {
     if(controller.current)return;
-    const current=new AbortController();controller.current=current;setBusy(true);setError('');setData(null);
+    const current=new AbortController();controller.current=current;setBusy(true);setError('');setData(null);setContextTarget(null);
     try {
       const response=await fetch(`/api/conversations/${conversationId}/highlights/${highlight.highlight_id}/related-turns`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(options),signal:current.signal});
       const result=await response.json();if(!response.ok)throw new Error(result.error?.message??'検索に失敗しました');
@@ -32,7 +34,8 @@ export function RelatedTurns({conversationId,highlight,onJump,sending}:{conversa
       <p>未索引・失敗・長文の発言は検索されません。元マーカーのTurnは除外します。類似度は順位の補助値で、確率や正しさではありません。</p>
       <small>space: {data.space_id}</small><details><summary>queryと検索時間</summary><pre>{data.query_text}</pre><p>query {data.timings.query_embedding_ms.toFixed(1)}ms / load {data.timings.vector_load_ms.toFixed(1)}ms / similarity {data.timings.similarity_ms.toFixed(1)}ms / total {data.timings.total_ms.toFixed(1)}ms / 対象 {data.timings.ready_vector_count}件 / 不正vector除外 {data.timings.invalid_vectors}件</p></details>
       {!data.results.length && <p>条件に合う検索結果はありません。</p>}
-      <ol>{data.results.map(result=><li key={result.turn_id}><p>{result.conversation_title} · #{result.sequence_no} {result.role} · 類似度 {result.score.toFixed(4)}</p><blockquote>{result.excerpt}</blockquote><button disabled={sending} onClick={()=>void onJump(result).catch(e=>setError(e.message))}>Jump</button></li>)}</ol>
+      <ol>{data.results.map(result=><li key={result.turn_id}><p>{result.conversation_title} · #{result.sequence_no} {result.role} · 類似度 {result.score.toFixed(4)}</p><blockquote>{result.excerpt}</blockquote><button disabled={sending} onClick={()=>void onJump(result).catch(e=>setError(e.message))}>Jump</button><button onClick={()=>setContextTarget(result)}>前後を見る</button></li>)}</ol>
+      {contextTarget&&<TurnContextPanel key={contextTarget.turn_id} target={contextTarget} onClose={()=>setContextTarget(null)}/>}
     </>}
   </section>;
 }

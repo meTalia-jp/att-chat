@@ -5,6 +5,7 @@ import { Repository, InputError } from './storage/repository.ts';
 import { GenerationService } from './generation.ts';
 import { ProviderError } from './provider.ts';
 import { SearchError, type SemanticSearchService } from '../semantic/search.ts';
+import { RetrievalError, type RetrievalService } from '../retrieval/service.ts';
 
 async function body(req: IncomingMessage, fields: string[]): Promise<Record<string, unknown>> {
   if (!req.headers['content-type']?.startsWith('application/json')) throw new InputError('JSONで送信してください', 415);
@@ -15,14 +16,23 @@ async function body(req: IncomingMessage, fields: string[]): Promise<Record<stri
   return data;
 }
 function send(res: ServerResponse, status: number, data: unknown) { res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(data)); }
-export function createAppServer(repo: Repository, distPath: string, generation = new GenerationService(repo), semantic?:SemanticSearchService) {
+export function createAppServer(repo: Repository, distPath: string, generation = new GenerationService(repo), semantic?:SemanticSearchService, retrieval?:RetrievalService) {
   const server = createServer(async (req, res) => {
     try {
       const port = (server.address() as { port: number }).port;
       if (![`127.0.0.1:${port}`, `localhost:${port}`].includes(req.headers.host ?? '')) throw new InputError('Hostが許可されていません', 403);
       const origin = req.headers.origin;
       if (origin && ![`http://127.0.0.1:${port}`, `http://localhost:${port}`, 'http://127.0.0.1:5180', 'http://localhost:5180'].includes(origin)) throw new InputError('Originが許可されていません', 403);
-      const path = new URL(req.url!, 'http://127.0.0.1').pathname;
+      const requestUrl = new URL(req.url!, 'http://127.0.0.1'), path=requestUrl.pathname;
+      const retrievalMatch=path.match(/^\/api\/retrieval\/turns\/([^/]+)(\/context)?$/);
+      if(retrievalMatch&&req.method==='GET') {
+        if(!retrieval)throw new RetrievalError('CONVERSATION_INCONSISTENT','Retrievalは利用できません',503);
+        let turnId:string;try{turnId=decodeURIComponent(retrievalMatch[1]);}catch{throw new RetrievalError('TURN_NOT_FOUND','turn_idが不正です',400);}
+        if(!retrievalMatch[2])return send(res,200,retrieval.getTurn(turnId));
+        const allowed=new Set(['before','after']);if([...requestUrl.searchParams.keys()].some(key=>!allowed.has(key)))throw new RetrievalError('INVALID_WINDOW','検索項目が不正です');
+        const parse=(name:'before'|'after')=>{const values=requestUrl.searchParams.getAll(name);if(values.length>1)throw new RetrievalError('INVALID_WINDOW',`${name}が重複しています`);if(!values.length)return undefined;if(!/^\d+$/.test(values[0]))throw new RetrievalError('INVALID_WINDOW',`${name}は0〜10の整数で指定してください`);return Number(values[0]);};
+        return send(res,200,retrieval.getTurnContext(turnId,parse('before'),parse('after')));
+      }
       const related=path.match(/^\/api\/conversations\/([^/]+)\/highlights\/([^/]+)\/related-turns$/);
       if(related && req.method==='POST') {
         const data=await body(req,['variant','role','scope','top_k']);
@@ -98,6 +108,7 @@ export function createAppServer(repo: Repository, distPath: string, generation =
       res.writeHead(200, { 'Content-Type': ({ '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css' } as Record<string, string>)[extname(file)] ?? 'application/octet-stream', 'X-Content-Type-Options': 'nosniff', 'Cache-Control': 'no-cache' }); res.end(data);
     } catch (error) {
       if (res.headersSent) { res.destroy(); return; }
+      if(error instanceof RetrievalError)return send(res,error.status,{error:{code:error.code,message:error.message}});
       if(error instanceof SearchError)return send(res,error.status,{error:{code:'SEMANTIC_SEARCH_ERROR',message:error.message}});
       if (error instanceof ProviderError) return send(res, 502, { error: { code: 'PROVIDER_ERROR', message: error.message } });
       const input = error instanceof InputError;
