@@ -6,6 +6,7 @@ import { GenerationService } from './generation.ts';
 import { ProviderError } from './provider.ts';
 import { SearchError, type SemanticSearchService } from '../semantic/search.ts';
 import { RetrievalError, type RetrievalService } from '../retrieval/service.ts';
+import { PreviewError, type ContextPreviewService } from '../context-preview/service.ts';
 
 async function body(req: IncomingMessage, fields: string[]): Promise<Record<string, unknown>> {
   if (!req.headers['content-type']?.startsWith('application/json')) throw new InputError('JSONで送信してください', 415);
@@ -16,7 +17,7 @@ async function body(req: IncomingMessage, fields: string[]): Promise<Record<stri
   return data;
 }
 function send(res: ServerResponse, status: number, data: unknown) { res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(data)); }
-export function createAppServer(repo: Repository, distPath: string, generation = new GenerationService(repo), semantic?:SemanticSearchService, retrieval?:RetrievalService) {
+export function createAppServer(repo: Repository, distPath: string, generation = new GenerationService(repo), semantic?:SemanticSearchService, retrieval?:RetrievalService, preview?:ContextPreviewService) {
   const server = createServer(async (req, res) => {
     try {
       const port = (server.address() as { port: number }).port;
@@ -24,6 +25,11 @@ export function createAppServer(repo: Repository, distPath: string, generation =
       const origin = req.headers.origin;
       if (origin && ![`http://127.0.0.1:${port}`, `http://localhost:${port}`, 'http://127.0.0.1:5180', 'http://localhost:5180'].includes(origin)) throw new InputError('Originが許可されていません', 403);
       const requestUrl = new URL(req.url!, 'http://127.0.0.1'), path=requestUrl.pathname;
+      const compare=path.match(/^\/api\/conversations\/([^/]+)\/highlights\/([^/]+)\/context-preview$/);
+      if(compare&&req.method==='POST'){
+        if(!preview)throw new PreviewError('PREVIEW_UNAVAILABLE','Previewは利用できません',503);
+        return send(res,200,preview.build(compare[1],compare[2],await body(req,['strategy','local_budget','local_ratio','before_turns','after_turns'])));
+      }
       const retrievalMatch=path.match(/^\/api\/retrieval\/turns\/([^/]+)(\/context)?$/);
       if(retrievalMatch&&req.method==='GET') {
         if(!retrieval)throw new RetrievalError('CONVERSATION_INCONSISTENT','Retrievalは利用できません',503);
@@ -108,6 +114,7 @@ export function createAppServer(repo: Repository, distPath: string, generation =
       res.writeHead(200, { 'Content-Type': ({ '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css' } as Record<string, string>)[extname(file)] ?? 'application/octet-stream', 'X-Content-Type-Options': 'nosniff', 'Cache-Control': 'no-cache' }); res.end(data);
     } catch (error) {
       if (res.headersSent) { res.destroy(); return; }
+      if(error instanceof PreviewError)return send(res,error.status,{error:{code:error.code,message:error.message}});
       if(error instanceof RetrievalError)return send(res,error.status,{error:{code:error.code,message:error.message}});
       if(error instanceof SearchError)return send(res,error.status,{error:{code:'SEMANTIC_SEARCH_ERROR',message:error.message}});
       if (error instanceof ProviderError) return send(res, 502, { error: { code: 'PROVIDER_ERROR', message: error.message } });

@@ -8,6 +8,7 @@ import { QuestionKeeps } from './QuestionKeeps.tsx';
 import type { GenerationRun } from '../shared/contracts.ts';
 import type { QuestionKeep } from '../shared/question-keep.ts';
 import { RelatedTurns } from './RelatedTurns.tsx';
+import { ContextCompare } from './ContextCompare.tsx';
 import type { RelatedTurn } from '../shared/semantic-search.ts';
 
 export function MarkedTurns({ conversationId, turns, reloadToken, runs, onAsk, sending, onRelatedJump }: { conversationId: string; turns: Turn[]; reloadToken: number; runs: GenerationRun[]; onAsk: (keep: QuestionKeep, newConversation?: boolean) => void; sending: boolean; onRelatedJump?:(result:RelatedTurn)=>Promise<void> }) {
@@ -17,6 +18,7 @@ export function MarkedTurns({ conversationId, turns, reloadToken, runs, onAsk, s
   const [enabledColors, setEnabledColors] = useState<Set<HighlightColor>>(() => new Set(highlightColors));
   const [message, setMessage] = useState(''), [error, setError] = useState('');
   const [keepTarget,setKeepTarget] = useState<Highlight|null>(null);
+  const [compareId,setCompareId]=useState<string|null>(null);
   const path = `/api/conversations/${conversationId}/highlights`;
   const visible = filterHighlights(orderHighlights(highlights, turns), enabledColors);
 
@@ -24,6 +26,7 @@ export function MarkedTurns({ conversationId, turns, reloadToken, runs, onAsk, s
     let disposed = false;
     setHighlights([]); setDraft(null); setEditing(null); setMessage(''); setError('');
     setKeepTarget(null);
+    setCompareId(null);
     void api<Highlight[]>(path).then(value => { if (!disposed) setHighlights(value); }).catch(reason => { if (!disposed) setError((reason as Error).message); });
     return () => { disposed = true; if (pulseTimer.current) clearTimeout(pulseTimer.current); };
   }, [conversationId, reloadToken]);
@@ -79,6 +82,7 @@ export function MarkedTurns({ conversationId, turns, reloadToken, runs, onAsk, s
       <p role="status">{message}</p>{error && <p role="alert">{error}</p>}
     </section>
     {editing && onRelatedJump && <RelatedTurns key={editing.highlight_id} conversationId={conversationId} highlight={editing} onJump={onRelatedJump} sending={sending}/>}
+    {compareId&&highlights.some(h=>h.highlight_id===compareId)&&<ContextCompare conversationId={conversationId} highlightId={compareId} onClose={()=>setCompareId(null)}/>}
     <section className="marker-list" aria-label="会話内のマーカー一覧">
       <h3>マーカー一覧</h3>
       <fieldset><legend>色別表示フィルタ</legend>{highlightColors.map(value => <label className="color-filter" key={value}><input type="checkbox" checked={enabledColors.has(value)} onChange={() => toggleColor(value)} /><span className={`color-swatch mark-${value}`} aria-hidden="true" />{value}</label>)}</fieldset>
@@ -93,6 +97,7 @@ export function MarkedTurns({ conversationId, turns, reloadToken, runs, onAsk, s
           <button onClick={() => beginEdit(highlight)}>編集</button><button onClick={() => void remove(highlight)}>削除</button>
           {onRelatedJump && <button disabled={highlight.status!=='resolved'} onClick={()=>beginEdit(highlight)}>Related Turns</button>}
           <button disabled={highlight.status!=='resolved'} onClick={()=>setKeepTarget({...highlight})}>質問キープ</button>
+          <button disabled={highlight.status!=='resolved'} onClick={()=>setCompareId(highlight.highlight_id)}>Context Compare</button>
         </li>;
       })}</ul>}
     </section>
