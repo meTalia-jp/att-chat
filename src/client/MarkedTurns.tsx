@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { Highlight, HighlightColor, Turn } from '../shared/contracts.ts';
 import { api, apiRequest } from './api.ts';
 import { captureSelection, type HighlightDraft } from './marker.ts';
-import { filterHighlights, highlightColors, locateHighlightElements, orderHighlights } from './marker-list.ts';
+import { filterHighlights, highlightColors, locateHighlightElements, orderHighlights, markerExcerpt } from './marker-list.ts';
 import { TurnMarkdown } from './TurnMarkdown.tsx';
 import { QuestionKeeps } from './QuestionKeeps.tsx';
 import type { GenerationRun } from '../shared/contracts.ts';
@@ -19,6 +19,7 @@ export function MarkedTurns({ conversationId, turns, reloadToken, runs, onAsk, s
   const [message, setMessage] = useState(''), [error, setError] = useState('');
   const [keepTarget,setKeepTarget] = useState<Highlight|null>(null);
   const [compareId,setCompareId]=useState<string|null>(null);
+  const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
   const path = `/api/conversations/${conversationId}/highlights`;
   const visible = filterHighlights(orderHighlights(highlights, turns), enabledColors);
 
@@ -27,6 +28,7 @@ export function MarkedTurns({ conversationId, turns, reloadToken, runs, onAsk, s
     setHighlights([]); setDraft(null); setEditing(null); setMessage(''); setError('');
     setKeepTarget(null);
     setCompareId(null);
+    setExpanded(new Set());
     void api<Highlight[]>(path).then(value => { if (!disposed) setHighlights(value); }).catch(reason => { if (!disposed) setError((reason as Error).message); });
     return () => { disposed = true; if (pulseTimer.current) clearTimeout(pulseTimer.current); };
   }, [conversationId, reloadToken]);
@@ -90,9 +92,11 @@ export function MarkedTurns({ conversationId, turns, reloadToken, runs, onAsk, s
       <p>{visible.length} / {highlights.length}件を表示</p>
       {!visible.length ? <p>表示対象のマーカーはありません。</p> : <ul>{visible.map(highlight => {
         const turn = turns.find(value => value.turn_id === highlight.turn_id);
+        const excerpt = markerExcerpt(highlight.target_text), isExpanded = expanded.has(highlight.highlight_id);
         return <li key={highlight.highlight_id} className={`marker-list-item marker-list-${highlight.status}`} data-list-highlight={highlight.highlight_id}>
           <p><span className={`color-swatch mark-${highlight.color}`} aria-hidden="true" /><strong>{highlight.color}</strong> · Assistant #{turn?.sequence_no ?? '?'}</p>
-          <blockquote>{highlight.target_text}</blockquote><p>メモ: {highlight.note || '（なし）'}</p>
+          <blockquote id={`marker-quote-${highlight.highlight_id}`}>{isExpanded ? highlight.target_text : excerpt.text}</blockquote><p>メモ: {highlight.note || '（なし）'}</p>
+          {excerpt.truncated && <button aria-expanded={isExpanded} aria-controls={`marker-quote-${highlight.highlight_id}`} onClick={() => setExpanded(current => { const next = new Set(current); if (next.has(highlight.highlight_id)) next.delete(highlight.highlight_id); else next.add(highlight.highlight_id); return next; })}>{isExpanded ? '閉じる' : '全文表示'}</button>}
           {highlight.status === 'unresolved' ? <><p className="unresolved-reason">unresolved: {highlight.reason ?? '理由不明'}</p><button disabled>ジャンプ不可</button></> : <button onClick={() => jump(highlight)}>このマーカーへジャンプ</button>}
           <button onClick={() => beginEdit(highlight)}>編集</button><button onClick={() => void remove(highlight)}>削除</button>
           {onRelatedJump && <button disabled={highlight.status!=='resolved'} onClick={()=>beginEdit(highlight)}>Related Turns</button>}

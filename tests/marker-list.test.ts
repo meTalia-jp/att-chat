@@ -2,7 +2,27 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import type { Highlight, HighlightColor } from '../src/shared/contracts.ts';
-import { filterHighlights, locateHighlightElements, orderHighlights } from '../src/client/marker-list.ts';
+import { filterHighlights, locateHighlightElements, orderHighlights, markerExcerpt } from '../src/client/marker-list.ts';
+
+test('表示専用excerpt: 60 grapheme境界、日本語・英数字・emoji・結合文字・改行', () => {
+  for (const unit of ['日', 'a', '1', '👨‍👩‍👧‍👦', 'e\u0301', '🇯🇵', '\n']) {
+    for (const count of [0, 59, 60, 61]) {
+      const input = unit.repeat(count);
+      assert.deepEqual(markerExcerpt(input), { text: unit.repeat(Math.min(count, 60)) + (count > 60 ? '…' : ''), truncated: count > 60 });
+    }
+  }
+});
+
+test('excerptは保存anchorを変更せず、同文別Turnのjump先を変えない', () => {
+  const text = '日本語👩🏽‍💻e\u0301 abc\n'.repeat(20);
+  const h = Object.freeze({ ...highlight('same', 'turn-b', 7, 7 + text.length, 'green'), source_text: text, target_text: text });
+  const before = JSON.stringify(h);
+  assert.equal(markerExcerpt(h.target_text).truncated, true);
+  assert.equal(JSON.stringify(h), before);
+  const dom = new JSDOM(`<main><article data-turn="turn-a"><mark data-highlight="same" data-s="7" data-e="${h.end_offset}"></mark></article><article data-turn="turn-b"><mark data-highlight="same" data-s="7" data-e="${h.end_offset}"></mark></article></main>`);
+  assert.equal(locateHighlightElements(dom.window.document.querySelector('main')!, h)[0].closest('[data-turn]')?.getAttribute('data-turn'), 'turn-b');
+  dom.window.close();
+});
 
 function highlight(id: string, turn: string, start: number, end: number, color: HighlightColor, status: Highlight['status'] = 'resolved'): Highlight {
   return { highlight_id: id, turn_id: turn, start_offset: start, end_offset: end, source_text: '同じ文', target_text: '同じ文', color, note: `${id}のメモ`, created_at: 'x', updated_at: 'x', status, reason: status === 'unresolved' ? 'source_text不一致' : null };

@@ -2,6 +2,15 @@ import type { Highlight, HighlightColor, Turn } from '../shared/contracts.ts';
 
 export const highlightColors: HighlightColor[] = ['yellow', 'red', 'green', 'blue'];
 
+/** Display only: never use this value for persistence or anchor resolution. */
+export function markerExcerpt(targetText: string) {
+  let count = 0;
+  for (const segment of new Intl.Segmenter('ja', { granularity: 'grapheme' }).segment(targetText)) {
+    if (count++ === 60) return { text: targetText.slice(0, segment.index) + '…', truncated: true };
+  }
+  return { text: targetText, truncated: false };
+}
+
 export function filterHighlights(highlights: Highlight[], enabled: ReadonlySet<HighlightColor>) {
   return highlights.filter(highlight => enabled.has(highlight.color));
 }
