@@ -4,6 +4,7 @@ import { api, apiRequest } from './api.ts';
 import { captureSelection, type HighlightDraft } from './marker.ts';
 import { filterHighlights, highlightColors, locateHighlightElements, orderHighlights, markerExcerpt } from './marker-list.ts';
 import { TurnMarkdown } from './TurnMarkdown.tsx';
+import { MiniMap } from './MiniMap.tsx';
 import { QuestionKeeps } from './QuestionKeeps.tsx';
 import type { GenerationRun } from '../shared/contracts.ts';
 import type { QuestionKeep } from '../shared/question-keep.ts';
@@ -78,6 +79,7 @@ export function MarkedTurns({ conversationId, turns, reloadToken, runs, onAsk, s
   }
 
   return <>
+    <MiniMap key={conversationId} root={root} highlights={highlights} turns={turns} onJump={jump} />
     <section className="marker-editor" ref={editor}>
       <h3>AttMarker</h3><p>completed Assistant本文内の対応範囲を選択してください。</p>
       {(draft || editing) && <><p>選択: {(draft ?? editing)!.target_text}</p><label>色<select value={color} onChange={event => setColor(event.target.value as HighlightColor)}>{highlightColors.map(value => <option key={value}>{value}</option>)}</select></label><label>メモ<textarea value={note} maxLength={10000} onChange={event => setNote(event.target.value)} /></label>{draft ? <button onClick={() => void register()}>登録</button> : <><button onClick={() => void update()}>更新</button><button onClick={() => void remove()}>削除</button></>}</>}
