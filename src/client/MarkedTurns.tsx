@@ -8,7 +8,8 @@ import { RelatedTurns } from './RelatedTurns.tsx';
 import { ContextCompare } from './ContextCompare.tsx';
 
 // Att-Chat composition: optional experiments do not belong to MarkerCore.
-export function MarkedTurns({ conversationId, turns, reloadToken, runs, onAsk, sending, onRelatedJump }: {
+export function MarkedTurns({ conversationId, turns, reloadToken, runs, onAsk, sending, onRelatedJump, compact = false }: {
+  compact?: boolean;
   conversationId: string;
   turns: Turn[];
   reloadToken: number;
@@ -21,18 +22,18 @@ export function MarkedTurns({ conversationId, turns, reloadToken, runs, onAsk, s
   const [compareId, setCompareId] = useState<string | null>(null);
   useEffect(() => { setKeepTarget(null); setCompareId(null); }, [conversationId, reloadToken]);
 
-  return <MarkerCore conversationId={conversationId} turns={turns} reloadToken={reloadToken}
+  return <MarkerCore conversationId={conversationId} turns={turns} reloadToken={reloadToken} showTurnIds={!compact}
     renderEditorExtras={({ editing, highlights }) => <>
-      {editing && onRelatedJump && <RelatedTurns key={editing.highlight_id} conversationId={conversationId} highlight={editing} onJump={onRelatedJump} sending={sending} />}
+      {editing && onRelatedJump && <details><summary>Related Turns</summary><RelatedTurns key={editing.highlight_id} conversationId={conversationId} highlight={editing} onJump={onRelatedJump} sending={sending} /></details>}
       {compareId && highlights.some(h => h.highlight_id === compareId) && <ContextCompare conversationId={conversationId} highlightId={compareId} onClose={() => setCompareId(null)} />}
     </>}
-    renderMarkerActions={(highlight, { beginEdit }) => <>
+    renderMarkerActions={(highlight, { beginEdit }) => <details><summary>追加操作</summary>
       {onRelatedJump && <button disabled={highlight.status !== 'resolved'} onClick={() => beginEdit(highlight)}>Related Turns</button>}
       <button disabled={highlight.status !== 'resolved'} onClick={() => setKeepTarget({ ...highlight })}>質問キープ</button>
       <button disabled={highlight.status !== 'resolved'} onClick={() => setCompareId(highlight.highlight_id)}>Context Compare</button>
-    </>}
-    renderListExtras={({ highlights }) => <QuestionKeeps key={conversationId} conversationId={conversationId}
+    </details>}
+    renderListExtras={({ highlights }) => <details open={keepTarget ? true : undefined}><summary>質問キープ</summary><QuestionKeeps key={conversationId} conversationId={conversationId}
       highlights={highlights} selected={highlights.find(h => h.highlight_id === keepTarget?.highlight_id) ? keepTarget : null}
-      onClose={() => setKeepTarget(null)} runs={runs} onAsk={onAsk} sending={sending} />}
+      onClose={() => setKeepTarget(null)} runs={runs} onAsk={onAsk} sending={sending} /></details>}
   />;
 }

@@ -3,7 +3,7 @@ import { api } from './api.ts';
 import type { ConversationDetail, GenerationRun } from '../shared/contracts.ts';
 import type { QuestionKeep } from '../shared/question-keep.ts';
 
-export function Chat({ detail, refresh, onBusy, question, onCloseQuestion }: { detail: ConversationDetail; refresh: (id?: string) => Promise<void>; onBusy: (value: boolean) => void; question: (QuestionKeep & { newConversation?: boolean }) | null; onCloseQuestion: () => void }) {
+export function Chat({ detail, refresh, onBusy, question, onCloseQuestion, normalLayout = false }: { normalLayout?: boolean; detail: ConversationDetail; refresh: (id?: string) => Promise<void>; onBusy: (value: boolean) => void; question: (QuestionKeep & { newConversation?: boolean }) | null; onCloseQuestion: () => void }) {
   const [models, setModels] = useState<string[]>([]), [model, setModel] = useState('');
   const [input, setInput] = useState(''), [text, setText] = useState(''), [busy, setBusy] = useState(false);
   const [runId, setRunId] = useState(''), [status, setStatus] = useState(''), [error, setError] = useState('');
@@ -11,6 +11,7 @@ export function Chat({ detail, refresh, onBusy, question, onCloseQuestion }: { d
   const destination = useRef(detail.conversation.conversation_id);
   const panel = useRef<HTMLElement>(null);
   const [quote, setQuote] = useState('');
+  const [submitted, setSubmitted] = useState('');
   const base = `/api/conversations/${detail.conversation.conversation_id}`;
   const active = detail.runs.find(r => ['preparing','running'].includes(r.outcome));
   async function loadModels() {
@@ -38,6 +39,7 @@ export function Chat({ detail, refresh, onBusy, question, onCloseQuestion }: { d
     if (lock.current || active || !model || !input.trim()) return;
     lock.current = true; setBusy(true); onBusy(true); setText(''); setError(''); setStatus('準備中');
     destination.current=detail.conversation.conversation_id;
+    if (normalLayout) setSubmitted(input);
     if (!request.current || request.current.input !== input || request.current.model !== model || request.current.keepId !== question?.keep_id || request.current.newConversation !== question?.newConversation) request.current = { id: crypto.randomUUID(), input, model, keepId: question?.keep_id, newConversation: question?.newConversation };
     let prepared = false;
     try {
@@ -71,7 +73,7 @@ export function Chat({ detail, refresh, onBusy, question, onCloseQuestion }: { d
       } finally { await reader.cancel().catch(() => {}); reader.releaseLock(); }
     } catch (e) { setStatus('成功未確認'); setError((e as Error).message); }
     finally {
-      try { await refresh(destination.current); } catch (e) { setError(`DB再取得失敗: ${(e as Error).message}`); }
+      try { await refresh(destination.current); if (normalLayout) { setText(''); setSubmitted(''); } } catch (e) { setError(`DB再取得失敗: ${(e as Error).message}`); }
       if (prepared) { request.current = null; onCloseQuestion(); }
       setBusy(false); onBusy(false); setRunId(''); lock.current = false;
     }
@@ -80,7 +82,7 @@ export function Chat({ detail, refresh, onBusy, question, onCloseQuestion }: { d
     try { const r = await api<GenerationRun>(`/api/conversations/${runId ? destination.current : detail.conversation.conversation_id}/runs/${runId || active?.run_id}/cancel`, {}); setStatus(r.outcome); await refresh(r.conversation_id); }
     catch (e) { setError((e as Error).message); }
   }
-  return <section ref={panel}><h3>{question ? `${question.newConversation ? '新しいチャットで聞く' : 'このチャットで聞く'} — 質問の確認` : 'LM Studioチャット'}</h3>
+  return <section ref={panel} className={normalLayout ? "normal-chat-input" : undefined}><div className="chat-controls"><h3>{question ? `${question.newConversation ? '新しいチャットで聞く' : 'このチャットで聞く'} — 質問の確認` : 'LM Studioチャット'}</h3>
     {question && <><blockquote>{quote}</blockquote><p>この引用と確定した質問だけを送ります。通常の会話履歴は含めません。下書きは変更しません。</p><button disabled={busy} onClick={() => { onCloseQuestion(); setInput(''); }}>質問確認を閉じる</button></>}
     <button disabled={busy} onClick={() => void loadModels()}>モデル一覧更新</button>
     <label>モデル<select value={model} disabled={busy || !!active} onChange={e => setModel(e.target.value)}><option value="">モデルを選択</option>{models.map(m => <option key={m} value={m}>{m}</option>)}</select></label>
@@ -88,7 +90,10 @@ export function Chat({ detail, refresh, onBusy, question, onCloseQuestion }: { d
     <label>{question ? '送信する質問文' : 'チャット本文'}<textarea value={input} maxLength={question ? 10000 : 100000} disabled={busy || !!active} onChange={e => setInput(e.target.value)} /></label>
     <button disabled={busy || !!active || !model || !input.trim() || (!!question && !quote)} onClick={() => void send()}>送信</button>
     <button disabled={!runId && !active} onClick={() => void stop()}>停止</button>
+    {normalLayout && <button type="button" disabled title="設定画面は今後対応予定です">設定（準備中）</button>}
     <p role="status">{status || (active ? '生成中Runがあります' : '')}</p>{error && <p role="alert">{error}</p>}
+    </div>
+    {normalLayout && submitted && <pre aria-label="送信した本文">{submitted}</pre>}
     {text && <pre aria-label="streaming本文">{text.replace(/\r\n?/g, '\n')}</pre>}
   </section>;
 }

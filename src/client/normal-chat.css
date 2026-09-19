@@ -1,0 +1,39 @@
+/* Normal Chat only: shared Laboratory and Study screens keep their own layout. */
+body:has(.normal-chat){margin:0;background:#fff;color:#20252b}
+.normal-chat{--sidebar:240px;--composer:260px;padding:16px 24px}
+.normal-chat button:not(.minimap-dot){border:1px solid #cbd2d8;border-radius:7px;background:#fff;padding:8px 12px}
+.normal-chat button:not(.minimap-dot):hover:not(:disabled){background:#edf3f7}
+.normal-chat button:focus-visible,.normal-chat summary:focus-visible{outline:3px solid #527ea4;outline-offset:2px}
+.normal-chat .app-heading h1{font-size:21px;margin:0}
+.normal-chat>.layout{grid-template-columns:var(--sidebar) minmax(0,1fr);gap:32px}
+.normal-chat .layout>aside{position:sticky;top:16px;align-self:start;max-height:calc(100vh - 32px);overflow:auto}
+.normal-chat .layout>aside ul{list-style:none;padding:0}
+.normal-chat .layout>aside li button{width:100%;text-align:left;overflow-wrap:anywhere}
+.normal-chat .layout>aside [aria-current=true]{background:#e8eff5}
+.normal-chat main{display:flex;flex-direction:column;min-width:0;padding-bottom:calc(var(--composer) + 40px)}
+.normal-chat main>h2{font-size:20px;overflow-wrap:anywhere}
+.normal-chat .normal-markers{display:contents}
+.normal-chat .normal-markers>section,.normal-chat .normal-markers>details{order:3}
+.normal-chat .normal-chat-input{order:2}
+.normal-chat .run-details{order:4}
+.normal-chat .normal-markers>div:last-child{order:1;min-height:25vh}
+.normal-chat .normal-markers>div:last-child>h3{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.normal-chat article[data-turn]{border:0;border-bottom:1px solid #e7ebee;padding:24px 12px;margin:0;line-height:1.7;scroll-margin-bottom:280px}
+.normal-chat article[data-turn]:has(>pre){background:#f5f7f9;border-radius:10px}
+.normal-chat article[data-turn]>b{font-size:13px;color:#536270}
+.normal-chat .developer-tools{display:none}
+.normal-chat .run-details{margin:16px 0}
+.normal-chat .normal-chat-input{border:0;padding:0;margin:0;display:flex;flex-direction:column}
+.normal-chat .normal-chat-input>pre{order:-1;background:#f5f7f9;padding:20px;line-height:1.7}
+.normal-chat .chat-controls{position:fixed;bottom:0;left:calc(var(--sidebar) + 56px);right:156px;z-index:4;background:#fff;border:1px solid #d6dde3;border-radius:12px 12px 0 0;padding:12px 16px;box-shadow:0 -4px 18px #2437480a;max-height:45vh;overflow:auto;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.normal-chat .chat-controls>h3{display:none}
+.normal-chat .chat-controls>label:has(textarea){order:-1;flex-basis:100%;margin:0;font-size:13px}
+.normal-chat .chat-controls textarea{height:72px;min-height:52px;resize:vertical;border:1px solid #b8c5ce;border-radius:8px;padding:10px}
+.normal-chat .chat-controls>label:has(select){margin:0;font-size:12px;flex:1;min-width:120px}
+.normal-chat .chat-controls select{width:100%;max-width:320px}
+.normal-chat .chat-controls>p{flex-basis:100%;margin:0;font-size:13px}
+.normal-chat .chat-controls>p:empty{display:none}
+.normal-chat .minimap{top:20px}
+@media(max-width:1099px){.normal-chat .chat-controls{right:24px}.normal-chat .minimap{top:12px;bottom:auto}.normal-chat main>h2{padding-right:120px}}
+@media(max-width:700px){.normal-chat{padding:12px;--sidebar:150px}.normal-chat>.layout{display:grid;gap:12px;grid-template-columns:150px minmax(0,1fr)}.normal-chat .layout>aside{font-size:13px}.normal-chat .chat-controls{left:12px;right:12px}.normal-chat .layout>aside{max-height:calc(100vh - 300px)}.normal-chat main{padding-bottom:300px}.normal-chat main>h2{padding-right:0;margin-top:50px}.normal-chat .minimap{font-size:12px}.normal-chat .layout>aside input{width:100%}}
+@media(max-width:420px){.normal-chat>.layout{grid-template-columns:110px minmax(0,1fr)}}
