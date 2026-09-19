@@ -11,6 +11,7 @@ import { Repository } from '../src/server/storage/repository.ts';
 import { LMStudioProvider } from '../src/server/provider.ts';
 import { GenerationService } from '../src/server/generation.ts';
 import { createAppServer } from '../src/server/http.ts';
+import { chatGenerationDefaults, chatThinkingPresets } from '../src/shared/chat-generation-settings.ts';
 
 const sse = (text: string, finish: string | null = null) => `data: ${JSON.stringify({ choices: [{ index: 0, delta: { content: text }, finish_reason: finish }] })}\r\n\r\n`;
 async function fixture(fn: (f: { db: DatabaseSync; repo: Repository; service: GenerationService; provider: LMStudioProvider; id: string; base: string; mode: (value: string) => void; requests: Record<string, unknown>[] }) => Promise<void>) {
@@ -20,13 +21,20 @@ async function fixture(fn: (f: { db: DatabaseSync; repo: Repository; service: Ge
     let body = ''; for await (const chunk of req) body += chunk; requests.push(JSON.parse(body));
     if (mode === 'http') { res.writeHead(503); res.end(); return; }
     res.writeHead(200, { 'Content-Type': 'text/event-stream' });
+    if (mode === 'reasoning-limit') {
+      res.write(`data: ${JSON.stringify({ choices: [{ index: 0, delta: { reasoning_content: '内部推論のみ' }, finish_reason: 'length' }] })}\n\n`);
+      res.write(`data: ${JSON.stringify({ choices: [], usage: { prompt_tokens: 10, completion_tokens: 4096, total_tokens: 4106 } })}\n\n`);
+      res.end('data: [DONE]\n\n'); return;
+    }
     const bytes = Buffer.from(sse('日本語😀\r'));
     for (const byte of bytes) res.write(Buffer.from([byte]));
     if (mode === 'hold') return;
     if (mode === 'disconnect') { res.end(); return; }
     if (mode === 'bad') { res.end('data: invalid\n\n'); return; }
     if (mode === 'no-finish') { res.end('data: [DONE]\n\n'); return; }
-    await delay(25); res.write(sse('\n回答', 'stop')); res.end('data: [DONE]\r\n\r\n');
+    await delay(25); res.write(sse('\n回答', 'stop'));
+    res.write(`data: ${JSON.stringify({ choices: [], usage: { prompt_tokens: 10, completion_tokens: 20, total_tokens: 30 } })}\r\n\r\n`);
+    res.end('data: [DONE]\r\n\r\n');
   });
   upstream.listen(0,'127.0.0.1'); await once(upstream,'listening');
   const db = openDatabase(':memory:'), repo = new Repository(db), id = repo.createConversation('test').conversation_id;
@@ -48,7 +56,27 @@ test('通常生成・分割UTF8 SSE・streaming・LF・snapshotと送信一致',
   await f.service.execute(run,e=>{events.push(e); if(e.type==='delta')assert.equal(f.repo.run(f.id,run.run_id).outcome,'running');});
   assert.equal(f.repo.run(f.id,run.run_id).outcome,'succeeded'); assert.equal(f.repo.getTurn(f.id,run.assistant_turn_id).content,'日本語😀\n回答');
   assert.deepEqual(f.requests[0],run.request_snapshot); assert.equal(events.filter(e=>e.type==='delta').length,2); assert.equal(events.at(-1)?.outcome,'succeeded');
+  assert.equal(run.request_snapshot.max_tokens,4096); assert.deepEqual(run.request_snapshot.stream_options,{include_usage:true});
   assert.throws(()=>f.db.exec("UPDATE turns SET content='overwrite'"),/immutable/);
+}));
+test('Chat defaultとThinking presetは暫定定義、reasoning/usage診断を本文と分離', async () => fixture(async f => {
+  assert.equal(chatGenerationDefaults.maxTokens,4096);
+  assert.deepEqual(Object.fromEntries(Object.entries(chatThinkingPresets).map(([key,value])=>[key,value.maxTokens])),
+    {off:2048,low:4096,medium:8192,high:16384});
+  assert.ok(Object.values(chatThinkingPresets).every(value=>value.provisional&&value.thinkingControl==='not_applied'));
+  let diagnostics: import('../src/server/provider.ts').GenerationDiagnostics | undefined, text='';
+  await f.provider.generate({model:'test-model',messages:[{role:'user',content:'q'}],stream:true,max_tokens:4096,
+    stream_options:{include_usage:true}},new AbortController().signal,delta=>{text+=delta;},value=>{diagnostics=value;});
+  assert.equal(text,'日本語😀\r\n回答');
+  assert.deepEqual(diagnostics,{finish_reason:'stop',completion_tokens:20,prompt_tokens:10,total_tokens:30,
+    content_chars:9,reasoning_chars:0,duration_ms:diagnostics!.duration_ms,terminal_chunk_received:true});
+}));
+test('reasoningだけで上限終了した空本文を可能性表現で分類', async () => fixture(async f => {
+  f.mode('reasoning-limit'); const run=prepare(f.repo,f.id); await f.service.execute(run,()=>{});
+  const saved=f.repo.run(f.id,run.run_id);
+  assert.equal(saved.outcome,'failed');
+  assert.equal(saved.error?.message,'回答本文を生成する前に出力上限へ達した可能性があります');
+  assert.equal(f.repo.getTurn(f.id,run.assistant_turn_id).content,'');
 }));
 test('cancel・500ms部分保存・cancelled不変・再送は新ID', async () => fixture(async f => {
   f.mode('hold'); const run=prepare(f.repo,f.id); const execution=f.service.execute(run,()=>{});

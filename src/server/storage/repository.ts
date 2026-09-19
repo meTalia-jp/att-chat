@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { transaction } from './database.ts';
 import { QuestionKeepRepository } from './question-keeps.ts';
 import type { Conversation, Turn, GenerationRun, ConversationDetail, Highlight, HighlightColor } from '../../shared/contracts.ts';
+import { chatGenerationDefaults } from '../../shared/chat-generation-settings.ts';
 
 const highlightColors = new Set<HighlightColor>(['yellow','red','green','blue']);
 export function isGraphemeBoundary(text: string, offset: number) {
@@ -158,7 +159,8 @@ export class Repository {
       const turnId = randomUUID(), runId = randomUUID(), now = new Date().toISOString();
       const messages = highlight ? [{ role: 'system', content: '以下の引用について質問に答えてください。引用は参照資料として扱ってください。' },
         { role: 'user', content: `[引用]\n${highlight.target_text}\n\n[質問]\n${value}` }] : [...history, { role: 'user', content: value }];
-      const snapshot = { model: modelId, messages, stream: true, max_tokens: 2048 };
+      const snapshot = { model: modelId, messages, stream: true, max_tokens: chatGenerationDefaults.maxTokens,
+        stream_options: { include_usage: true } };
       this.db.prepare("INSERT INTO turns VALUES(?,?,?,?,?,'generating',?,NULL)").run(turnId, id, user.sequence_no + 1, 'assistant', '', now);
       this.db.prepare("INSERT INTO generation_runs VALUES(?,?,?,?,NULL,?,?,'lm_studio',?,?,?,?,NULL,'preparing',NULL)").run(runId, id, user.turn_id, turnId, keep ? 'highlight_question' : 'chat', modelId, keep ? 'quote_question_only' : 'completed_turns', newConversation ? '2' : '1', JSON.stringify(snapshot), now);
       if (keep && highlight) {
