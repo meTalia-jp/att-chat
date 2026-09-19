@@ -1,0 +1,27 @@
+:root{
+  --marker-yellow-text:#ffd84d;
+  --marker-red-text:#ff7a73;
+  --marker-green-text:#69d57a;
+  --marker-blue-text:#6aafff;
+  --marker-yellow-list:#ffc928;
+  --marker-red-list:#f95d67;
+  --marker-green-list:#3fc45d;
+  --marker-blue-list:#438ff0;
+  --marker-yellow-minimap:#ffb800;
+  --marker-red-minimap:#ed334d;
+  --marker-green-minimap:#1fa447;
+  --marker-blue-minimap:#216dd6;
+}
+.mark-yellow{background:var(--marker-yellow-text)}
+.mark-red{background:var(--marker-red-text)}
+.mark-green{background:var(--marker-green-text)}
+.mark-blue{background:var(--marker-blue-text)}
+.marker-list .mark-yellow,.marker-editor .mark-yellow,.marker-color-select.mark-yellow{background:var(--marker-yellow-list)}
+.marker-list .mark-red,.marker-editor .mark-red,.marker-color-select.mark-red{background:var(--marker-red-list)}
+.marker-list .mark-green,.marker-editor .mark-green,.marker-color-select.mark-green{background:var(--marker-green-list)}
+.marker-list .mark-blue,.marker-editor .mark-blue,.marker-color-select.mark-blue{background:var(--marker-blue-list)}
+.minimap .mark-yellow{background:var(--marker-yellow-minimap)}
+.minimap .mark-red{background:var(--marker-red-minimap)}
+.minimap .mark-green{background:var(--marker-green-minimap)}
+.minimap .mark-blue{background:var(--marker-blue-minimap)}
+.marker-color-select{color:#172033}

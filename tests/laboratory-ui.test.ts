@@ -54,7 +54,7 @@ test('Catalog / Workspace reuse experiments and gate session / generation switch
     const settle=async(fn:()=>void)=>{await act(async()=>{fn();await new Promise(r=>setTimeout(r,15));});};
     const button=(name:string)=>{const b=Array.from(container.querySelectorAll('button')).find(b=>b.textContent===name);assert.ok(b,name);return b;};
     await settle(()=>root!.render(createElement(Laboratory)));
-    assert.equal(container.querySelectorAll('[aria-label="Experiment Catalog"] li').length,3);
+    assert.equal(container.querySelectorAll('[aria-label="Experiment Catalog"] li').length,4);
     assert.deepEqual(calls,['/api/laboratory/sessions/current','/api/conversations']);
     await settle(()=>button('Run').click());
     await settle(()=>button('セッションを開始').click());
@@ -91,6 +91,15 @@ test('Catalog / Workspace reuse experiments and gate session / generation switch
     assert.ok(container.querySelector('[aria-label="Run"]')!.textContent!.includes('Record only'));
     assert.equal(container.querySelector('.single-text-generation'),null);
     assert.ok(calls.every(path=>!path.includes('study')&&!path.includes('question-')));
+    await settle(()=>button('Marker Color Sample').click());
+    assert.match(container.querySelector('[aria-label="Overview"]')!.textContent!,/marker-color-sample/);
+    await settle(()=>button('Run').click());
+    assert.equal(container.querySelectorAll('[data-palette]').length,5);
+    assert.deepEqual(Array.from(container.querySelectorAll('[data-palette]')).map(item=>item.getAttribute('data-palette')),
+      ['current','vivid-a','vivid-b','pastel','high-contrast']);
+    assert.equal(container.querySelectorAll('[aria-label$="miniMAP相当の小さい色点"]').length,5);
+    await settle(()=>button('Results').click());
+    assert.match(container.querySelector('[aria-label="Results"]')!.textContent!,/自動スコアとRun JSONは作成しません/);
     await settle(()=>root!.render(createElement(Laboratory,{key:'derived',definitions:[...experiments,derivedExperiment]})));
     await settle(()=>button(derivedExperiment.title).click());
     assert.match(container.querySelector('[aria-label="Overview"]')!.textContent!,/fixture-marker-review/);

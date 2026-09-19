@@ -90,7 +90,7 @@ export function MarkerCore({ conversationId, turns, reloadToken, showTurnIds = t
     <MiniMap key={conversationId} root={root} highlights={highlights} turns={turns} onJump={jump} />
     <section className="marker-editor" ref={editor}>
       <h3>AttMarker</h3><p>completed Assistant本文内の対応範囲を選択してください。</p>
-      {(draft || editing) && <><p>選択: {(draft ?? editing)!.target_text}</p><label>色<select value={color} onChange={event => setColor(event.target.value as HighlightColor)}>{highlightColors.map(value => <option key={value}>{value}</option>)}</select></label><label>メモ<textarea value={note} maxLength={10000} onChange={event => setNote(event.target.value)} /></label>{draft ? <button onClick={() => void register()}>登録</button> : <><button onClick={() => void update()}>更新</button><button onClick={() => void remove()}>削除</button></>}</>}
+      {(draft || editing) && <><p>選択: {(draft ?? editing)!.target_text}</p><label>色<span className={`color-swatch mark-${color}`} aria-hidden="true" /><select className={`marker-color-select mark-${color}`} value={color} onChange={event => setColor(event.target.value as HighlightColor)}>{highlightColors.map(value => <option key={value}>{value}</option>)}</select></label><label>メモ<textarea value={note} maxLength={10000} onChange={event => setNote(event.target.value)} /></label>{draft ? <button onClick={() => void register()}>登録</button> : <><button onClick={() => void update()}>更新</button><button onClick={() => void remove()}>削除</button></>}</>}
       <p role="status">{message}</p>{error && <p role="alert">{error}</p>}
     </section>
     {renderEditorExtras?.(context)}

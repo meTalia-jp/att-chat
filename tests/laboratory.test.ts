@@ -8,11 +8,12 @@ import { LMStudioProvider } from '../src/server/provider.ts';
 import { startLaboratory } from '../src/laboratory/server.ts';
 import { experiments, canSwitchExperiment } from '../src/laboratory/catalog.ts';
 
-test('Catalog has three fixed entries and switching respects generation and Simple session',()=>{
-  assert.equal(experiments.length,3);
-  assert.equal(new Set(experiments.map(e=>e.id)).size,3);
-  assert.deepEqual(experiments.map(e=>e.runnable),[true,true,false]);
+test('Catalog has four fixed entries and switching respects generation and Simple session',()=>{
+  assert.equal(experiments.length,4);
+  assert.equal(new Set(experiments.map(e=>e.id)).size,4);
+  assert.deepEqual(experiments.map(e=>e.runnable),[true,true,false,true]);
   assert.equal(experiments[2].kind,'existing-experiment');assert.equal(experiments[2].execution,null);
+  assert.equal(experiments[3].execution?.entry,'marker-color-sample');
   for(const e of experiments){assert.ok(e.title&&e.purpose&&e.hypothesis&&e.version&&e.status&&e.equipment.length);if(e.runnable)assert.equal(e.execution!.entry,e.id);}
   assert.equal(canSwitchExperiment(false,false),true);
   for(const [busy,session] of [[true,false],[false,true],[true,true]])assert.equal(canSwitchExperiment(busy,session),false);

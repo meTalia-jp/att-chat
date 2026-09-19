@@ -23,5 +23,13 @@ export const experiments: readonly ExperimentDefinition[] = [
     purpose:'既存のStudy Tutor制御実験を参照する',
     hypothesis:'Study固有処理を共通化せず独立実験として保持できる',
     equipment:['既存Study P0 runner'],execution:null },
+  { schema_version:1, derived_from:null,
+    procedure:['Runを開く','同じ文章・一覧・miniMAP条件で5 paletteを比較','評価項目に沿って人間が候補を判断'],
+    acceptance:['Currentを採用前の旧本番色として保持','Vivid A / Vivid B / Pastel / High Contrastを同時比較','Marker保存契約を変更しない'],
+    id:'marker-color-sample',title:'Marker Color Sample',kind:'example',status:'TESTING',version:'0.1',runnable:true,
+    purpose:'Marker表示色を本番採用前に本文・一覧・miniMAP相当で目視比較する',
+    hypothesis:'現在より彩度を上げるとMarker位置を認識しやすくなるが、高彩度すぎる場合は本文可読性を低下させる可能性がある',
+    equipment:['Marker color IDs','Visual Sample Workspace'],
+    execution:{kind:'interactive',entry:'marker-color-sample'} },
 ];
 export function canSwitchExperiment(busy: boolean, simpleSession: boolean) { return !busy && !simpleSession; }
