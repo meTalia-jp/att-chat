@@ -31,5 +31,13 @@ export const experiments: readonly ExperimentDefinition[] = [
     hypothesis:'現在より彩度を上げるとMarker位置を認識しやすくなるが、高彩度すぎる場合は本文可読性を低下させる可能性がある',
     equipment:['Marker color IDs','Visual Sample Workspace'],
     execution:{kind:'interactive',entry:'marker-color-sample'} },
+  { schema_version:1, derived_from:null,
+    procedure:['Runを開く','A / D2を切り替える','選択→色でMarkerを確定','左▽のDetailと右▽のQuick仮パネルを確認'],
+    acceptance:['色クリックでDetailを自動展開しない','左/中央/右の意味を固定','A / D2は外観だけ異なる','本番Marker/API/DBを変更しない'],
+    id:'marker-quick-action-prototype',title:'Marker Quick Action Prototype',kind:'example',status:'TESTING',version:'0.4',runnable:true,
+    purpose:'左右▽付きSignalでMarker最短経路とPersistent / Quickの分離を確認する',
+    hypothesis:'選択→色クリックを最短経路に固定し、保存系を左、Quick系を右へ分離するとMarker操作を妨げず追加機能へアクセスできる',
+    equipment:['Vivid A display tokens','Selection Range','Experiment-local in-memory Marker'],
+    execution:{kind:'interactive',entry:'marker-quick-action-prototype'} },
 ];
 export function canSwitchExperiment(busy: boolean, simpleSession: boolean) { return !busy && !simpleSession; }

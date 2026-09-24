@@ -6,6 +6,7 @@ import type { SimpleRun } from './run-contracts.ts';
 import type { Conversation } from '../shared/contracts.ts';
 import { laboratoryJson, RunResults } from './RunResults.tsx';
 import { MarkerColorSample } from './MarkerColorSample.tsx';
+import { MarkerQuickActionPrototype } from './MarkerQuickActionPrototype.tsx';
 
 export function Laboratory({ definitions = experiments }: { definitions?: readonly ExperimentDefinition[] } = {}) {
   const [selected, setSelected] = useState(definitions[0].id);
@@ -86,6 +87,7 @@ export function Laboratory({ definitions = experiments }: { definitions?: readon
             ? <SingleTextGeneration onBusy={setBusy} />
             : <button onClick={() => setSingleOpened(true)}>Single Text Generationを開く</button>)}
           {entry === 'marker-color-sample' && <MarkerColorSample />}
+          {entry === 'marker-quick-action-prototype' && <MarkerQuickActionPrototype />}
           {selected === 'study-p0' && <><p>Record only。StudyをLaboratory内では起動・統合しません。</p>
             <p>既存の起動方法は src/study-poc/serve.ts と vite.study.config.ts、docs/study-p0-design.md を参照してください。</p></>}
         </section>
@@ -99,6 +101,8 @@ export function Laboratory({ definitions = experiments }: { definitions?: readon
             <button onClick={() => { setSingleOpened(true); setTab('Run'); }}>保存Runを確認</button></>}
           {entry === 'marker-color-sample' && <><p>このExperimentは人間による比較用です。自動スコアとRun JSONは作成しません。</p>
             <p>Runで本文可読性、一覧の識別性、miniMAPの小点、明暗面を確認し、採用判断は別の本番変更Phaseで記録してください。</p></>}
+          {entry === 'marker-quick-action-prototype' && <><p>操作感を確認するLab内Prototypeです。Markerはメモリ内だけに保持し、DB・Highlight API・本番Chatへ保存しません。</p>
+            <p>Runで選択直後の位置、クリックしやすさ、selection保持、端処理、外側クリックとEscを確認してください。</p></>}
           {selected === 'study-p0' && <><p>既存の検証文書を参照してください。Study P0のセッションはメモリ上の記録です。</p>
             <ul>{['docs/study-p0-results.md','docs/study-p0-model-comparison.md','docs/study-p0-tutor-control-comparison.md'].map(path => <li key={path}><code>{path}</code></li>)}</ul></>}
         </section>
