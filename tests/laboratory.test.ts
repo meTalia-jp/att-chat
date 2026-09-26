@@ -1,12 +1,25 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readdirSync, statSync } from 'node:fs';
+import { join, resolve, relative, isAbsolute } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
 import { randomUUID } from 'node:crypto';
 import { LMStudioProvider } from '../src/server/provider.ts';
 import { startLaboratory } from '../src/laboratory/server.ts';
 import { experiments, canSwitchExperiment } from '../src/laboratory/catalog.ts';
+
+test('Catalog primary documents exist inside the repository and Experiment IDs are unique',()=>{
+  const root=fileURLToPath(new URL('../',import.meta.url));
+  assert.equal(new Set(experiments.map(e=>e.id)).size,experiments.length);
+  for(const e of experiments){
+    assert.ok(e.document_path?.trim(),`${e.id}: document_path required`);
+    assert.equal(isAbsolute(e.document_path),false);
+    const path=resolve(root,e.document_path),fromRoot=relative(root,path);
+    assert.ok(fromRoot && !fromRoot.startsWith('..') && !isAbsolute(fromRoot),e.id);
+    assert.ok(statSync(path).isFile(),`${e.id}: ${e.document_path}`);
+  }
+});
 
 test('Catalog has five fixed entries and switching respects generation and Simple session',()=>{
   assert.equal(experiments.length,5);

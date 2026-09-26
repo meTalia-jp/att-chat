@@ -1,0 +1,17 @@
+{
+  "name": "EJDict-hand",
+  "expected_filename": "ejdict.json",
+  "expected_sha256": "74bf048fddee2d5bad426f81cc2c10374ae7d8007d7f8550bf42d86c61614e2b",
+  "expected_size": 5009560,
+  "placement_path": "public/dictionaries/ejdict-hand/ejdict.json",
+  "source_url": "https://github.com/kujirahand/EJDict",
+  "download_url": "https://kujirahand.com/web-tools/EJDictFreeDL.php",
+  "license": "Public Domain",
+  "retrieved_at": "2026-09-25",
+  "files": [
+    "ejdict.json",
+    "README.md"
+  ],
+  "modified": false,
+  "notes": "Quick Dictionary Prototype v0.1 用。公式配布JSONをそのまま使用。"
+}

@@ -1,5 +1,26 @@
 # Laboratory Phase 2: Simple Marker Chat
 
+## Current State
+
+照合日: 2026-09-26。Repositoryのdirty working treeを根拠とする要約。以下のPhase履歴は当時の記録として保持する。実装完了・技術検証・ユーザー評価・本番採用は別の判定。
+
+- Catalog ID: `simple-marker-chat`
+- Catalog status: `TESTING`
+- Current phase: Laboratory v0.1 / Phase 5.1（Catalog version 0.1）。本書のPhase 2実装に、共通の[Phase 5](laboratory-phase5-run-records.md)・[Phase 5.1](laboratory-phase51-completion-fixes.md)が追加済み。
+- Implemented through: implementation complete（記録された範囲）。Chat + MarkerCore composition、専用Lab保存先、session開始/終了、Results、定義snapshot、Marker ID-onlyイベントまで。
+- Technical validation: 上記Phaseの自動・実ブラウザ/実LM Studio検証は記録上完了。今回の再検証は自動テスト/typecheck/buildに限定し、当時の実機検証と区別する。
+- User evaluation: 最終的な使いやすさ・Experiment全体の受入完了を示す人間判断は確認できない。技術的操作確認と区別。
+- Adopted outputs: 既存Chat/Marker部品のLab内再利用は成立。本Experimentから本番への新機能採用判断は確認できない。
+- Production impact: 専用画面・Lab記録を追加。共有MarkerCoreにshowTurnIdsオプションを追加したが本番既定trueを維持。Lab session処理を本番へ反映したものではない。
+- Pending decision: user evaluationとExperiment全体の受入判断。TESTING維持。ADOPTED/PARTIALへ変える明確な追加根拠は確認できない。
+- Allowed change scope: 今回は本書Current Stateのみ。再開時は別途依頼の範囲内でSimple専用composition・Lab session/Results・対応テストを扱う（Phase 5/5.1の境界）。共有部品変更は自動許可ではない。
+- Excluded scope: 本番Chat機能、Marker anchor、Core API/DB schema、Study統合、汎用Runner/Plugin基盤。
+- Primary code: [SimpleMarkerChat](../src/client/SimpleMarkerChat.tsx)、[SimpleSessions](../src/laboratory/simple-sessions.ts)、[Lab server](../src/laboratory/server.ts)
+- Primary tests: [Simple](../tests/simple-marker-chat.test.ts)、[Run](../tests/laboratory-runs.test.ts)、[completion](../tests/laboratory-completion.test.ts)
+- Known limitations: 単一Labプロセス/session。SQLiteとRun JSONは一括transactionではなく完全監査ログではない。Run completedは明示終了であり生成成功・検証合格ではない。
+- Reproduction notes: 現在の共通起動は[LAB_GUIDE](../LAB_GUIDE.md)。以下の専用5193起動・「Catalog未着手」はPhase 2当時の履歴で、現在はCatalog/Resultsあり。
+
+
 ## 実装
 
 既存画面とは別のHTML入口 `simple-marker-chat.html` を追加した。ページ全体スクロールと既存CSSを使用する。新しいMarker・miniMAP・jump・Chat送信処理は作っていない。

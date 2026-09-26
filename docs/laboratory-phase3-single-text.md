@@ -1,5 +1,26 @@
 # Laboratory Phase 3: Single Text Generation
 
+## Current State
+
+照合日: 2026-09-26。Repositoryのdirty working treeを根拠とする要約。以下のPhase履歴は当時の記録として保持する。実装完了・技術検証・ユーザー評価・本番採用は別の判定。
+
+- Catalog ID: `single-text-generation`
+- Catalog status: `TESTING`
+- Current phase: Laboratory v0.1 / Phase 5.1（Catalog version 0.1）。[Phase 5](laboratory-phase5-run-records.md)・[Phase 5.1](laboratory-phase51-completion-fixes.md)でCatalog/Resultsと正本snapshot運用を追加。
+- Implemented through: implementation complete（記録された範囲）。単発生成・Stop・checkpoint/復旧・Run JSON・Results・旧snapshot互換まで。Conversation非依存を維持。
+- Technical validation: Phase 3〜5.1の自動・実ブラウザ/実LM Studio検証は記録上完了。今回の再検証は自動のみ。Run validation_status=not_runとコードの検証完了は別概念。
+- User evaluation: Experiment全体の人間による受入完了は確認できない。実機の生成/停止確認を採用判断と同一視しない。
+- Adopted outputs: ProviderのLab再利用は実証。本Experimentから本番への新機能採用判断は確認できない。
+- Production impact: Lab専用UI/service/JSON保存を追加。Single実行系はDB/Conversation/GenerationService非依存。完全LabサーバーはSimple用DBも開くため「Lab全体がDB不使用」ではない。
+- Pending decision: user evaluationと全体受入。TESTING維持。自動テストだけでADOPTEDへ変更しない。
+- Allowed change scope: 今回は本書Current Stateのみ。再開時は別途依頼の範囲内でSingle専用UI/serviceと対応テスト。共通保存部品の変更はSimpleへの影響確認と明示scopeが必要。
+- Excluded scope: 本番Chat、DB/migration、Study、汎用Runner、任意Plugin実行、Run形式の無断変更。
+- Primary code: [UI](../src/laboratory/single-text/SingleTextGeneration.tsx)、[service](../src/laboratory/single-text/service.ts)
+- Primary tests: [service/HTTP](../tests/single-text.test.ts)、[UI](../tests/single-text-ui.test.ts)、[completion](../tests/laboratory-completion.test.ts)
+- Known limitations: max_tokens=2048、temperature=0.7。completedは回答の意味的完成ではない。全件JSON読込・checkpoint間の損失・dirtyコードの完全再現に制限。
+- Reproduction notes: 共通起動は[LAB_GUIDE](../LAB_GUIDE.md)。本書5194はDBを開かないSingle専用入口。以下のCatalog/履歴一覧未実装はPhase 3当時の状態で、現在のLab Resultsとは区別。
+
+
 ## 構成と再利用
 
 単発テキスト生成だけを扱う専用画面・サーバーを追加した。Conversation / Turn / Marker / SQLiteは利用しない。

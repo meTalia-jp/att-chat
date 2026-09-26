@@ -65,6 +65,7 @@ export function Laboratory({ definitions = experiments }: { definitions?: readon
             <dt>Status</dt><dd>{experiment.status}</dd>
             <dt>Version</dt><dd>{experiment.version}</dd>
             <dt>ID</dt><dd>{experiment.id}</dd>
+            <dt>Primary document (Repository path)</dt><dd><code>{experiment.document_path ?? '未指定'}</code></dd>
             <dt>Derived from</dt><dd>{experiment.derived_from ? `${experiment.derived_from.id} / ${experiment.derived_from.version}` : 'なし'}</dd>
             <dt>Procedure</dt><dd>{experiment.procedure.join(' → ')}</dd>
             <dt>Acceptance</dt><dd>{experiment.acceptance.join(' / ')}</dd>
@@ -101,8 +102,8 @@ export function Laboratory({ definitions = experiments }: { definitions?: readon
             <button onClick={() => { setSingleOpened(true); setTab('Run'); }}>保存Runを確認</button></>}
           {entry === 'marker-color-sample' && <><p>このExperimentは人間による比較用です。自動スコアとRun JSONは作成しません。</p>
             <p>Runで本文可読性、一覧の識別性、miniMAPの小点、明暗面を確認し、採用判断は別の本番変更Phaseで記録してください。</p></>}
-          {entry === 'marker-quick-action-prototype' && <><p>操作感を確認するLab内Prototypeです。Markerはメモリ内だけに保持し、DB・Highlight API・本番Chatへ保存しません。</p>
-            <p>Runで選択直後の位置、クリックしやすさ、selection保持、端処理、外側クリックとEscを確認してください。</p></>}
+          {entry === 'marker-quick-action-prototype' && <><p>操作感を確認するLab内Prototypeです。MarkerとQuick Memoはメモリ内だけに保持し、DB・Highlight API・本番Chatへ保存しません。</p>
+            <p>Runでドラッグ終端→右▷→右Menu→右Sidebarの移動感、端での反転、Signalの視覚バランスを確認してください。Quick Memoは断片追加、Dictionaryは英単語1語のローカル辞書検索です。採用判断はユーザー評価待ちです。</p></>}
           {selected === 'study-p0' && <><p>既存の検証文書を参照してください。Study P0のセッションはメモリ上の記録です。</p>
             <ul>{['docs/study-p0-results.md','docs/study-p0-model-comparison.md','docs/study-p0-tutor-control-comparison.md'].map(path => <li key={path}><code>{path}</code></li>)}</ul></>}
         </section>

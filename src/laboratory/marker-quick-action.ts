@@ -34,6 +34,23 @@ export function textareaHeight(scrollHeight: number, minHeight: number, maxHeigh
   return { height, overflowY: scrollHeight > maxHeight ? 'auto' as const : 'hidden' as const };
 }
 
+// Align the right-arrow center 12px to the right of the final selected line.
+// The 216px Signal has its arrow center 21px inside the right edge.
+export function endSignalPosition(rect: Pick<DOMRect, 'left' | 'right' | 'top' | 'bottom'>, viewport: { width: number; height: number }, size = { width: 216, height: 44 }): PalettePosition {
+  const position = palettePosition(rect, viewport, size, 8, true);
+  return { ...position, left: Math.min(Math.max(8, viewport.width - size.width - 8), Math.max(8, rect.right + 12 - size.width + 21)) };
+}
+
+export function quickMenuPosition(signal: Pick<DOMRect, 'left' | 'right' | 'top'>, viewport: { width: number; height: number }, size: { width: number; height: number }) {
+  const side = signal.right + 8 + size.width <= viewport.width - 8 ? 'right' : 'left';
+  const desiredLeft = side === 'right' ? signal.right + 8 : signal.left - 8 - size.width;
+  return {
+    side,
+    left: Math.min(Math.max(8, viewport.width - size.width - 8), Math.max(8, desiredLeft)),
+    top: Math.min(Math.max(8, viewport.height - size.height - 8), Math.max(8, signal.top)),
+  };
+}
+
 export function overlaps(a: Pick<QuickMarker, 'start' | 'end'>, b: Pick<QuickMarker, 'start' | 'end'>) {
   const before = (x: SelectionPoint, y: SelectionPoint) => x.paragraph < y.paragraph || (x.paragraph === y.paragraph && x.offset < y.offset);
   return before(a.start, b.end) && before(b.start, a.end);

@@ -1,121 +1,47 @@
-# att-chat Laboratory current state
+# Laboratory asset inventory
 
-調査日: 2026-09-19
+最終照合: 2026-09-26、HEAD `74aae1e` + **dirty working tree**（Phase 1、Quick系の未コミット変更、辞書・Study等の未追跡資産を含む）。HEADだけでは再現できません。
 
-## 分類上の注意
+## 分類ルール
 
-現行コードにEquipment registry、Equipment interface、動的探索機構はない。
-`ExperimentDefinition.equipment` はCatalogに表示する文字列メタデータであり、そこへ記載された名前だけを
-「実装済みEquipment」とは判定しない。本書では、実在するmodule / Component / Service、テストfixture、
-再利用候補を分けて記載する。
+- Experiment一覧と状態の正本は[Catalog](../../src/laboratory/catalog.ts)。Inventoryは資産分類専用で、Experiment状態を複製しません。
+- Catalogの`equipment`文字列だけではEquipment認定しません。再利用実績がないものはFixture / Component / Data Asset等のままです。
+- Componentは実装部品、Fixtureは実験専用の画面・治具、Data Assetは入力・参照データ、Test Fixtureはテスト専用の代用品です。
+- Equipment Candidateは共有の道具として検討する候補。Equipmentは用途・境界が合意された道具ですが、今回は認定せず0件です。Tool Card作成も昇格を意味しません。
+- stack等はまとめて1資産として数えます。Evidenceは参照・テスト・記録であり、実行回数や今回の実ブラウザ検証を意味しません。Maturityは資産の成熟度でありExperiment statusではありません。
+- [LAB_GUIDE](../../LAB_GUIDE.md)から対象ExperimentのScope Boundaryを確認し、本書→[Tool Cards](tool-cards/README.md)→コード/Testsと進みます。Cardは利用許可を拡張しません。
 
-## Experiments
+## 資産
 
-正本は `src/laboratory/catalog.ts` の固定配列である。
+| Name | Classification | Code path | Used by | Evidence | Side effects | Tool Card | Maturity |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| LMStudioProvider | Equipment Candidate | [provider.ts](../../src/server/provider.ts) | Core/Simple、Single、Study | [service.ts](../../src/laboratory/single-text/service.ts) | loopback HTTP・推論消費 | [Card](tool-cards/lmstudio-provider.md) | 共有、未昇格 |
+| RunFiles&lt;T&gt; | Equipment Candidate | [run-files.ts](../../src/laboratory/single-text/run-files.ts) | Simple、Single | [server.ts](../../src/laboratory/server.ts) | directory/lock/JSON書込 | [Card](tool-cards/run-files.md) | 2種類のRunで共有 |
+| Marker stack | Equipment Candidate | [MarkerCore.tsx](../../src/client/MarkerCore.tsx) | Core、Simple | [marker-core.test.ts](../../tests/marker-core.test.ts) | Highlight API・selection/scroll/focus | [Card](tool-cards/marker-stack.md) | 共有Component群、未昇格 |
+| Laboratory workspace | Component | [Laboratory.tsx](../../src/laboratory/Laboratory.tsx) | Lab入口 | [laboratory-ui.test.ts](../../tests/laboratory-ui.test.ts) | API読取・子画面操作 | — | 固定Catalog用 |
+| Chat | Component | [Chat.tsx](../../src/client/Chat.tsx) | Core、Simple | [SimpleMarkerChat.tsx](../../src/client/SimpleMarkerChat.tsx) | 会話・生成API | — | 共有UI |
+| SimpleMarkerChat | Component | [SimpleMarkerChat.tsx](../../src/client/SimpleMarkerChat.tsx) | Simple | [simple-marker-chat.test.ts](../../tests/simple-marker-chat.test.ts) | Chat/Markerの副作用 | — | 専用composition |
+| GenerationService | Component | [generation.ts](../../src/server/generation.ts) | Core、Simple | [server.ts](../../src/laboratory/server.ts) | Provider通信・DB更新 | — | Chat契約専用 |
+| Core persistence / HTTP | Component | [repository.ts](../../src/server/storage/repository.ts) | Core、Simple | [server.ts](../../src/laboratory/server.ts) | SQLite・HTTP listen | — | 専用Lab保存先が必要 |
+| Single Text UI / service | Component | [service.ts](../../src/laboratory/single-text/service.ts) | Single | [single-text.test.ts](../../tests/single-text.test.ts) | Provider通信・Run保存 | — | 専用実行系 |
+| SimpleSessions | Component | [simple-sessions.ts](../../src/laboratory/simple-sessions.ts) | Simple | [laboratory-runs.test.ts](../../tests/laboratory-runs.test.ts) | Run JSON記録 | — | 専用recorder |
+| RunResults | Component | [RunResults.tsx](../../src/laboratory/RunResults.tsx) | Simple、Single | [laboratory-ui.test.ts](../../tests/laboratory-ui.test.ts) | Run API読取 | — | 最小共通viewer |
+| Quick Dictionary service / panel | Component | [quick-dictionary.ts](../../src/laboratory/quick-dictionary.ts) | Quick Action | [quick-dictionary.test.ts](../../tests/quick-dictionary.test.ts) | 初回fetch・メモリcache | — | 単一Prototype内 |
+| Quick Memo panel | Component | [QuickMemoPanel.tsx](../../src/laboratory/QuickMemoPanel.tsx) | Quick Action | [marker-quick-action.test.ts](../../tests/marker-quick-action.test.ts) | メモリ状態の表示 | — | 単一Prototype内 |
+| Quick Action workspace / positioning | Fixture | [MarkerQuickActionPrototype.tsx](../../src/laboratory/MarkerQuickActionPrototype.tsx) | Quick Action | [marker-quick-action.test.ts](../../tests/marker-quick-action.test.ts) | selection・メモリMarker/Memo・辞書呼出 | — | Coreとは別契約 |
+| Marker Color Sample | Fixture | [MarkerColorSample.tsx](../../src/laboratory/MarkerColorSample.tsx) | Color比較 | [marker-color-sample.test.ts](../../tests/marker-color-sample.test.ts) | 画面内palette切替 | — | 専用比較画面 |
+| Generation diagnostic | Fixture | [generation-diagnostic.ts](../../scripts/generation-diagnostic.ts) | max_tokens調査・再確認 | [generation-settings-v01.md](../../docs/experiments/generation-settings-v01.md) | HTTP・入力読取・JSON書込 | — | 12 Runの反復記録、汎用契約未確定 |
+| EJDict-hand | Data Asset | [配置案内](../../public/dictionaries/ejdict-hand/README.md) | Quick Dictionary | [SOURCE.json](../../public/dictionaries/ejdict-hand/SOURCE.json) | データ自体なし、読込時メモリ使用 | — | External Data Asset。本体は任意配置・ignore、未配置はDictionaryのみ案内 |
+| Quick Action fixture本文 | Data Asset | [MarkerQuickActionPrototype.tsx](../../src/laboratory/MarkerQuickActionPrototype.tsx) | Quick Action | [marker-quick-action.test.ts](../../tests/marker-quick-action.test.ts) | データ自体なし | — | paragraphs定数、UI内同居 |
+| Color palette dataset | Data Asset | [marker-color-sample.ts](../../src/laboratory/marker-color-sample.ts) | Color比較 | [marker-color-sample.test.ts](../../tests/marker-color-sample.test.ts) | データ自体なし | — | 共通Themeではない |
+| Study P0教材 | Data Asset | [problems.ts](../../src/study-poc/problems.ts) | Study独立runner | [study-poc.test.ts](../../tests/study-poc.test.ts) | データ自体なし | — | Study専用 |
+| derived Experiment fixture | Test Fixture | [derived-experiment.ts](../../tests/fixtures/derived-experiment.ts) | completion / UI tests | [laboratory-completion.test.ts](../../tests/laboratory-completion.test.ts) | metadataコピー、実行時既存entry利用 | — | 派生定義試験専用 |
+| inline fake LM Studio | Test Fixture | [laboratory.test.ts](../../tests/laboratory.test.ts) | Lab/Single tests | [single-text.test.ts](../../tests/single-text.test.ts) | test内HTTP・一時保存先 | — | 共通helper未抽出 |
+| FakeEmbeddingProvider | Test Fixture | [fake-embedding-provider.ts](../../tests/fixtures/fake-embedding-provider.ts) | Semantic tests | [semantic-search.test.ts](../../tests/semantic-search.test.ts) | 呼出・失敗の模擬 | — | Semantic test内共有 |
 
-| ID / title | kind | runnable | entry | Run記録 | 状態 |
-| --- | --- | --- | --- | --- | --- |
-| `simple-marker-chat` / Simple Marker Chat | example | yes | `simple-marker-chat` | Simple session JSON + Core SQLite GenerationRun | TESTING |
-| `single-text-generation` / Single Text Generation | example | yes | `single-text-generation` | ExperimentRun JSON | TESTING |
-| `study-p0` / Study P0 | existing-experiment | no | なし | Lab内ではrecord-only。Study自身はメモリ上 | TESTING |
-| `marker-color-sample` / Marker Color Sample | example | yes | `marker-color-sample` | 自動Run JSONなし。定義と目視手順を記録 | TESTING |
+## 補助参照と照合上の注意
 
-Color Sampleは本調査で追加した。固定登録であり、Plugin discoveryは行わない。
-
-## Components and services with code identity
-
-| 名前 | 種類 | 使用中のExperiment | 使用実績 | 状態 / reusable |
-| --- | --- | --- | --- | --- |
-| `Laboratory` | React Catalog / Workspace | 全登録Experiment | Catalogから4件を表示 | Lab入口として使用中 |
-| `SimpleMarkerChat` | React composition | Simple Marker Chat | Phase 2以降のtest・実ブラウザ | reusable。ChatとMarkerCoreをcomposition |
-| `Chat` | React Component | Core Chat、Simple | 複数画面・回帰test | reusable。通常Generation UI |
-| `MarkerCore` | React Component | Core Chat、Simple | Phase 1以降のtest・実ブラウザ | reusable。Highlight操作の正本 |
-| `MiniMap` + `minimap.ts` | React + position logic | Core Chat、Simple | MarkerCore経由 | reusable。DOM位置から算出 |
-| `MarkerColorSample` | React Experiment-local Component | Marker Color Sample | 今回のRun画面とtest | 専用。共通Theme Componentではない |
-| `SingleTextGeneration` | React Component | Single Text Generation | Phase 3以降のtest・実ブラウザ | Conversation非依存UIとして使用中 |
-| `SingleTextService` | Service | Single Text Generation | Unit / HTTP / UI test | 専用service、汎用Runnerではない |
-| `LMStudioProvider` | Provider | Simple/Core、Single、Study P0 | 複数経路・実モデル検証 | 実体のある共有module |
-| `GenerationService` | Service | Core / Simple | CoreとLab gateway | Chat用。汎用Runnerではない |
-| `Repository` / Core HTTP server | persistence / HTTP | Simple Marker Chat | Lab専用SQLiteで使用 | Core再利用。Lab用コピーなし |
-| `RunFiles<T>` | JSON persistence Component | Simple、Single | 2種類のRun directory | reusableな保存部品。正式Equipment registryなし |
-| `SimpleSessions` | session recorder | Simple Marker Chat | session、Generation ID、Marker event | Simple専用 |
-| `RunResults` | React results viewer | Simple、Single | 2種類のJSON Run | 最小共通表示。Color/Studyには適用しない |
-
-使用回数を実行回数として正確に取得できない項目は `unknown` とする。上表の「複数画面」「test」は
-参照箇所・検証実績であり、利用者の実行回数ではない。
-
-## Equipment
-
-### Explicitly implemented as Equipment
-
-**なし。** Equipmentという型、registry、lifecycle、共通UI契約は実装されていない。
-
-### Catalog metadata labelled as equipment
-
-- Simple: Local LLM、Conversation / Turn、Marker、Marker List、miniMAP
-- Single: Local LLM、Text Input、Output Viewer、Run JSON
-- Study: 既存Study P0 runner
-- Color Sample: Marker color IDs、Visual Sample Workspace
-
-これらはExperiment定義上の使用設備名であり、コード上のEquipment宣言ではない。
-
-### Equipment candidates
-
-| 候補 | 根拠 | 現在の判定 |
-| --- | --- | --- |
-| Local LLM access (`LMStudioProvider`) | Core、Single、Studyで同一moduleを再利用 | 強い候補。ただしEquipment contractなし |
-| Run JSON (`RunFiles<T>`) | SimpleとSingleで共用 | 強い候補。保存対象schemaはExperiment別 |
-| Marker stack (`MarkerCore` / MiniMap) | CoreとSimpleで再利用 | Componentとして確立。Equipment化の必要性は未決定 |
-| GenerationDiagnostic | 12実モデルRunで再利用 | reusable fixture / Equipment候補。未昇格 |
-
-## Fixtures
-
-| 名前 | 分類 | 使用箇所 | 確認できる使用実績 | reusable | Equipment候補 |
-| --- | --- | --- | --- | --- | --- |
-| `scripts/generation-diagnostic.ts` | 作業用診断fixture | max_tokens比較 | 先行9 + 続編3 = 12 Run | yes候補 | yes候補、未昇格 |
-| `tests/fixtures/derived-experiment.ts` | Lab completion fixture | Catalog / Run派生実証 | 2 test fileから参照 | metadata手動コピー例として限定的 | no |
-| inline fake LM Studio providers | test-local fixture | Lab / Single / Chat test | 実行回数 unknown | test helper抽出候補 | no |
-| Study P0 problems | Experiment-local fixture | Study P0 | 6教材fixture | Study内のみ | no |
-| `tests/fixtures/fake-embedding-provider.ts` | Semantic test fixture | S0〜S3系test | 実行回数 unknown | Semantic test内でreusable | no（Lab Equipmentではない） |
-| Marker Color palette dataset | Experiment-local visual dataset | Marker Color Sample | 今回の画面・3 test | Theme検討へ再利用可能 | 現時点ではno |
-
-Generation diagnosticは入力・上限・反復を変えて複数回使われているため「1回しか使っていない治具」ではない。
-ただしprivacy、artifact lifecycle、Provider対応、result schemaが未確定なので共通Equipmentとは呼ばない。
-
-## Run records
-
-- Laboratory既定data directory: `data/laboratory`（`LAB_DATA`で専用directoryへ変更可能）。
-- Simple: `simple-marker.sqlite`をCoreデータの正本とし、`simple-session-runs/*.json`へ
-  Experiment snapshot、GenerationRun ID、model、Marker ID-only eventを保存する。
-- Single: `single-text-runs/*.json`へ入力・出力・partial、request body、settings、provenance、
-  Experiment snapshotを保存する。
-- RunFilesはowner lock、temporary write、fsync、renameを使用する。
-- Study P0はLab Resultsから文書へ案内し、統一Run JSONには入れない。
-- Marker Color Sampleは目視比較であり、今回自動Runや評価スコアを保存しない。
-
-## Catalog / Workspace / Results
-
-- Catalog: TypeScript固定配列。title、status、purpose、kind、runnableを表示。
-- Workspace: Overview / Run / Resultsの3 tab。IDE型paneや動的Plugin discoveryはない。
-- Run: entryを明示的に既存Componentへ対応付ける。任意entryの動的実行はしない。
-- Results: Simple / Singleの保存Runを最小表示。Studyは既存文書、Color Sampleは目視評価の案内。
-- 生成中、またはSimple session中は別Experimentへ切り替えない。
-
-## Composition evidence
-
-### Simple Marker Chat
-
-`SimpleMarkerChat -> Chat + MarkerCore -> MiniMap`。Server側はCoreのRepository、GenerationService、
-LMStudioProvider、HTTP serverをLab専用data directoryで起動する。Question Keep、Related Turns、
-Context CompareはSimple構成へ入らない。Marker、Chat、miniMAP、jumpのコピーはない。
-
-### Single Text Generation
-
-`SingleTextGeneration -> SingleTextService -> LMStudioProvider + RunFiles`。
-Conversation、Turn、Marker、GenerationServiceへ依存しない。同じProviderを使うが実行serviceは専用である。
-
-## Current conclusion
-
-Laboratory v0.1は固定Catalog、軽量Workspace、既存Componentのcomposition、Experiment別Run記録を持つ。
-一方、Equipmentはまだ概念とmetadataの段階であり、ComponentをEquipmentと自動的に読み替えない。
-Marker Color Sampleもこの方針に従い、専用比較画面として追加し、本番Theme systemへ昇格させていない。
+- Core persistence / HTTPのHTTP部分は[http.ts](../../src/server/http.ts)、Single UIは[SingleTextGeneration](../../src/laboratory/single-text/SingleTextGeneration.tsx)、Dictionary表示は[DictionaryPanel](../../src/laboratory/DictionaryPanel.tsx)、Quick位置計算は[helper](../../src/laboratory/marker-quick-action.ts)を参照。
+- Quick系の利用制限・経緯は[個別記録](marker-quick-action-prototype.md)、Color比較は[個別記録](marker-color-sample.md)、辞書出典は[配布README](../../public/dictionaries/ejdict-hand/README.md)を参照。
+- 旧版のExperiment一覧・Catalog件数・起動説明はCatalogとGuideへ集約しました。診断治具の12 Runは反復実績であり、共通Equipmentとしての適用範囲を証明しません。今回はFixtureとして保持します。
+- Card対象外にも副作用のある部品はありますが、初期3枚に限定します。未追跡資産へのリンクは現working treeでは実在しますが、別checkoutへの配布時は同梱確認が必要です。

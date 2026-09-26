@@ -4,6 +4,8 @@ LM Studioと通信し、会話・発言・生成Run・Assistant本文のマー�
 
 ## 起動
 
+Laboratoryで実験を始める・再開する場合は、[LAB_GUIDE.md](LAB_GUIDE.md)から読んでください。
+
 検証環境はWindows / Node.js 24.19.0です。Node.js 24系を使用してください。
 
 ```powershell

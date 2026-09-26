@@ -1,6 +1,9 @@
 # Reference-only repositories (provenance snapshots are kept under docs/).
 /sample/
 
+# Optional external dictionary; provenance and setup instructions stay in Git.
+/public/dictionaries/ejdict-hand/ejdict.json
+
 # Installed dependencies and generated output.
 node_modules/
 dist/
