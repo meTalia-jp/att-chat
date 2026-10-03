@@ -54,7 +54,7 @@ test('新会話分岐: pending予約・所属・v2 snapshot・質問確定・元
 }));
 
 test('同じKeepから元会話・新会話・別の新会話へ1:N、旧snapshot不変',async()=>fixture(async f=>{
-  const local=f.repo.prepareChat(f.id,'元会話で質問','test-model',crypto.randomUUID(),f.k.keep_id);await f.service.execute(local,()=>{});
+  const local=f.repo.prepareChat(f.id,'元会話で質問','test-model',crypto.randomUUID(),f.k.keep_id,false,undefined,'standard');await f.service.execute(local,()=>{});
   const saved=f.repo.run(f.id,local.run_id),asked=f.repo.questionKeeps.get(f.id,f.k.keep_id);
   const first=f.prepare();await f.service.execute(first,()=>{});const second=f.prepare('再質問');await f.service.execute(second,()=>{});
   assert.notEqual(first.conversation_id,second.conversation_id);assert.equal(f.repo.listConversations().length,3);
@@ -80,7 +80,7 @@ for(const table of ['conversations','turns','generation_runs','run_question_refe
 
 test('分岐生成中Keep排他、通常active制約、同一request_id再送拒否',async()=>fixture(async f=>{
   const key=crypto.randomUUID(),run=f.prepare('質問',key);
-  assert.throws(()=>f.prepare(),/生成中/);assert.throws(()=>f.repo.prepareChat(f.id,'同会話','m',crypto.randomUUID(),f.k.keep_id),/生成中/);assert.equal(f.repo.listConversations().length,2);
+  assert.throws(()=>f.prepare(),/生成中/);assert.throws(()=>f.repo.prepareChat(f.id,'同会話','m',crypto.randomUUID(),f.k.keep_id,false,undefined,'standard'),/生成中/);assert.equal(f.repo.listConversations().length,2);
   assert.throws(()=>f.repo.prepareChat(run.conversation_id,'通常','m',crypto.randomUUID()),/生成中/);
   await f.service.execute(run,()=>{});assert.throws(()=>f.prepare('質問',key),/送信済み/);assert.equal(f.repo.listConversations().length,2);
 }));
@@ -116,7 +116,7 @@ test('005→006でv1 Run/snapshotを含む既存データ完全保持、v2の出
     for(const [i,file] of ['001_initial.sql','002_live_runs.sql','003_highlights.sql','004_question_keeps.sql','005_keep_runs.sql'].entries()){
       const sql=readFileSync(new URL(`../src/server/storage/migrations/${file}`,import.meta.url),'utf8').replace(/\r\n?/g,'\n');db.exec(sql);db.prepare('INSERT INTO schema_migrations VALUES(?,?,?)').run(i+1,createHash('sha256').update(sql).digest('hex'),new Date().toISOString());
     }
-    const f=seed(db),r=f.repo.prepareChat(f.id,'v1','m',crypto.randomUUID(),f.k.keep_id);f.repo.startRun(f.id,r.run_id);f.repo.finishRun(f.id,r.run_id,'succeeded','回答');
+    const f=seed(db),r=f.repo.prepareChat(f.id,'v1','m',crypto.randomUUID(),f.k.keep_id,false,undefined,'standard');f.repo.startRun(f.id,r.run_id);f.repo.finishRun(f.id,r.run_id,'succeeded','回答');
     const read=()=>({detail:f.repo.detail(f.id),highlights:f.repo.listHighlights(f.id),keeps:f.repo.questionKeeps.list(f.id)}),before=read();migrate(db);assert.deepEqual(read(),before);
     const branch=f.prepare();assert.equal(branch.reference_snapshot?.snapshot_version,2);
     const reference=db.prepare('SELECT * FROM run_question_references WHERE run_id=?').get(branch.run_id)!;

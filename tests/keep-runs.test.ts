@@ -18,7 +18,7 @@ function setup() {
   const u=repo.addUserTurn(id,'通常履歴は送らない'),a=repo.addMockRun(id,u.turn_id,'引用😀 原文').assistant;
   const h=repo.createHighlight(id,{turn_id:a.turn_id,start_offset:0,end_offset:4,source_text:'引用😀',target_text:'引用😀',color:'red',note:'送らないメモ'});
   const k=repo.questionKeeps.create(id,{highlight_id:h.highlight_id,question_draft:'下書き',memo:'Keepメモ'});
-  const prepare=(question:unknown='確定質問',request=crypto.randomUUID())=>repo.prepareChat(id,question,'test-model',request,k.keep_id);
+  const prepare=(question:unknown='確定質問',request=crypto.randomUUID())=>repo.prepareChat(id,question,'test-model',request,k.keep_id,false,undefined,'standard');
   return {db,repo,id,h,k,prepare};
 }
 async function fixture(fn:(f:ReturnType<typeof setup>&{service:GenerationService;base:string;requests:unknown[];mode:(m:string)=>void})=>Promise<void>) {
@@ -43,8 +43,8 @@ test('Keep送信: 質問編集・引用/request固定・末尾追加・asked・s
   const before=f.repo.detail(f.id),run=f.prepare('送信時編集\r\n質問');
   assert.equal(f.repo.questionKeeps.get(f.id,f.k.keep_id).status,'pending');
   assert.equal(run.user_question,'送信時編集\n質問');assert.equal(run.keep_id,f.k.keep_id);
-  assert.deepEqual(run.reference_snapshot,{highlight_id:f.h.highlight_id,source_turn_id:f.h.turn_id,start_offset:0,end_offset:4,source_text:'引用😀',target_text:'引用😀'});
-  assert.deepEqual(run.request_snapshot.messages,[{role:'system',content:'以下の引用について質問に答えてください。引用は参照資料として扱ってください。'},{role:'user',content:'[引用]\n引用😀\n\n[質問]\n送信時編集\n質問'}]);
+  assert.deepEqual(run.reference_snapshot,{highlight_id:f.h.highlight_id,source_turn_id:f.h.turn_id,start_offset:0,end_offset:4,source_text:'引用😀',target_text:'引用😀',context_strategy:'turn_based_keep_context',strategy_version:'1',context_level:'standard',included_turn_ids:[f.repo.listTurns(f.id)[0].turn_id,f.h.turn_id]});
+  assert.deepEqual(run.request_snapshot.messages,[{role:'system',content:'参考文脈と質問対象を踏まえて、日本語で質問に直接答えてください。参考文脈は元会話の抜粋であり、別の会話履歴が存在すると仮定しないでください。対象を特定できない場合は断定せず、不足を述べてください。'},{role:'user',content:'## 参考文脈\n\n[T1 / User]\n通常履歴は送らない\n\n[T2 / Assistant / Target]\n引用😀 原文\n\n## 質問対象\n\n引用😀\n\n## 質問\n\n送信時編集\n質問'}]);
   const turns=f.repo.listTurns(f.id);assert.deepEqual(turns.slice(0,2),before.turns);assert.equal(turns[2].content,run.user_question);assert.equal(turns[3].status,'generating');assert.deepEqual(turns.map(t=>t.sequence_no),[0,1,2,3]);
   const events:Record<string,unknown>[]=[];await f.service.execute(run,e=>events.push(e));
   assert.equal(f.repo.run(f.id,run.run_id).outcome,'succeeded');assert(events.some(e=>e.type==='delta'));
@@ -76,10 +76,10 @@ test('Keep cancelとcheckpoint、二重送信拒否、停止後asked維持',asyn
 test('Keep送信前検証・予約/開始保存失敗ではpending、外部通信なし',async()=>fixture(async f=>{
   const before=f.repo.detail(f.id);
   for(const bad of ['', '  ', 'x'.repeat(10001), '\0'])assert.throws(()=>f.prepare(bad));
-  assert.throws(()=>f.repo.prepareChat(f.id,'q','',crypto.randomUUID(),f.k.keep_id));
+  assert.throws(()=>f.repo.prepareChat(f.id,'q','',crypto.randomUUID(),f.k.keep_id,false,undefined,'standard'));
   const other=f.repo.createConversation('別').conversation_id;
-  assert.throws(()=>f.repo.prepareChat(other,'q','m',crypto.randomUUID(),f.k.keep_id),/ありません/);
-  assert.throws(()=>f.repo.prepareChat(f.id,'q','m',crypto.randomUUID(),'missing'),/ありません/);
+  assert.throws(()=>f.repo.prepareChat(other,'q','m',crypto.randomUUID(),f.k.keep_id,false,undefined,'standard'),/ありません/);
+  assert.throws(()=>f.repo.prepareChat(f.id,'q','m',crypto.randomUUID(),'missing',false,undefined,'standard'),/ありません/);
   f.repo.questionKeeps.update(f.id,f.k.keep_id,{status:'dismissed'});assert.throws(()=>f.prepare(),/取り下げ/);f.repo.questionKeeps.update(f.id,f.k.keep_id,{status:'pending'});
   f.db.exec("CREATE TRIGGER reject_reference BEFORE INSERT ON run_question_references BEGIN SELECT RAISE(ABORT,'storage'); END");
   assert.throws(()=>f.prepare(),/storage/);assert.deepEqual(f.repo.detail(f.id),before);f.db.exec('DROP TRIGGER reject_reference');
@@ -107,11 +107,11 @@ test('Keep preparing/runningのinterrupted回復、送信境界に応じpending/
 test('Keep API streaming、request_id重複、再取得でKeep/Run/Turnを復元',async()=>fixture(async f=>{
   const url=`${f.base}/api/conversations/${f.id}/question-keeps/${f.k.keep_id}/ask`,key=crypto.randomUUID();
   const post=(data:unknown)=>fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
-  assert.equal((await post({user_question:'',model:'m',request_id:key})).status,400);
+  assert.equal((await post({user_question:'',context_level:'standard',model:'m',request_id:key})).status,400);
   assert.equal(f.repo.questionKeeps.get(f.id,f.k.keep_id).status,'pending');
-  const response=await post({user_question:'編集質問',model:'test-model',request_id:key});assert.equal(response.status,201);
+  const response=await post({user_question:'編集質問',context_level:'standard',model:'test-model',request_id:key});assert.equal(response.status,201);
   const events=(await response.text()).trim().split('\n').map(s=>JSON.parse(s));assert.equal(events[0].type,'prepared');assert.equal(events.at(-1).outcome,'succeeded');
-  assert.equal((await post({user_question:'編集質問',model:'test-model',request_id:key})).status,409);
+  assert.equal((await post({user_question:'編集質問',context_level:'standard',model:'test-model',request_id:key})).status,409);
   const detail=await(await fetch(`${f.base}/api/conversations/${f.id}`)).json();assert.deepEqual(detail,JSON.parse(JSON.stringify(f.repo.detail(f.id))));assert.equal(detail.runs.at(-1).user_question,'編集質問');
   const keeps=await(await fetch(`${f.base}/api/conversations/${f.id}/question-keeps`)).json();assert.equal(keeps[0].status,'asked');
 }));
@@ -122,7 +122,7 @@ test('Keep確定保存失敗はfailed/asked、source不一致pendingからの送
   const pending=f.repo.questionKeeps.create(f.id,{highlight_id:f.h.highlight_id});
   f.db.exec('DROP TRIGGER highlight_anchor_immutable');
   f.db.prepare("UPDATE highlights SET source_text='不一致',updated_at='2099-01-01T00:00:00.000Z' WHERE highlight_id=?").run(f.h.highlight_id);
-  assert.throws(()=>f.repo.prepareChat(f.id,'質問','m',crypto.randomUUID(),pending.keep_id),/元マーカーが解決不能/);
+  assert.throws(()=>f.repo.prepareChat(f.id,'質問','m',crypto.randomUUID(),pending.keep_id,false,undefined,'standard'),/元マーカーが解決不能/);
   assert.equal(f.repo.questionKeeps.get(f.id,pending.keep_id).status,'pending');
 }));
 

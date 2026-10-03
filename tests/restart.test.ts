@@ -49,7 +49,7 @@ test('Keep質問は別プロセス再起動でasked/Run/Turn/引用を保持しr
       const user=repo.addUserTurn(id,'元質問'),assistant=repo.addMockRun(id,user.turn_id,'引用').assistant;
       const h=repo.createHighlight(id,{turn_id:assistant.turn_id,start_offset:0,end_offset:2,source_text:'引用',target_text:'引用',color:'yellow'});
       const k=repo.questionKeeps.create(id,{highlight_id:h.highlight_id,question_draft:'下書き'});
-      const run=repo.prepareChat(id,'確定質問','test-model',crypto.randomUUID(),k.keep_id);
+      const run=repo.prepareChat(id,'確定質問','test-model',crypto.randomUUID(),k.keep_id,false,undefined,'standard');
       if(state!=='preparing'){repo.startRun(id,run.run_id);repo.checkpoint(id,run.run_id,'途中')}
       if(state==='succeeded')repo.finishRun(id,run.run_id,'succeeded','回答');
     }

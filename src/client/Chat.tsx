@@ -2,16 +2,35 @@ import { useEffect, useRef, useState } from 'react';
 import { api } from './api.ts';
 import type { ConversationDetail, GenerationRun } from '../shared/contracts.ts';
 import type { QuestionKeep } from '../shared/question-keep.ts';
+import type { ImmediateAskDraft } from './MarkerDetailAdapter.tsx';
+import {
+  productionHandoffLabels,
+  productionHandoffLevels,
+  type ProductionHandoffLevel,
+  type ProductionHandoffPreview,
+} from '../shared/production-new-chat-handoff.ts';
+import {
+  keepContextLabels,
+  keepContextLevels,
+  type KeepContextLevel,
+  type KeepContextPreview,
+} from '../shared/production-keep-context.ts';
+import { buildImmediateAskUserTurn, immediateAskMaxReferences } from '../shared/production-immediate-ask.ts';
 
-export function Chat({ detail, refresh, onBusy, question, onCloseQuestion, normalLayout = false }: { normalLayout?: boolean; detail: ConversationDetail; refresh: (id?: string) => Promise<void>; onBusy: (value: boolean) => void; question: (QuestionKeep & { newConversation?: boolean }) | null; onCloseQuestion: () => void }) {
+export function Chat({ detail, refresh, onBusy, question, onCloseQuestion, immediateDrafts = [], onChangeImmediateDraft, onClearImmediateDraft, onImmediateSent, normalLayout = false }: { normalLayout?: boolean; detail: ConversationDetail; refresh: (id?: string) => Promise<void>; onBusy: (value: boolean) => void; question: (QuestionKeep & { newConversation?: boolean }) | null; onCloseQuestion: () => void; immediateDrafts?: ImmediateAskDraft[]; onChangeImmediateDraft?: (highlightId: string, question: string) => void; onClearImmediateDraft?: (highlightId: string) => void; onImmediateSent?: () => void }) {
   const [models, setModels] = useState<string[]>([]), [model, setModel] = useState('');
   const [input, setInput] = useState(''), [text, setText] = useState(''), [busy, setBusy] = useState(false);
   const [runId, setRunId] = useState(''), [status, setStatus] = useState(''), [error, setError] = useState('');
-  const lock = useRef(false), request = useRef<{ id: string; input: string; model: string; keepId?: string; newConversation?: boolean } | null>(null);
+  const lock = useRef(false), request = useRef<{ id: string; input: string; model: string; keepId?: string; newConversation?: boolean; handoffLevel?: ProductionHandoffLevel; contextLevel?: KeepContextLevel; immediateFingerprint?: string } | null>(null);
   const destination = useRef(detail.conversation.conversation_id);
   const panel = useRef<HTMLElement>(null);
   const [quote, setQuote] = useState('');
   const [submitted, setSubmitted] = useState('');
+  const [handoffLevel, setHandoffLevel] = useState<ProductionHandoffLevel>('standard');
+  const [handoffPreview, setHandoffPreview] = useState<ProductionHandoffPreview | null>(null);
+  const [contextLevel, setContextLevel] = useState<KeepContextLevel>('standard');
+  const [keepContextPreview, setKeepContextPreview] = useState<KeepContextPreview | null>(null);
+  const [previewBusy, setPreviewBusy] = useState(false);
   const base = `/api/conversations/${detail.conversation.conversation_id}`;
   const active = detail.runs.find(r => ['preparing','running'].includes(r.outcome));
   async function loadModels() {
@@ -21,11 +40,11 @@ export function Chat({ detail, refresh, onBusy, question, onCloseQuestion, norma
   useEffect(() => { void loadModels(); }, []);
   useEffect(() => {
     // Keep the same stream owner mounted when a prepared branch becomes selected.
-    if (!lock.current) { setInput(''); setText(''); setRunId(''); setStatus(''); setError(''); request.current=null; destination.current=detail.conversation.conversation_id; }
+    if (!lock.current) { setInput(''); setText(''); setRunId(''); setStatus(''); setError(''); setHandoffPreview(null); setKeepContextPreview(null); request.current=null; destination.current=detail.conversation.conversation_id; }
   }, [detail.conversation.conversation_id]);
   useEffect(() => {
     if (!question) { setQuote(''); return; }
-    setInput(question.question_draft); setQuote(''); setError(''); panel.current?.scrollIntoView({block:'start'});
+    setInput(question.question_draft); setQuote(''); setError(''); setHandoffLevel('standard'); setHandoffPreview(null); setContextLevel('standard'); setKeepContextPreview(null); panel.current?.scrollIntoView({block:'start'});
     let disposed = false;
     void api<import('../shared/contracts.ts').Highlight[]>(`${base}/highlights`).then(items => {
       if (disposed) return;
@@ -35,15 +54,38 @@ export function Chat({ detail, refresh, onBusy, question, onCloseQuestion, norma
     }).catch(e => { if (!disposed) setError(e.message); });
     return () => { disposed = true; };
   }, [question, base]);
+  async function prepareHandoff() {
+    if (!question?.newConversation || !input.trim() || previewBusy) return;
+    setPreviewBusy(true); setError(''); setStatus('Preview確認中');
+    try {
+      const preview = await api<ProductionHandoffPreview>(`${base}/question-keeps/${question.keep_id}/handoff-preview`, { user_question: input, handoff_level: handoffLevel });
+      setHandoffPreview(preview); setStatus('Previewを作成しました。Conversationはまだ作成していません。');
+    } catch (error) { setHandoffPreview(null); setStatus(''); setError((error as Error).message); }
+    finally { setPreviewBusy(false); }
+  }
+  async function prepareKeepContext() {
+    if (!question || question.newConversation || !input.trim() || previewBusy) return;
+    setPreviewBusy(true); setError(''); setStatus('Preview確認中');
+    try {
+      const preview = await api<KeepContextPreview>(`${base}/question-keeps/${question.keep_id}/context-preview`, { user_question: input, context_level: contextLevel });
+      setKeepContextPreview(preview); setStatus('Context Previewを作成しました。KeepとRunは変更していません。');
+    } catch (error) { setKeepContextPreview(null); setStatus(''); setError((error as Error).message); }
+    finally { setPreviewBusy(false); }
+  }
   async function send() {
-    if (lock.current || active || !model || !input.trim()) return;
+    const immediate = !question && immediateDrafts.length > 0;
+    const immediateReady = immediate && immediateDrafts.length <= immediateAskMaxReferences && immediateDrafts.every(item=>item.question.trim());
+    if (lock.current || active || !model || (!input.trim() && !immediate) || (immediate && !immediateReady) || (question?.newConversation ? !handoffPreview : !!question && !keepContextPreview)) return;
     lock.current = true; setBusy(true); onBusy(true); setText(''); setError(''); setStatus('準備中');
     destination.current=detail.conversation.conversation_id;
-    if (normalLayout) setSubmitted(input);
-    if (!request.current || request.current.input !== input || request.current.model !== model || request.current.keepId !== question?.keep_id || request.current.newConversation !== question?.newConversation) request.current = { id: crypto.randomUUID(), input, model, keepId: question?.keep_id, newConversation: question?.newConversation };
+    const immediateFingerprint=immediate?JSON.stringify(immediateDrafts.map(item=>[item.highlightId,item.prefix,item.question])):undefined;
+    if (normalLayout) setSubmitted(immediate?buildImmediateAskUserTurn(input,immediateDrafts.map(item=>({prefix:item.prefix,target_text:item.quote,question_text:item.question}))):input);
+    if (!request.current || request.current.input !== input || request.current.model !== model || request.current.keepId !== question?.keep_id || request.current.newConversation !== question?.newConversation || request.current.handoffLevel !== (question?.newConversation ? handoffLevel : undefined) || request.current.contextLevel !== (question && !question.newConversation ? contextLevel : undefined) || request.current.immediateFingerprint!==immediateFingerprint) request.current = { id: crypto.randomUUID(), input, model, keepId: question?.keep_id, newConversation: question?.newConversation, handoffLevel: question?.newConversation ? handoffLevel : undefined, contextLevel: question && !question.newConversation ? contextLevel : undefined, immediateFingerprint };
     let prepared = false;
     try {
-      const res = await fetch(question ? `${base}/question-keeps/${question.keep_id}/${question.newConversation ? 'ask-new' : 'ask'}` : `${base}/chat`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...(question ? { user_question: input } : { content: input }), model, request_id: request.current.id }) });
+      const path=question?`${base}/question-keeps/${question.keep_id}/${question.newConversation?'handoff-new':'ask'}`:immediate?`${base}/immediate-ask`:`${base}/chat`;
+      const payload=question?{user_question:input,...(question.newConversation?{handoff_level:handoffLevel}:{context_level:contextLevel})}:immediate?{main_draft:input,marker_questions:immediateDrafts.map(item=>({highlight_id:item.highlightId,prefix:item.prefix,question_text:item.question}))}:{content:input};
+      const res = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...payload, model, request_id: request.current.id }) });
       if (!res.ok) { const value = await res.json(); throw new Error(value.error?.message ?? `HTTP ${res.status}`); }
       if (!res.body) throw new Error('streamがありません');
       const reader = res.body.getReader(), decoder = new TextDecoder(); let buffer = '', terminal = false;
@@ -57,13 +99,16 @@ export function Chat({ detail, refresh, onBusy, question, onCloseQuestion, norma
             if (event.type === 'prepared') {
               prepared = true; const saved=event.run as GenerationRun;
               destination.current=saved.conversation_id; setRunId(saved.run_id); setInput('');
+              if(immediate)onImmediateSent?.();
+              if (question?.newConversation) setHandoffPreview(null);
+              else if (question) setKeepContextPreview(null);
               if (question?.newConversation) {
                 onCloseQuestion();
                 try { await refresh(saved.conversation_id); }
                 catch (e) { setError(`分岐先 ${saved.conversation_id} の表示更新失敗: ${(e as Error).message}`); }
               }
             }
-            if (event.type === 'running') setStatus(question ? '生成中 — Keepは質問送信開始済み（asked）' : '生成中');
+            if (event.type === 'running') setStatus(question ? question.newConversation ? '生成中 — 元Keepの状態は変更しません' : '生成中 — Keepは質問送信開始済み（asked）' : immediate ? `生成中 — Immediate Ask ${immediateDrafts.length}件` : '生成中');
             if (event.type === 'delta') setText(t => t + event.text);
             if (event.type === 'terminal') { terminal = true; setStatus(event.outcome); if (event.outcome === 'failed') setError(event.message); }
             if (event.type === 'storage_error') throw new Error(event.message);
@@ -82,13 +127,19 @@ export function Chat({ detail, refresh, onBusy, question, onCloseQuestion, norma
     try { const r = await api<GenerationRun>(`/api/conversations/${runId ? destination.current : detail.conversation.conversation_id}/runs/${runId || active?.run_id}/cancel`, {}); setStatus(r.outcome); await refresh(r.conversation_id); }
     catch (e) { setError((e as Error).message); }
   }
-  return <section ref={panel} className={normalLayout ? "normal-chat-input" : undefined}><div className="chat-controls"><h3>{question ? `${question.newConversation ? '新しいチャットで聞く' : 'このチャットで聞く'} — 質問の確認` : 'LM Studioチャット'}</h3>
-    {question && <><blockquote>{quote}</blockquote><p>この引用と確定した質問だけを送ります。通常の会話履歴は含めません。下書きは変更しません。</p><button disabled={busy} onClick={() => { onCloseQuestion(); setInput(''); }}>質問確認を閉じる</button></>}
+  return <section ref={panel} className={normalLayout ? "normal-chat-input" : undefined}><div className="chat-controls"><h3>{question ? `${question.newConversation ? '新しいチャットへ引継ぐ' : 'このチャットで聞く'} — 質問の確認` : 'LM Studioチャット'}</h3>
+    {question && <><blockquote>{quote}</blockquote><p>{question.newConversation ? '選択したTurn範囲を最初のUser Message内へ埋め込みます。元会話をmessage履歴として送りません。' : '選択した前方TurnとTargetを最初のUser Message内へ埋め込みます。元会話全履歴をmessage配列へ追加しません。'}</p><button disabled={busy} onClick={() => { onCloseQuestion(); setInput(''); setHandoffPreview(null); setKeepContextPreview(null); }}>質問確認を閉じる</button></>}
     <button disabled={busy} onClick={() => void loadModels()}>モデル一覧更新</button>
     <label>モデル<select value={model} disabled={busy || !!active} onChange={e => setModel(e.target.value)}><option value="">モデルを選択</option>{models.map(m => <option key={m} value={m}>{m}</option>)}</select></label>
     {!models.length && <p>利用可能なモデルがありません。LM Studioの起動と設定を確認してください。</p>}
-    <label>{question ? '送信する質問文' : 'チャット本文'}<textarea value={input} maxLength={question ? 10000 : 100000} disabled={busy || !!active} onChange={e => setInput(e.target.value)} /></label>
-    <button disabled={busy || !!active || !model || !input.trim() || (!!question && !quote)} onClick={() => void send()}>送信</button>
+    {question?.newConversation && <fieldset className="production-handoff-level"><legend>引継ぎ量</legend>{productionHandoffLevels.map(level => <label key={level}><input type="radio" name="production-handoff-level" checked={handoffLevel === level} disabled={busy || !!active || previewBusy} onChange={() => { setHandoffLevel(level); setHandoffPreview(null); request.current=null; }} />{productionHandoffLabels[level]}{level === 'standard' && <small>（初期値・前3 Turn + Target）</small>}</label>)}<p>少なめは前1 Turn、標準は前3 Turn、多めは前5 TurnとTargetを使います。質問に必要な思考の流れを機械的に近似する初期値です。</p></fieldset>}
+    {question && !question.newConversation && <fieldset className="production-handoff-level"><legend>引継ぎContext</legend>{keepContextLevels.map(level => <label key={level}><input type="radio" name="production-keep-context-level" checked={contextLevel === level} disabled={busy || !!active || previewBusy} onChange={() => { setContextLevel(level); setKeepContextPreview(null); request.current=null; }} />{keepContextLabels[level]}{level === 'standard' && <small>（初期値・前3 Turn + Target）</small>}</label>)}<p>未来側Turnは含めません。固定Turn数は質問に必要な思考の流れを機械的に近似する初期値です。</p></fieldset>}
+    <label>{question ? '送信する質問文' : 'チャット本文'}<textarea value={input} maxLength={question ? 10000 : 100000} disabled={busy || !!active} onChange={e => { setInput(e.target.value); if(question?.newConversation)setHandoffPreview(null);else if(question)setKeepContextPreview(null);if(question)request.current=null; }} /></label>
+    {normalLayout && !question && <section className="immediate-reference-foundation" aria-label="参照中"><header><strong>参照中</strong><small>{immediateDrafts.length}/{immediateAskMaxReferences}件</small></header>{immediateDrafts.length?<div className="immediate-reference-list">{immediateDrafts.map(item=><article key={item.highlightId}><span className="immediate-reference-dot" aria-hidden="true" /><div><small>T{item.turnNumber} [{item.prefix}]「{item.quote}」</small><input aria-label={`Immediate Ask質問 T${item.turnNumber}`} value={item.question} disabled={busy} onChange={event => onChangeImmediateDraft?.(item.highlightId,event.target.value)} /></div><button type="button" aria-label={`T${item.turnNumber} Marker参照を外す`} disabled={busy} onClick={()=>onClearImmediateDraft?.(item.highlightId)}>×</button></article>)}</div>:<p>Marker Detailの「今すぐ質問」から、最大5件の質問を準備できます。</p>}</section>}
+    {question && <button type="button" disabled={busy || !!active || previewBusy || !input.trim() || !quote} onClick={() => question.newConversation ? void prepareHandoff() : void prepareKeepContext()}>{previewBusy ? 'Preview確認中…' : 'Preview'}</button>}
+    {handoffPreview && <section className="production-handoff-preview" aria-label="New Chat Handoff Preview"><h4>New Chat Handoff Preview</h4><dl><dt>Source Turn</dt><dd>T{handoffPreview.source_turn_number}</dd><dt>引継ぎ</dt><dd>{productionHandoffLabels[handoffPreview.handoff_level]}</dd><dt>Included Turns</dt><dd>{handoffPreview.included_turns.length ? handoffPreview.included_turns.map(turn => `T${turn.turn_number}`).join(', ') : 'なし'}</dd></dl><pre>{handoffPreview.display_first_user_message}</pre><button type="button" disabled={busy} onClick={() => setHandoffPreview(null)}>戻る</button></section>}
+    {keepContextPreview && <section className="production-handoff-preview" aria-label="Keep Context Preview"><h4>Keep Context Preview</h4><dl><dt>Source Turn</dt><dd>T{keepContextPreview.source_turn_number}</dd><dt>Context</dt><dd>{keepContextLabels[keepContextPreview.context_level]}</dd><dt>Included Turns</dt><dd>{keepContextPreview.included_turns.map(turn => `T${turn.turn_number}`).join(', ')}</dd></dl><pre>{keepContextPreview.first_user_message}</pre><button type="button" disabled={busy} onClick={() => setKeepContextPreview(null)}>戻る</button></section>}
+    <button disabled={busy || !!active || !model || (!input.trim() && !immediateDrafts.length) || (!question && immediateDrafts.some(item=>!item.question.trim())) || (!!question && !quote) || (!!question?.newConversation && !handoffPreview) || (!!question && !question.newConversation && !keepContextPreview)} onClick={() => void send()}>{question?.newConversation ? '新規チャットとして送信' : '送信'}</button>
     <button disabled={!runId && !active} onClick={() => void stop()}>停止</button>
     {normalLayout && <button type="button" disabled title="設定画面は今後対応予定です">設定（準備中）</button>}
     <p role="status">{status || (active ? '生成中Runがあります' : '')}</p>{error && <p role="alert">{error}</p>}

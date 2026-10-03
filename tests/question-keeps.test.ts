@@ -85,6 +85,41 @@ test('Keep API CRUD、会話外/未知項目/asked拒否、保存失敗は非2xx
   }finally{server.closeAllConnections();await new Promise<void>(r=>server.close(()=>r()));db.close()}
 });
 
+test('Global Question Box read modelはConversation横断join・新着順・read-onlyを保つ',async()=>{
+  const {db,repo,id,h}=fixture();
+  const server=createAppServer(repo,resolve('dist'));
+  try{
+    const first=repo.questionKeeps.create(id,{highlight_id:h.highlight_id,question_draft:'最初の質問',memo:'A'});
+    const secondConversation=repo.createConversation('別の会話').conversation_id;
+    const user=repo.addUserTurn(secondConversation,'別の質問');
+    const answer=repo.addMockRun(secondConversation,user.turn_id,'原文と表示引用').assistant;
+    const secondHighlight=repo.createHighlight(secondConversation,{turn_id:answer.turn_id,start_offset:0,end_offset:2,source_text:'原文',target_text:'表示引用',color:'blue'});
+    const second=repo.questionKeeps.create(secondConversation,{highlight_id:secondHighlight.highlight_id,question_draft:'新しい質問',memo:'B'});
+    repo.createConversation('Keepなし');
+    const before={conversations:repo.listConversations(),first:repo.questionKeeps.get(id,first.keep_id),second:repo.questionKeeps.get(secondConversation,second.keep_id)};
+
+    const rows=repo.questionKeeps.listGlobal();
+    assert.equal(rows.length,2);
+    assert.equal(rows[0].keep.keep_id,second.keep_id);
+    assert.deepEqual(new Set(rows.map(row=>row.conversation.title)),new Set(['Keep','別の会話']));
+    assert(rows.every((row,index)=>index===0||rows[index-1].keep.created_at>=row.keep.created_at));
+    const joined=rows.find(row=>row.keep.keep_id===second.keep_id)!;
+    assert.equal(joined.conversation.conversation_id,secondConversation);
+    assert.equal(joined.source_turn.turn_id,answer.turn_id);
+    assert.equal(joined.source_turn.sequence_no,1);
+    assert.equal(joined.highlight.source_text,'原文');
+    assert.equal(joined.highlight.target_text,'表示引用');
+    assert.deepEqual({conversations:repo.listConversations(),first:repo.questionKeeps.get(id,first.keep_id),second:repo.questionKeeps.get(secondConversation,second.keep_id)},before);
+
+    server.listen(0,'127.0.0.1');await once(server,'listening');
+    const response=await fetch(`http://127.0.0.1:${(server.address() as {port:number}).port}/api/question-box`);
+    assert.equal(response.status,200);
+    assert.deepEqual(await response.json(),rows);
+  }finally{
+    server.closeAllConnections();if(server.listening)await new Promise<void>(resolve=>server.close(()=>resolve()));db.close();
+  }
+});
+
 test('003から004へのmigrationで既存Conversation/Turn/Run/Highlightを完全保持',()=>{
   const db=new DatabaseSync(':memory:');
   try{

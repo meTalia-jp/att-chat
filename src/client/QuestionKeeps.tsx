@@ -11,6 +11,7 @@ export function QuestionKeeps({ conversationId, highlights, selected, onClose, r
   const [questionRuns,setQuestionRuns]=useState<GenerationRun[]>([]);
   const [draft,setDraft]=useState(''),[memo,setMemo]=useState(''),[filter,setFilter]=useState<KeepStatus>('pending');
   const [error,setError]=useState(''),[message,setMessage]=useState(''),[busy,setBusy]=useState(false);
+  const [menuKeepId,setMenuKeepId]=useState<string|null>(null);
   const lock=useRef(false), panel=useRef<HTMLElement>(null);
   const path=`/api/conversations/${conversationId}/question-keeps`;
   useEffect(()=>{
@@ -21,6 +22,13 @@ export function QuestionKeeps({ conversationId, highlights, selected, onClose, r
   },[path,highlights,runs,conversationId]);
   useEffect(()=>{if(selected){setEditing(null);setDraft('');setMemo('');setError('');panel.current?.scrollIntoView({block:'start'})}},[selected]);
   useEffect(()=>{if(editing&&!highlights.some(h=>h.highlight_id===editing.highlight_id))setEditing(null)},[highlights,editing]);
+  useEffect(()=>{setMenuKeepId(null)},[conversationId,filter]);
+  useEffect(()=>{
+    const outside=(event:PointerEvent)=>{const target=event.target as {closest?:(selector:string)=>Element|null}|null;if(!target?.closest?.('[data-question-actions]'))setMenuKeepId(null)};
+    const escape=(event:KeyboardEvent)=>{if(event.key==='Escape')setMenuKeepId(null)};
+    document.addEventListener('pointerdown',outside);document.addEventListener('keydown',escape);
+    return()=>{document.removeEventListener('pointerdown',outside);document.removeEventListener('keydown',escape)};
+  },[]);
   async function action(fn:()=>Promise<void>) {
     if(lock.current)return;
     lock.current=true;setBusy(true);setError('');setMessage('');
@@ -52,7 +60,7 @@ export function QuestionKeeps({ conversationId, highlights, selected, onClose, r
       return <li key={keep.keep_id}><blockquote>{h.target_text}</blockquote><p>質問: {keep.question_draft||'（下書きなし）'}</p><p>メモ: {keep.memo||'（なし）'}</p><p>{keep.status}</p>
         {h.status==='unresolved'&&<p>元マーカーが解決不能のため質問できません — {h.reason}</p>}
         {keep.status!=='dismissed'&&<button disabled={busy||sending||h.status!=='resolved'} onClick={()=>onAsk({...keep})}>{keep.status==='asked'?'このチャットでもう一度聞く':'このチャットで聞く'}</button>}
-        {keep.status!=='dismissed'&&<button disabled={busy||sending||h.status!=='resolved'} onClick={()=>onAsk({...keep},true)}>新しいチャットで聞く</button>}
+        {keep.status!=='dismissed'&&<span className="question-secondary-actions" data-question-actions><button type="button" aria-label="その他の操作" aria-expanded={menuKeepId===keep.keep_id} disabled={busy||sending||h.status!=='resolved'} onClick={()=>setMenuKeepId(current=>current===keep.keep_id?null:keep.keep_id)}>…</button>{menuKeepId===keep.keep_id&&<span role="menu"><button type="button" role="menuitem" onClick={()=>{setMenuKeepId(null);onAsk({...keep},true)}}>新規チャット</button></span>}</span>}
         {keep.status==='asked'&&<p>質問送信開始済み · 関連Run {questionRuns.filter(r=>r.keep_id===keep.keep_id).length}件 · 最新結果: {questionRuns.filter(r=>r.keep_id===keep.keep_id).at(-1)?.outcome??'Runを再読込してください'} · 最新質問先: {questionRuns.filter(r=>r.keep_id===keep.keep_id).at(-1)?.conversation_id}</p>}
         {keep.status!=='asked'&&<><button disabled={busy} onClick={()=>{onClose();setEditing(keep);setDraft(keep.question_draft);setMemo(keep.memo)}}>キープ編集</button>
           <button disabled={busy} onClick={()=>void action(()=>changeStatus(keep,keep.status==='pending'?'dismissed':'pending'))}>{keep.status==='pending'?'取り下げ':'pendingに戻す'}</button></>}

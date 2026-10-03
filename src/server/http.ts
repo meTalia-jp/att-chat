@@ -50,11 +50,27 @@ export function createAppServer(repo: Repository, distPath: string, generation =
         finally {clearTimeout(timeout);res.off('close',closed);}
       }
       if (path === '/api/models' && req.method === 'GET') return send(res, 200, { models: await generation.provider.models() });
+      if (path === '/api/question-box' && req.method === 'GET') return send(res, 200, repo.questionKeeps.listGlobal());
       const chat = path.match(/^\/api\/conversations\/([^/]+)\/chat$/);
-      const ask = path.match(/^\/api\/conversations\/([^/]+)\/question-keeps\/([^/]+)\/(ask|ask-new)$/);
-      if ((chat || ask) && req.method === 'POST') {
-        const data = await body(req, ask ? ['user_question', 'model', 'request_id'] : ['content', 'model', 'request_id']);
-        const run = repo.prepareChat((chat || ask)![1], ask ? data.user_question : data.content, data.model, data.request_id, ask?.[2], ask?.[3] === 'ask-new');
+      const immediateAsk = path.match(/^\/api\/conversations\/([^/]+)\/immediate-ask$/);
+      const keepContextPreview = path.match(/^\/api\/conversations\/([^/]+)\/question-keeps\/([^/]+)\/context-preview$/);
+      if (keepContextPreview && req.method === 'POST') {
+        const data = await body(req, ['user_question', 'context_level']);
+        return send(res, 200, repo.previewKeepContextCorrection(keepContextPreview[1], keepContextPreview[2], data.user_question, data.context_level));
+      }
+      const handoffPreview = path.match(/^\/api\/conversations\/([^/]+)\/question-keeps\/([^/]+)\/handoff-preview$/);
+      if (handoffPreview && req.method === 'POST') {
+        const data = await body(req, ['user_question', 'handoff_level']);
+        return send(res, 200, repo.previewNewChatHandoff(handoffPreview[1], handoffPreview[2], data.user_question, data.handoff_level));
+      }
+      const ask = path.match(/^\/api\/conversations\/([^/]+)\/question-keeps\/([^/]+)\/(ask|ask-new|handoff-new)$/);
+      if ((chat || ask || immediateAsk) && req.method === 'POST') {
+        const handoff = ask?.[3] === 'handoff-new';
+        const sameChatKeep = ask?.[3] === 'ask';
+        const data = await body(req, immediateAsk ? ['main_draft','marker_questions','model','request_id'] : ask ? ['user_question', 'model', 'request_id', ...(handoff ? ['handoff_level'] : []), ...(sameChatKeep ? ['context_level'] : [])] : ['content', 'model', 'request_id']);
+        const run = immediateAsk
+          ? repo.prepareImmediateAsk(immediateAsk[1],data.main_draft,data.marker_questions,data.model,data.request_id)
+          : repo.prepareChat((chat || ask)![1], ask ? data.user_question : data.content, data.model, data.request_id, ask?.[2], ask ? ask[3] !== 'ask' : false, handoff ? data.handoff_level : undefined, sameChatKeep ? data.context_level : undefined);
         res.writeHead(201, { 'Content-Type': 'application/x-ndjson; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' });
         const emit = (event: Record<string, unknown>) => {
           if (!res.destroyed) {

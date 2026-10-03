@@ -152,7 +152,7 @@ test('S2 restartでmissing/expired lease/ready復元',async()=>{
     assert(repo.readVector(missing.turn_id,f.space)); assert(repo.readVector(extra.turn_id,f.space));
   } finally { db.close(); rmSync(dir,{recursive:true,force:true}); }
 });
-for (const version of [4,6]) test(`S2 migration ${version}→007 既存rows保全・再実行`,()=>{
+for (const version of [4,6]) test(`S2 migration ${version}→008 既存rows保全・再実行`,()=>{
   const db=new DatabaseSync(':memory:');
   try {
     db.exec('PRAGMA foreign_keys=ON; CREATE TABLE schema_migrations(version INTEGER PRIMARY KEY,checksum TEXT,applied_at TEXT) STRICT');
@@ -162,7 +162,7 @@ for (const version of [4,6]) test(`S2 migration ${version}→007 既存rows保�
     const repo=new Repository(db), c=repo.createConversation('legacy'), t=repo.addUserTurn(c.conversation_id,'original'); repo.addMockRun(c.conversation_id,t.turn_id,'answer');
     const tables=db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all().map(r=>r.name as string);
     const before=tables.filter(n=>n!=='schema_migrations').map(n=>[n,db.prepare(`SELECT * FROM ${n}`).all()] as const);
-    migrate(db); migrate(db); assert.equal(db.prepare('SELECT count(*) n FROM schema_migrations').get()!.n,7);
+    migrate(db); migrate(db); assert.equal(db.prepare('SELECT count(*) n FROM schema_migrations').get()!.n,8);
     for(const [name,rows] of before)assert.deepEqual(db.prepare(`SELECT * FROM ${name}`).all(),rows);
   } finally { db.close(); }
 });

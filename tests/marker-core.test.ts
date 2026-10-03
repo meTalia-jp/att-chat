@@ -68,7 +68,7 @@ test('MarkerCore standalone and Att-Chat composition preserve marker and extensi
       calls.push({path,method,body});
       if(path.endsWith('/question-runs'))return Response.json([]);
       if(path.includes('/question-keeps')){
-        if(method==='POST'){const k={...body,keep_id:'k',status:'pending',memo:body.memo,question_draft:body.question_draft};keeps.push(k);return Response.json(k);}
+        if(method==='POST'){const k={...body,keep_id:keeps.length?`k${keeps.length+1}`:'k',status:'pending',memo:body.memo,question_draft:body.question_draft};keeps.push(k);return Response.json(k);}
         return Response.json(keeps);
       }
       if(path.endsWith('/related-turns'))return Response.json({coverage:{ready:0,total_completed:0,pending:0,failed:0,stale:0,missing:0,input_too_long:0},space_id:'fixture',query_text:'fixture',results:[],timings:{query_embedding_ms:0,vector_load_ms:0,similarity_ms:0,total_ms:0,ready_vector_count:0,invalid_vectors:0}});
@@ -151,6 +151,44 @@ test('MarkerCore standalone and Att-Chat composition preserve marker and extensi
     assert.equal(container.querySelector('[aria-label="Related Turns"]'),null);
     assert.equal(container.querySelector('[aria-label="Question Keep"] form'),null);
     assert.ok(row('h1'));
+
+    // Production conversation presentation keeps management UI collapsed and opens Detail from the exact inline Marker.
+    const immediateDrafts:any[]=[],createdKeeps:any[]=[];
+    await settle(()=>root!.render(createElement(MarkedTurns,{...props,reloadToken:2,runs:[],sending:false,onAsk:()=>{},onRelatedJump:async()=>{},compact:true,onImmediatePrepared:(draft:any)=>immediateDrafts.push(draft),onKeepCreated:(keep:any)=>createdKeeps.push(keep)})));
+    const debug=container.querySelector('details.marker-debug-tools') as HTMLDetailsElement;
+    assert.ok(debug);assert.equal(debug.open,false);assert.ok(debug.querySelector('.marker-editor'));assert.ok(debug.querySelector('.marker-list'));
+    await click(container.querySelector('[data-highlight="h1"]'));
+    let detail=container.querySelector('[aria-label="Marker Detail"]')!;
+    assert.ok(detail);assert.equal((button('今すぐ質問',detail) as HTMLButtonElement).disabled,false);
+    await click(button('質問',detail));
+    assert.equal((detail.querySelector('input') as HTMLInputElement).value,'質問です。 ');
+    await click(button('Composerへ準備',detail));
+    assert.equal(immediateDrafts.length,1);assert.equal(immediateDrafts[0].highlightId,'h1');assert.equal(immediateDrafts[0].turnNumber,3);
+    assert.equal(container.querySelector('[aria-label="Marker Detail"]'),null);
+
+    await click(container.querySelector('[data-highlight="new"]'));
+    detail=container.querySelector('[aria-label="Marker Detail"]')!;
+    assert.equal((button('今すぐ質問',detail) as HTMLButtonElement).disabled,true);
+    assert.match(detail.textContent!,/最新のcompleted Assistant Turnだけ/);
+    await click(button('後で質問',detail));
+    const deferredInput=detail.querySelector('input') as HTMLInputElement;
+    await settle(()=>{Object.getOwnPropertyDescriptor(dom.window.HTMLInputElement.prototype,'value')!.set!.call(deferredInput,'あとで確認');deferredInput.dispatchEvent(new dom.window.Event('input',{bubbles:true}));deferredInput.dispatchEvent(new dom.window.Event('change',{bubbles:true}));});
+    await click(button('質問箱へ保存',detail));
+    assert.equal(createdKeeps.length,1);assert.equal(createdKeeps[0].highlight_id,'new');
+
+    await click(container.querySelector('[data-highlight="h1"]'));
+    detail=container.querySelector('[aria-label="Marker Detail"]')!;
+    const detailColor=detail.querySelector('[aria-label="Marker色"]') as HTMLSelectElement;
+    await settle(()=>{detailColor.value='yellow';detailColor.dispatchEvent(new dom.window.Event('change',{bubbles:true}));});
+    await click(button('Markerを更新',detail));
+    assert.equal(highlights.find(h=>h.highlight_id==='h1')?.color,'yellow');assert.equal(highlights.find(h=>h.highlight_id==='h1')?.note,'memo 1');
+
+    const externalJumpResults:boolean[]=[];
+    await settle(()=>root!.render(createElement(MarkedTurns,{...props,reloadToken:3,runs:[],sending:false,onAsk:()=>{},onRelatedJump:async()=>{},markerJump:{highlightId:'h1',request:1},onMarkerJumpResult:(found:boolean)=>externalJumpResults.push(found)})));
+    assert.equal(externalJumpResults.at(-1),true);
+    assert.ok(container.querySelector('[data-highlight="h1"]')?.classList.contains('marker-jump-active'));
+    await settle(()=>root!.render(createElement(MarkedTurns,{...props,reloadToken:3,runs:[],sending:false,onAsk:()=>{},onRelatedJump:async()=>{},markerJump:{highlightId:'h2',request:2},onMarkerJumpResult:(found:boolean)=>externalJumpResults.push(found)})));
+    assert.equal(externalJumpResults.at(-1),false);
   } finally {
     if(root)await act(async()=>root!.unmount());
     for(const [key,descriptor] of saved){if(descriptor)Object.defineProperty(globalThis,key,descriptor);else Reflect.deleteProperty(globalThis,key);}

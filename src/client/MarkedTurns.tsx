@@ -6,9 +6,10 @@ import { MarkerCore } from './MarkerCore.tsx';
 import { QuestionKeeps } from './QuestionKeeps.tsx';
 import { RelatedTurns } from './RelatedTurns.tsx';
 import { ContextCompare } from './ContextCompare.tsx';
+import { MarkerDetailAdapter, type ImmediateAskDraft } from './MarkerDetailAdapter.tsx';
 
 // Att-Chat composition: optional experiments do not belong to MarkerCore.
-export function MarkedTurns({ conversationId, turns, reloadToken, runs, onAsk, sending, onRelatedJump, compact = false }: {
+export function MarkedTurns({ conversationId, turns, reloadToken, runs, onAsk, sending, onRelatedJump, onImmediatePrepared, onKeepCreated, markerJump, onMarkerJumpResult, compact = false }: {
   compact?: boolean;
   conversationId: string;
   turns: Turn[];
@@ -17,15 +18,20 @@ export function MarkedTurns({ conversationId, turns, reloadToken, runs, onAsk, s
   onAsk: (keep: QuestionKeep, newConversation?: boolean) => void;
   sending: boolean;
   onRelatedJump?: (result: RelatedTurn) => Promise<void>;
+  onImmediatePrepared?: (draft: ImmediateAskDraft) => unknown;
+  onKeepCreated?: (keep: QuestionKeep) => void;
+  markerJump?: { highlightId: string; request: number } | null;
+  onMarkerJumpResult?: (found: boolean) => void;
 }) {
   const [keepTarget, setKeepTarget] = useState<Highlight | null>(null);
   const [compareId, setCompareId] = useState<string | null>(null);
   useEffect(() => { setKeepTarget(null); setCompareId(null); }, [conversationId, reloadToken]);
 
-  return <MarkerCore conversationId={conversationId} turns={turns} reloadToken={reloadToken} showTurnIds={!compact}
-    renderEditorExtras={({ editing, highlights }) => <>
-      {editing && onRelatedJump && <details><summary>Related Turns</summary><RelatedTurns key={editing.highlight_id} conversationId={conversationId} highlight={editing} onJump={onRelatedJump} sending={sending} /></details>}
-      {compareId && highlights.some(h => h.highlight_id === compareId) && <ContextCompare conversationId={conversationId} highlightId={compareId} onClose={() => setCompareId(null)} />}
+  return <MarkerCore conversationId={conversationId} turns={turns} reloadToken={reloadToken} showTurnIds={!compact} presentation={compact ? 'conversation' : 'full'} externalJump={markerJump} onExternalJumpResult={onMarkerJumpResult}
+    renderEditorExtras={context => <>
+      {compact && <MarkerDetailAdapter conversationId={conversationId} turns={turns} context={context} sending={sending} onImmediatePrepared={onImmediatePrepared ?? (() => {})} onKeepCreated={onKeepCreated ?? (() => {})} />}
+      {!compact && context.editing && onRelatedJump && <details><summary>Related Turns</summary><RelatedTurns key={context.editing.highlight_id} conversationId={conversationId} highlight={context.editing} onJump={onRelatedJump} sending={sending} /></details>}
+      {!compact && compareId && context.highlights.some(h => h.highlight_id === compareId) && <ContextCompare conversationId={conversationId} highlightId={compareId} onClose={() => setCompareId(null)} />}
     </>}
     renderMarkerActions={(highlight, { beginEdit }) => <details><summary>追加操作</summary>
       {onRelatedJump && <button disabled={highlight.status !== 'resolved'} onClick={() => beginEdit(highlight)}>Related Turns</button>}
