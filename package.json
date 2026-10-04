@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1 --port 5180 --strictPort",
+    "electron:dev": "electron electron/main.mjs",
     "server": "node --experimental-strip-types src/server/main.ts",
     "start": "node --experimental-strip-types src/server/main.ts",
     "typecheck": "tsc --noEmit",
@@ -23,6 +24,7 @@
     "@types/node": "24.3.0",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.4",
+    "electron": "^44.5.1",
     "jsdom": "^26.1.0",
     "onnxruntime-node": "1.21.0",
     "typescript": "7.0.2",
