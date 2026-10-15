@@ -12,6 +12,9 @@ test('HTTP作成・取得・並列追加・更新API拒否・DB失敗の非2xx',
   const post = (path: string, data: unknown) => fetch(base+path, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) });
   try {
     const created = await post('/api/conversations', {title:'HTTP'}); assert.equal(created.status,201); const c = await created.json();
+    const renamed=await fetch(base+`/api/conversations/${c.conversation_id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:'  HTTP変更後  '})});assert.equal(renamed.status,200);assert.equal((await renamed.json()).title,'HTTP変更後');
+    const listed=await(await fetch(base+'/api/conversations')).json();assert.equal(listed[0].title,'HTTP変更後');
+    const emptyRename=await fetch(base+`/api/conversations/${c.conversation_id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:'   '})});assert.equal(emptyRename.status,400);
     const replies = await Promise.all(Array.from({length:8}, (_,i) => post(`/api/conversations/${c.conversation_id}/turns`, {content:`発言${i}`}))); assert(replies.every(r=>r.status===201));
     const detail = await (await fetch(base+`/api/conversations/${c.conversation_id}`)).json(); assert.deepEqual(detail.turns.map((t:{sequence_no:number})=>t.sequence_no), [0,1,2,3,4,5,6,7]);
     const update = await fetch(base+`/api/conversations/${c.conversation_id}/turns`, {method:'PUT'}); assert.equal(update.status,404);

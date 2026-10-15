@@ -1,0 +1,76 @@
+{
+  "experiment": "context-correction-v0.2",
+  "fixture_version": "physics-long-32-v2",
+  "marker": "D",
+  "condition": "B",
+  "source_turn": "T20",
+  "source_utf16": 2650,
+  "source_text": "この比を十分小さくします。",
+  "question": "質問です。これはどういう意味ですか？",
+  "anchor": {
+    "highlight_id": "D",
+    "turn_id": "T20",
+    "start_offset": 2128,
+    "end_offset": 2141,
+    "source_text": "この比を十分小さくします。",
+    "target_text": "この比を十分小さくします。",
+    "color": "yellow",
+    "note": "",
+    "created_at": "2026-09-29T00:00:00Z",
+    "updated_at": "2026-09-29T00:00:00Z",
+    "status": "resolved",
+    "reason": null
+  },
+  "local_range": {
+    "context_start_offset": 1978,
+    "highlight_start_offset": 2128,
+    "highlight_end_offset": 2141,
+    "context_end_offset": 2291
+  },
+  "context_utf16": 313,
+  "included_percentage": 11.81132075471698,
+  "input_utf16": 486,
+  "included_turn_ids": [
+    "T20"
+  ],
+  "request": {
+    "model": "unsloth/gemma-4-12b-it-qat",
+    "temperature": 0,
+    "max_tokens": 2048,
+    "stream": true,
+    "messages": [
+      {
+        "role": "system",
+        "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+      },
+      {
+        "role": "user",
+        "content": "[参照文脈]\n、ポテンシャルが変化する代表長さℓからε=abs(x)/ℓを作ります。ここで小さくする対象は時間間隔ではなく、代表長さに対する変位の比です。これは無次元量なので、長さの単位をmからcmへ変えても値は変わりません。ただし長さの規約を分子だけ変えれば誤った値になります。\n\n空間近似で見ているεについて、【選択箇所開始】この比を十分小さくします。【選択箇所終了】これにより平衡点の近くに運動を限定しますが、高次項の係数が大きい場合や二次項が消える場合は別の検討が必要です。滑らかなポテンシャルでも、無条件に二次式だけでよいとは限りません。実際には省略する三次以上の項を残す二次項と比較します。ここでの「小さい」は前の時間分解能のΔとは違う量を指します。\n\n【別の\n\n[Marker Focus]\nこの比を十分小さくします。\n\n[質問]\n質問です。これはどういう意味ですか？"
+      }
+    ]
+  },
+  "automatic": {
+    "marker_match": true,
+    "window_boundaries": true,
+    "source_only": true,
+    "no_future_turns": true
+  },
+  "human_review": "pending",
+  "provider_base_url": "http://127.0.0.1:1234/v1",
+  "request_sha256": "e3128ae90dcf8c84f195b8e04554f75568fe9635c2c2a910ee50580a7c6c6e6e",
+  "started": "2026-09-29T11:46:39.490Z",
+  "finished": "2026-09-29T11:47:00.084Z",
+  "answer": "この文脈における「この比を十分小さくします」という言葉は、**変位の大きさを代表的な長さと比較した相対的な割合（$\\epsilon = |x|/\\ell$）を十分に小さく保つこと**を意味しています。\n\n具体的には、以下の3つのポイントに分けられます。\n\n1.  **近似の正当化**:\n    ポテンシャル関数を二次式（放物線のような形）で近似するためには、平衡点からのズレ（変位 $x$）が、その系の特性を示す長さ（代表長さ $\\ell$）に対して十分に小さい必要があります。$\\epsilon$ を小さくすることで、テイラー展開における高次の項（三次以上の項）の影響を無視できるようにしています。\n\n2.  **運動の限定**:\n    この比を小さく保つことは、「系が平衡点のすぐ近くでしか動かない」という条件を課すことを意味します。これにより、複雑なポテンシャルを単純な二次式として扱うことが可能になります。\n\n3.  **時間分解能との区別**:\n    文末にある通り、この「小さい」は時間の刻み幅（$\\Delta$）のことではなく、空間的なスケールに関する制約です。つまり、「計算の細かさ」の話ではなく、「近似が成り立つ範囲（空間的な広がり）」の話をしています。\n\n**注意点として：**\nテキスト内では、単に $\\epsilon$ が小さければ良いというわけではなく、高次の係数が非常に大きい場合や二次項自体が消えている場合には、この比を小さくしても二次式での近似が成立しない可能性があることも補足されています。",
+  "output_utf16": 665,
+  "diagnostics": {
+    "finish_reason": "stop",
+    "completion_tokens": null,
+    "prompt_tokens": null,
+    "total_tokens": null,
+    "content_chars": 665,
+    "reasoning_chars": 2772,
+    "duration_ms": 20593,
+    "terminal_chunk_received": true
+  },
+  "error": null
+}

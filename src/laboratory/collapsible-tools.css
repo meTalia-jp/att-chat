@@ -1,0 +1,23 @@
+.turn-map-layout.tools-layout{grid-template-columns:minmax(0,1fr) 320px}
+.tools-sidebar{height:calc(100dvh - 24px);min-height:440px;box-sizing:border-box;display:flex;flex-direction:column;gap:12px;overflow:hidden}
+.tools-quick-area{height:220px;flex:0 0 220px;display:flex;flex-direction:column;min-height:0}
+.tools-quick-area [role=tablist]{display:flex;gap:4px;flex:0 0 auto}
+.tools-quick-area [role=tab]{font-size:13px;min-height:32px;border:1px solid #dce1e5;background:transparent;cursor:pointer}
+.tools-quick-area [aria-selected=true]{background:#e0e7ed}
+.tools-quick-area [role=tabpanel]{flex:1;min-height:0;overflow:hidden}
+.tools-sidebar [hidden]{display:none!important}
+.tools-sidebar .quick-memo-panel,.tools-sidebar .quick-dictionary-panel{position:static;height:100%;max-height:none;min-height:0;box-sizing:border-box;padding:8px;display:flex;flex-direction:column;z-index:auto}
+.tools-sidebar .quick-memo-panel h3,.tools-sidebar .quick-dictionary-panel h3{display:none}
+.tools-sidebar .quick-memo-hint{margin:3px 0;font-size:11px}
+.tools-sidebar .quick-memo-scroll,.tools-sidebar .quick-dictionary-result{flex:1;min-height:0;max-height:none;overflow:auto;overflow-anchor:none}
+.tools-sidebar .quick-dictionary-panel small{flex-shrink:0}
+.tools-persistent-map{flex:1;min-height:200px;display:flex;flex-direction:column;border-top:1px solid #dce1e5;padding-top:10px;overflow:hidden}
+.tools-persistent-map>h3,.tools-persistent-map>small,.tools-persistent-map>.turn-map-mode,.tools-persistent-map>p{flex-shrink:0}
+.tools-sidebar .turn-map-overview{height:auto;flex:1;min-height:100px}
+.tools-sidebar .turn-map-rows{flex:1;min-height:0;max-height:none}
+.tools-input{font-size:12px;padding:8px 0;max-width:540px}.tools-input input{box-sizing:border-box;width:100%;margin:4px 0}.tools-input button{font-size:12px;min-height:30px}
+.tools-unsearched{font-size:13px;color:#64717d}
+.tools-toast-host{position:fixed;bottom:24px;left:58%;transform:translateX(-50%);z-index:100;pointer-events:none}
+.tools-toast{padding:9px 14px;border:1px solid #dce1e5;border-radius:6px;background:#f7faf8;color:#34483b;box-shadow:0 2px 8px #0002;font-size:13px;white-space:nowrap;animation:tools-toast-fade 1.1s linear forwards}
+@keyframes tools-toast-fade{0%,80%{opacity:1}100%{opacity:0}}
+@media(max-width:700px){.turn-map-layout.tools-layout{grid-template-columns:minmax(0,1fr) 210px}.tools-sidebar{padding:6px}.tools-toast-host{left:50%;bottom:16px}}

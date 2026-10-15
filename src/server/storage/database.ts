@@ -1,6 +1,6 @@
 import { DatabaseSync } from 'node:sqlite';
 import { readFileSync, mkdirSync } from 'node:fs';
-import { dirname } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { createHash } from 'node:crypto';
 
 export function transaction<T>(db: DatabaseSync, action: () => T): T {
@@ -11,7 +11,7 @@ export function transaction<T>(db: DatabaseSync, action: () => T): T {
 
 export function migrate(db: DatabaseSync) {
   const migrations = ['001_initial.sql', '002_live_runs.sql', '003_highlights.sql', '004_question_keeps.sql', '005_keep_runs.sql', '006_branch_questions.sql', '007_semantic_index.sql', '008_immediate_ask_references.sql'].map((file, i) => {
-    const sql = readFileSync(new URL(`./migrations/${file}`, import.meta.url), 'utf8').replace(/\r\n?/g, '\n');
+    const sql = readFileSync(process.env.ATTCHAT_MIGRATIONS ? resolve(process.env.ATTCHAT_MIGRATIONS, file) : new URL(`./migrations/${file}`, import.meta.url), 'utf8').replace(/\r\n?/g, '\n');
     return { version: i + 1, sql, checksum: createHash('sha256').update(sql).digest('hex') };
   });
   transaction(db, () => {

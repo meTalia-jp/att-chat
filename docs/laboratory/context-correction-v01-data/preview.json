@@ -1,0 +1,1285 @@
+{
+  "fixtureVersion": "physics-40-v1",
+  "turns": [
+    {
+      "turn_id": "T1",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 0,
+      "role": "user",
+      "content": "ベクトルと微分積分は理解しています。ニュートン力学も学びましたが、保存則から作用へつながる道筋を学びたいです。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T2",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 1,
+      "role": "assistant",
+      "content": "まず一定質量の粒子なら運動量p=mv、運動方程式はdp/dt=Fです。力は運動量の変化率です。この関係を複数粒子へ広げ、系全体の量を考えましょう。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T3",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 2,
+      "role": "user",
+      "content": "単一粒子のF=maは分かります。二つの台車が衝突すると、一方の運動量は変わりますよね。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T4",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 3,
+      "role": "assistant",
+      "content": "はい。二台を一つの系とすると内部の作用反作用の力が打ち消し合います。総運動量P=p1+p2の変化は、系に働く外力の合計で決まります。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T5",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 4,
+      "role": "user",
+      "content": "ベクトルの足し算と作用反作用は分かりました。床の摩擦を無視し、二台全体を系に取ります。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T6",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 5,
+      "role": "assistant",
+      "content": "その条件なら水平方向の外力はゼロです。衝突中に各台車の運動量が変わっても、二台の総運動量の時間微分はゼロになります。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T7",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 6,
+      "role": "user",
+      "content": "運動量保存は理解しました。各台車の速度が同じという意味ではないですね。式を最初からやり直さず、まとめの表現を確認したいです。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T8",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 7,
+      "role": "assistant",
+      "content": "二台の総運動量Pを見ています。各台車の速度は衝突で変わってよく、同じ速度になる必要もありません。外力の合計がゼロである限り、これは保存されます。ここで変わらないのは二台を合わせたベクトル量で、個別の速さでも運動エネルギーでもありません。非弾性衝突でも総運動量は保存できますが、運動エネルギーの一部は内部エネルギーへ移ります。系をどこまで含めたかを先に決めることが大切です。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T9",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 8,
+      "role": "user",
+      "content": "運動エネルギーと運動量は別ですね。外力がなくても、運動エネルギー保存は自動的には言えないと理解しました。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T10",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 9,
+      "role": "assistant",
+      "content": "その区別を保ちましょう。次は保存則を、運動方程式の計算だけでなく対称性から見る考え方へ進みます。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T11",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 10,
+      "role": "user",
+      "content": "対称性は図形の左右対称くらいしか知りません。保存則とどうつながりますか。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T12",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 11,
+      "role": "assistant",
+      "content": "物理での対称性は、ある変換をしても法則の形が変わらないことです。連続的な変換と保存量の関係を、後で作用を使って整理します。今は空間と時間の移動を区別しましょう。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T13",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 12,
+      "role": "user",
+      "content": "空間をずらす話からお願いします。実験装置全体を水平移動するイメージですか。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T14",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 13,
+      "role": "assistant",
+      "content": "孤立した同じ装置を同じ環境で移し、絶対位置で法則が変わらないなら空間並進対称性があります。この対称性は総運動量保存に対応します。固定された外部ポテンシャルが位置を特別扱いする場合には注意が要ります。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T15",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 14,
+      "role": "user",
+      "content": "空間並進と運動量の対応は理解しました。今度は時間をずらす場合を知りたいです。まだラグランジアンやネーターの定理の式は習っていません。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T16",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 15,
+      "role": "assistant",
+      "content": "同じ初期条件の実験を今日始めても明日始めても、装置の法則が同じなら時間並進対称性があります。外部から設定を時間変化させる駆動装置はここでは除きます。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T17",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 16,
+      "role": "user",
+      "content": "時刻が変わっても粒子の位置が同じ、という意味ではないですね。空間並進と取り違えずに、対応する量だけ確認したいです。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T18",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 17,
+      "role": "assistant",
+      "content": "ここで考えるのは時間並進です。開始時刻のラベルをまとめてずらしても法則が変わらないという性質であり、粒子が停止していることではありません。それが重要です。この対称性に対応する保存量はエネルギーで、先ほどの空間並進に対応する運動量とは区別します。通常の時間に依存しない保存力の力学では、運動エネルギーと位置エネルギーの和を考えます。厳密な導出は作用の形式を学んでからにし、今は対称性と保存量の対応を整理しておきましょう。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T19",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 18,
+      "role": "user",
+      "content": "空間並進なら運動量、時間並進ならエネルギーですね。証明より、次の形式へのつながりが気になります。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T20",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 19,
+      "role": "assistant",
+      "content": "では同じニュートン力学を、座標とエネルギーの関数で書き直します。新しい自然法則を追加するのではなく、同じ運動を別の形式で表します。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T21",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 20,
+      "role": "user",
+      "content": "ニュートンの運動方程式と保存則は理解しています。ラグランジアンはまだ分かりません。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T22",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 21,
+      "role": "assistant",
+      "content": "ここでは通常の保存力を受ける一次元粒子に限定し、L=T−Vと置きます。Tは運動エネルギー、Vは位置エネルギーです。全エネルギーT+Vとは役割が違います。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T23",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 22,
+      "role": "user",
+      "content": "引き算なのが不思議です。Lは保存する量だと思えばいいのでしょうか。変分はまだ知りません。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T24",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 23,
+      "role": "assistant",
+      "content": "L自体は一般には保存量ではありません。位置と速度を入れる関数として、運動方程式を作る材料だと考えてください。運動の軌道全体を比べるには、その時間積分を使います。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T25",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 24,
+      "role": "user",
+      "content": "ベクトルやF=maの説明は不要です。Lが保存量でないことは分かりましたが、作用と変分は初めてです。まず何を比べるのか知りたいです。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T26",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 25,
+      "role": "assistant",
+      "content": "開始と終了の時刻と位置を固定し、その間をつなぐ候補の軌道を比べます。各軌道についてLを時間積分したSを作用と呼びます。この方法では、実際の軌道のまわりで作用の一次の変化がゼロになります。これは停留条件であって、常に最小という断定ではありません。位置を少し変えた候補を用意し、どちらが単に短い道かではなく、その道をどの速さで通るかも含めて評価します。固定するのは両端の条件で、途中の位置と速度は候補によって変わります。式の導出は次の段階で扱い、まず軌道全体に一つの数Sを割り当てる操作を押さえましょう。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T27",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 26,
+      "role": "user",
+      "content": "軌道ごとに作用という数があるのですね。最小と停留の違いがまだ曖昧です。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T28",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 27,
+      "role": "assistant",
+      "content": "停留は微小な変化に対する一次の増減がゼロであることです。通常の関数の極小だけでなく極大や鞍点も停留点になり得ます。作用でも、停留だけから最小とは言えません。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T29",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 28,
+      "role": "user",
+      "content": "微分がゼロの例えなら分かります。では、ニュートンの式には戻れますか。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T30",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 29,
+      "role": "assistant",
+      "content": "固定端の変分からd/dt(∂L/∂速度)−∂L/∂位置=0が得られます。L=m速度²/2−Vならm加速度=−dV/d位置となり、ニュートンの運動方程式へ戻ります。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T31",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 30,
+      "role": "user",
+      "content": "自由粒子で確認したいです。VがゼロならLは運動エネルギーだけですか。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T32",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 31,
+      "role": "assistant",
+      "content": "その設定でL=m速度²/2です。位置がLに明示的に現れないため、∂L/∂速度=m速度が一定になります。これは保存されます。ここでは自由粒子の運動量を指します。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T33",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 32,
+      "role": "user",
+      "content": "自由粒子で運動量一定になることは理解しました。次はばねの近くで小さい量を扱う近似を知りたいです。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T34",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 33,
+      "role": "assistant",
+      "content": "平衡点近くの滑らかな位置エネルギーをテイラー展開します。平衡点で一次項が消え、安定な極小なら二次項の係数が正です。高次項が十分小さい範囲で調和振動の近似になります。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T35",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 34,
+      "role": "user",
+      "content": "小さいというとエネルギーがゼロに近い意味ですか。位置エネルギーの基準値は任意だと理解しています。無次元量やテイラー展開は分かります。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T36",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 35,
+      "role": "assistant",
+      "content": "この近似では、平衡点からの変位xをポテンシャルが変化する代表的な長さℓと比較します。比ε=|x|/ℓを見ており、この量は小さい、というのが近似の条件です。絶対的なエネルギーの値が小さいという意味ではありません。基準エネルギーを定数だけずらしても運動は変わらないからです。ただし小さい比だけで全ての系に誤差保証ができるわけではなく、高次項の係数が極端に大きくないことや二次項が消えないことも必要です。実際には三次以上の項と二次項の大きさを比較し、目的とする精度の範囲で省略可能かを見ます。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T37",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 36,
+      "role": "user",
+      "content": "小さいのは単位付きxだけでなく長さの比で、高次項も確認するのですね。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T38",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 37,
+      "role": "assistant",
+      "content": "はい。保存量の議論と近似の議論は分けましょう。時間に依存しない元の系でエネルギーが保存されることと、近似式が十分正確かどうかは別の確認です。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T39",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 38,
+      "role": "user",
+      "content": "力から運動量、対称性、作用、具体例へつながりました。復習では短い引用だけだと何の量か迷いそうです。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    },
+    {
+      "turn_id": "T40",
+      "conversation_id": "physics-40-v1",
+      "sequence_no": 39,
+      "role": "assistant",
+      "content": "同じ「これは保存されます」でも、対象は直前の定義と系の条件で決まります。復習では対象と既に理解した前提を確認し、必要なところから続きを説明しましょう。",
+      "status": "completed",
+      "created_at": "2026-09-29T00:00:00Z",
+      "finalized_at": "2026-09-29T00:00:00Z"
+    }
+  ],
+  "markers": [
+    {
+      "id": "A",
+      "turn": 8,
+      "text": "これは保存されます。",
+      "question": "これはどういう意味ですか？",
+      "expected": "孤立二台の総運動量P。個別速度や運動エネルギーではない。",
+      "known": "ベクトル・F=ma・総運動量保存は理解済み。速度一定の再説明から始めない。"
+    },
+    {
+      "id": "B",
+      "turn": 18,
+      "text": "それが重要です。",
+      "question": "なぜですか？",
+      "expected": "時間並進対称性とエネルギー保存。空間並進と運動量ではない。",
+      "known": "空間並進と運動量の対応は既知。ラグランジアン・ネーターの数式は未習。"
+    },
+    {
+      "id": "C",
+      "turn": 26,
+      "text": "この方法では、実際の軌道のまわりで作用の一次の変化がゼロになります。",
+      "question": "ここがよく分かりません。",
+      "expected": "固定端の軌道変分と作用の停留。常に最小とは断定しない。",
+      "known": "ベクトル・ニュートン力学は既知。作用と変分は初めて。Lは保存量ではないと理解済み。"
+    },
+    {
+      "id": "D",
+      "turn": 36,
+      "text": "この量は小さい",
+      "question": "これはどういう意味ですか？",
+      "expected": "無次元比|x|/ℓと高次項の比較。絶対エネルギーではない。",
+      "known": "無次元量・テイラー展開・エネルギー基準の任意性は既知。"
+    }
+  ],
+  "previews": [
+    {
+      "experiment": "context-correction-v0.1",
+      "fixture_version": "physics-40-v1",
+      "marker": "A",
+      "condition": "A",
+      "source_turn": "T8",
+      "included_turn_ids": [],
+      "context_utf16": 0,
+      "input_utf16": 151,
+      "source_text": "これは保存されます。",
+      "question": "これはどういう意味ですか？",
+      "anchor": {
+        "highlight_id": "A",
+        "turn_id": "T8",
+        "start_offset": 62,
+        "end_offset": 72,
+        "source_text": "これは保存されます。",
+        "target_text": "これは保存されます。",
+        "color": "yellow",
+        "note": "",
+        "created_at": "2026-09-29T00:00:00Z",
+        "updated_at": "2026-09-29T00:00:00Z",
+        "status": "resolved",
+        "reason": null
+      },
+      "local_range": null,
+      "request": {
+        "model": "unsloth/gemma-4-12b-it-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "[参照文脈]\nなし\n\n[Marker Focus]\nこれは保存されます。\n\n[質問]\nこれはどういう意味ですか？"
+          }
+        ]
+      },
+      "automatic": {
+        "marker_match": true,
+        "no_future_turns": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "context-correction-v0.1",
+      "fixture_version": "physics-40-v1",
+      "marker": "A",
+      "condition": "B",
+      "source_turn": "T8",
+      "included_turn_ids": [
+        "T8"
+      ],
+      "context_utf16": 204,
+      "input_utf16": 353,
+      "source_text": "これは保存されます。",
+      "question": "これはどういう意味ですか？",
+      "anchor": {
+        "highlight_id": "A",
+        "turn_id": "T8",
+        "start_offset": 62,
+        "end_offset": 72,
+        "source_text": "これは保存されます。",
+        "target_text": "これは保存されます。",
+        "color": "yellow",
+        "note": "",
+        "created_at": "2026-09-29T00:00:00Z",
+        "updated_at": "2026-09-29T00:00:00Z",
+        "status": "resolved",
+        "reason": null
+      },
+      "local_range": {
+        "context_start_offset": 0,
+        "highlight_start_offset": 62,
+        "highlight_end_offset": 72,
+        "context_end_offset": 186
+      },
+      "request": {
+        "model": "unsloth/gemma-4-12b-it-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "[参照文脈]\n[T8 assistant 局所]\n二台の総運動量Pを見ています。各台車の速度は衝突で変わってよく、同じ速度になる必要もありません。外力の合計がゼロである限り、これは保存されます。ここで変わらないのは二台を合わせたベクトル量で、個別の速さでも運動エネルギーでもありません。非弾性衝突でも総運動量は保存できますが、運動エネルギーの一部は内部エネルギーへ移ります。系をどこまで含めたかを先に決めることが大切です。\n\n[Marker Focus]\nこれは保存されます。\n\n[質問]\nこれはどういう意味ですか？"
+          }
+        ]
+      },
+      "automatic": {
+        "marker_match": true,
+        "no_future_turns": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "context-correction-v0.1",
+      "fixture_version": "physics-40-v1",
+      "marker": "A",
+      "condition": "C",
+      "source_turn": "T8",
+      "included_turn_ids": [
+        "T6",
+        "T7",
+        "T8"
+      ],
+      "context_utf16": 350,
+      "input_utf16": 499,
+      "source_text": "これは保存されます。",
+      "question": "これはどういう意味ですか？",
+      "anchor": {
+        "highlight_id": "A",
+        "turn_id": "T8",
+        "start_offset": 62,
+        "end_offset": 72,
+        "source_text": "これは保存されます。",
+        "target_text": "これは保存されます。",
+        "color": "yellow",
+        "note": "",
+        "created_at": "2026-09-29T00:00:00Z",
+        "updated_at": "2026-09-29T00:00:00Z",
+        "status": "resolved",
+        "reason": null
+      },
+      "local_range": null,
+      "request": {
+        "model": "unsloth/gemma-4-12b-it-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "[参照文脈]\n[T6 assistant]\nその条件なら水平方向の外力はゼロです。衝突中に各台車の運動量が変わっても、二台の総運動量の時間微分はゼロになります。\n\n[T7 user]\n運動量保存は理解しました。各台車の速度が同じという意味ではないですね。式を最初からやり直さず、まとめの表現を確認したいです。\n\n[T8 assistant]\n二台の総運動量Pを見ています。各台車の速度は衝突で変わってよく、同じ速度になる必要もありません。外力の合計がゼロである限り、これは保存されます。ここで変わらないのは二台を合わせたベクトル量で、個別の速さでも運動エネルギーでもありません。非弾性衝突でも総運動量は保存できますが、運動エネルギーの一部は内部エネルギーへ移ります。系をどこまで含めたかを先に決めることが大切です。\n\n[Marker Focus]\nこれは保存されます。\n\n[質問]\nこれはどういう意味ですか？"
+          }
+        ]
+      },
+      "automatic": {
+        "marker_match": true,
+        "no_future_turns": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "context-correction-v0.1",
+      "fixture_version": "physics-40-v1",
+      "marker": "A",
+      "condition": "D",
+      "source_turn": "T8",
+      "included_turn_ids": [
+        "T2",
+        "T3",
+        "T4",
+        "T5",
+        "T6",
+        "T7",
+        "T8"
+      ],
+      "context_utf16": 633,
+      "input_utf16": 782,
+      "source_text": "これは保存されます。",
+      "question": "これはどういう意味ですか？",
+      "anchor": {
+        "highlight_id": "A",
+        "turn_id": "T8",
+        "start_offset": 62,
+        "end_offset": 72,
+        "source_text": "これは保存されます。",
+        "target_text": "これは保存されます。",
+        "color": "yellow",
+        "note": "",
+        "created_at": "2026-09-29T00:00:00Z",
+        "updated_at": "2026-09-29T00:00:00Z",
+        "status": "resolved",
+        "reason": null
+      },
+      "local_range": null,
+      "request": {
+        "model": "unsloth/gemma-4-12b-it-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "[参照文脈]\n[T2 assistant]\nまず一定質量の粒子なら運動量p=mv、運動方程式はdp/dt=Fです。力は運動量の変化率です。この関係を複数粒子へ広げ、系全体の量を考えましょう。\n\n[T3 user]\n単一粒子のF=maは分かります。二つの台車が衝突すると、一方の運動量は変わりますよね。\n\n[T4 assistant]\nはい。二台を一つの系とすると内部の作用反作用の力が打ち消し合います。総運動量P=p1+p2の変化は、系に働く外力の合計で決まります。\n\n[T5 user]\nベクトルの足し算と作用反作用は分かりました。床の摩擦を無視し、二台全体を系に取ります。\n\n[T6 assistant]\nその条件なら水平方向の外力はゼロです。衝突中に各台車の運動量が変わっても、二台の総運動量の時間微分はゼロになります。\n\n[T7 user]\n運動量保存は理解しました。各台車の速度が同じという意味ではないですね。式を最初からやり直さず、まとめの表現を確認したいです。\n\n[T8 assistant]\n二台の総運動量Pを見ています。各台車の速度は衝突で変わってよく、同じ速度になる必要もありません。外力の合計がゼロである限り、これは保存されます。ここで変わらないのは二台を合わせたベクトル量で、個別の速さでも運動エネルギーでもありません。非弾性衝突でも総運動量は保存できますが、運動エネルギーの一部は内部エネルギーへ移ります。系をどこまで含めたかを先に決めることが大切です。\n\n[Marker Focus]\nこれは保存されます。\n\n[質問]\nこれはどういう意味ですか？"
+          }
+        ]
+      },
+      "automatic": {
+        "marker_match": true,
+        "no_future_turns": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "context-correction-v0.1",
+      "fixture_version": "physics-40-v1",
+      "marker": "B",
+      "condition": "A",
+      "source_turn": "T18",
+      "included_turn_ids": [],
+      "context_utf16": 0,
+      "input_utf16": 142,
+      "source_text": "それが重要です。",
+      "question": "なぜですか？",
+      "anchor": {
+        "highlight_id": "B",
+        "turn_id": "T18",
+        "start_offset": 69,
+        "end_offset": 77,
+        "source_text": "それが重要です。",
+        "target_text": "それが重要です。",
+        "color": "yellow",
+        "note": "",
+        "created_at": "2026-09-29T00:00:00Z",
+        "updated_at": "2026-09-29T00:00:00Z",
+        "status": "resolved",
+        "reason": null
+      },
+      "local_range": null,
+      "request": {
+        "model": "unsloth/gemma-4-12b-it-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "[参照文脈]\nなし\n\n[Marker Focus]\nそれが重要です。\n\n[質問]\nなぜですか？"
+          }
+        ]
+      },
+      "automatic": {
+        "marker_match": true,
+        "no_future_turns": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "context-correction-v0.1",
+      "fixture_version": "physics-40-v1",
+      "marker": "B",
+      "condition": "B",
+      "source_turn": "T18",
+      "included_turn_ids": [
+        "T18"
+      ],
+      "context_utf16": 228,
+      "input_utf16": 368,
+      "source_text": "それが重要です。",
+      "question": "なぜですか？",
+      "anchor": {
+        "highlight_id": "B",
+        "turn_id": "T18",
+        "start_offset": 69,
+        "end_offset": 77,
+        "source_text": "それが重要です。",
+        "target_text": "それが重要です。",
+        "color": "yellow",
+        "note": "",
+        "created_at": "2026-09-29T00:00:00Z",
+        "updated_at": "2026-09-29T00:00:00Z",
+        "status": "resolved",
+        "reason": null
+      },
+      "local_range": {
+        "context_start_offset": 0,
+        "highlight_start_offset": 69,
+        "highlight_end_offset": 77,
+        "context_end_offset": 209
+      },
+      "request": {
+        "model": "unsloth/gemma-4-12b-it-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "[参照文脈]\n[T18 assistant 局所]\nここで考えるのは時間並進です。開始時刻のラベルをまとめてずらしても法則が変わらないという性質であり、粒子が停止していることではありません。それが重要です。この対称性に対応する保存量はエネルギーで、先ほどの空間並進に対応する運動量とは区別します。通常の時間に依存しない保存力の力学では、運動エネルギーと位置エネルギーの和を考えます。厳密な導出は作用の形式を学んでからにし、今は対称性と保存量の対応を整理しておきましょう。\n\n[Marker Focus]\nそれが重要です。\n\n[質問]\nなぜですか？"
+          }
+        ]
+      },
+      "automatic": {
+        "marker_match": true,
+        "no_future_turns": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "context-correction-v0.1",
+      "fixture_version": "physics-40-v1",
+      "marker": "B",
+      "condition": "C",
+      "source_turn": "T18",
+      "included_turn_ids": [
+        "T16",
+        "T17",
+        "T18"
+      ],
+      "context_utf16": 387,
+      "input_utf16": 527,
+      "source_text": "それが重要です。",
+      "question": "なぜですか？",
+      "anchor": {
+        "highlight_id": "B",
+        "turn_id": "T18",
+        "start_offset": 69,
+        "end_offset": 77,
+        "source_text": "それが重要です。",
+        "target_text": "それが重要です。",
+        "color": "yellow",
+        "note": "",
+        "created_at": "2026-09-29T00:00:00Z",
+        "updated_at": "2026-09-29T00:00:00Z",
+        "status": "resolved",
+        "reason": null
+      },
+      "local_range": null,
+      "request": {
+        "model": "unsloth/gemma-4-12b-it-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "[参照文脈]\n[T16 assistant]\n同じ初期条件の実験を今日始めても明日始めても、装置の法則が同じなら時間並進対称性があります。外部から設定を時間変化させる駆動装置はここでは除きます。\n\n[T17 user]\n時刻が変わっても粒子の位置が同じ、という意味ではないですね。空間並進と取り違えずに、対応する量だけ確認したいです。\n\n[T18 assistant]\nここで考えるのは時間並進です。開始時刻のラベルをまとめてずらしても法則が変わらないという性質であり、粒子が停止していることではありません。それが重要です。この対称性に対応する保存量はエネルギーで、先ほどの空間並進に対応する運動量とは区別します。通常の時間に依存しない保存力の力学では、運動エネルギーと位置エネルギーの和を考えます。厳密な導出は作用の形式を学んでからにし、今は対称性と保存量の対応を整理しておきましょう。\n\n[Marker Focus]\nそれが重要です。\n\n[質問]\nなぜですか？"
+          }
+        ]
+      },
+      "automatic": {
+        "marker_match": true,
+        "no_future_turns": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "context-correction-v0.1",
+      "fixture_version": "physics-40-v1",
+      "marker": "B",
+      "condition": "D",
+      "source_turn": "T18",
+      "included_turn_ids": [
+        "T12",
+        "T13",
+        "T14",
+        "T15",
+        "T16",
+        "T17",
+        "T18"
+      ],
+      "context_utf16": 731,
+      "input_utf16": 871,
+      "source_text": "それが重要です。",
+      "question": "なぜですか？",
+      "anchor": {
+        "highlight_id": "B",
+        "turn_id": "T18",
+        "start_offset": 69,
+        "end_offset": 77,
+        "source_text": "それが重要です。",
+        "target_text": "それが重要です。",
+        "color": "yellow",
+        "note": "",
+        "created_at": "2026-09-29T00:00:00Z",
+        "updated_at": "2026-09-29T00:00:00Z",
+        "status": "resolved",
+        "reason": null
+      },
+      "local_range": null,
+      "request": {
+        "model": "unsloth/gemma-4-12b-it-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "[参照文脈]\n[T12 assistant]\n物理での対称性は、ある変換をしても法則の形が変わらないことです。連続的な変換と保存量の関係を、後で作用を使って整理します。今は空間と時間の移動を区別しましょう。\n\n[T13 user]\n空間をずらす話からお願いします。実験装置全体を水平移動するイメージですか。\n\n[T14 assistant]\n孤立した同じ装置を同じ環境で移し、絶対位置で法則が変わらないなら空間並進対称性があります。この対称性は総運動量保存に対応します。固定された外部ポテンシャルが位置を特別扱いする場合には注意が要ります。\n\n[T15 user]\n空間並進と運動量の対応は理解しました。今度は時間をずらす場合を知りたいです。まだラグランジアンやネーターの定理の式は習っていません。\n\n[T16 assistant]\n同じ初期条件の実験を今日始めても明日始めても、装置の法則が同じなら時間並進対称性があります。外部から設定を時間変化させる駆動装置はここでは除きます。\n\n[T17 user]\n時刻が変わっても粒子の位置が同じ、という意味ではないですね。空間並進と取り違えずに、対応する量だけ確認したいです。\n\n[T18 assistant]\nここで考えるのは時間並進です。開始時刻のラベルをまとめてずらしても法則が変わらないという性質であり、粒子が停止していることではありません。それが重要です。この対称性に対応する保存量はエネルギーで、先ほどの空間並進に対応する運動量とは区別します。通常の時間に依存しない保存力の力学では、運動エネルギーと位置エネルギーの和を考えます。厳密な導出は作用の形式を学んでからにし、今は対称性と保存量の対応を整理しておきましょう。\n\n[Marker Focus]\nそれが重要です。\n\n[質問]\nなぜですか？"
+          }
+        ]
+      },
+      "automatic": {
+        "marker_match": true,
+        "no_future_turns": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "context-correction-v0.1",
+      "fixture_version": "physics-40-v1",
+      "marker": "C",
+      "condition": "A",
+      "source_turn": "T26",
+      "included_turn_ids": [],
+      "context_utf16": 0,
+      "input_utf16": 174,
+      "source_text": "この方法では、実際の軌道のまわりで作用の一次の変化がゼロになります。",
+      "question": "ここがよく分かりません。",
+      "anchor": {
+        "highlight_id": "C",
+        "turn_id": "T26",
+        "start_offset": 59,
+        "end_offset": 93,
+        "source_text": "この方法では、実際の軌道のまわりで作用の一次の変化がゼロになります。",
+        "target_text": "この方法では、実際の軌道のまわりで作用の一次の変化がゼロになります。",
+        "color": "yellow",
+        "note": "",
+        "created_at": "2026-09-29T00:00:00Z",
+        "updated_at": "2026-09-29T00:00:00Z",
+        "status": "resolved",
+        "reason": null
+      },
+      "local_range": null,
+      "request": {
+        "model": "unsloth/gemma-4-12b-it-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "[参照文脈]\nなし\n\n[Marker Focus]\nこの方法では、実際の軌道のまわりで作用の一次の変化がゼロになります。\n\n[質問]\nここがよく分かりません。"
+          }
+        ]
+      },
+      "automatic": {
+        "marker_match": true,
+        "no_future_turns": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "context-correction-v0.1",
+      "fixture_version": "physics-40-v1",
+      "marker": "C",
+      "condition": "B",
+      "source_turn": "T26",
+      "included_turn_ids": [
+        "T26"
+      ],
+      "context_utf16": 269,
+      "input_utf16": 441,
+      "source_text": "この方法では、実際の軌道のまわりで作用の一次の変化がゼロになります。",
+      "question": "ここがよく分かりません。",
+      "anchor": {
+        "highlight_id": "C",
+        "turn_id": "T26",
+        "start_offset": 59,
+        "end_offset": 93,
+        "source_text": "この方法では、実際の軌道のまわりで作用の一次の変化がゼロになります。",
+        "target_text": "この方法では、実際の軌道のまわりで作用の一次の変化がゼロになります。",
+        "color": "yellow",
+        "note": "",
+        "created_at": "2026-09-29T00:00:00Z",
+        "updated_at": "2026-09-29T00:00:00Z",
+        "status": "resolved",
+        "reason": null
+      },
+      "local_range": {
+        "context_start_offset": 0,
+        "highlight_start_offset": 59,
+        "highlight_end_offset": 93,
+        "context_end_offset": 250
+      },
+      "request": {
+        "model": "unsloth/gemma-4-12b-it-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "[参照文脈]\n[T26 assistant 局所]\n開始と終了の時刻と位置を固定し、その間をつなぐ候補の軌道を比べます。各軌道についてLを時間積分したSを作用と呼びます。この方法では、実際の軌道のまわりで作用の一次の変化がゼロになります。これは停留条件であって、常に最小という断定ではありません。位置を少し変えた候補を用意し、どちらが単に短い道かではなく、その道をどの速さで通るかも含めて評価します。固定するのは両端の条件で、途中の位置と速度は候補によって変わります。式の導出は次の段階で扱い、まず軌道全体に一つの数Sを割り当てる操作を押さえましょう。\n\n[Marker Focus]\nこの方法では、実際の軌道のまわりで作用の一次の変化がゼロになります。\n\n[質問]\nここがよく分かりません。"
+          }
+        ]
+      },
+      "automatic": {
+        "marker_match": true,
+        "no_future_turns": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "context-correction-v0.1",
+      "fixture_version": "physics-40-v1",
+      "marker": "C",
+      "condition": "C",
+      "source_turn": "T26",
+      "included_turn_ids": [
+        "T24",
+        "T25",
+        "T26"
+      ],
+      "context_utf16": 442,
+      "input_utf16": 614,
+      "source_text": "この方法では、実際の軌道のまわりで作用の一次の変化がゼロになります。",
+      "question": "ここがよく分かりません。",
+      "anchor": {
+        "highlight_id": "C",
+        "turn_id": "T26",
+        "start_offset": 59,
+        "end_offset": 93,
+        "source_text": "この方法では、実際の軌道のまわりで作用の一次の変化がゼロになります。",
+        "target_text": "この方法では、実際の軌道のまわりで作用の一次の変化がゼロになります。",
+        "color": "yellow",
+        "note": "",
+        "created_at": "2026-09-29T00:00:00Z",
+        "updated_at": "2026-09-29T00:00:00Z",
+        "status": "resolved",
+        "reason": null
+      },
+      "local_range": null,
+      "request": {
+        "model": "unsloth/gemma-4-12b-it-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "[参照文脈]\n[T24 assistant]\nL自体は一般には保存量ではありません。位置と速度を入れる関数として、運動方程式を作る材料だと考えてください。運動の軌道全体を比べるには、その時間積分を使います。\n\n[T25 user]\nベクトルやF=maの説明は不要です。Lが保存量でないことは分かりましたが、作用と変分は初めてです。まず何を比べるのか知りたいです。\n\n[T26 assistant]\n開始と終了の時刻と位置を固定し、その間をつなぐ候補の軌道を比べます。各軌道についてLを時間積分したSを作用と呼びます。この方法では、実際の軌道のまわりで作用の一次の変化がゼロになります。これは停留条件であって、常に最小という断定ではありません。位置を少し変えた候補を用意し、どちらが単に短い道かではなく、その道をどの速さで通るかも含めて評価します。固定するのは両端の条件で、途中の位置と速度は候補によって変わります。式の導出は次の段階で扱い、まず軌道全体に一つの数Sを割り当てる操作を押さえましょう。\n\n[Marker Focus]\nこの方法では、実際の軌道のまわりで作用の一次の変化がゼロになります。\n\n[質問]\nここがよく分かりません。"
+          }
+        ]
+      },
+      "automatic": {
+        "marker_match": true,
+        "no_future_turns": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "context-correction-v0.1",
+      "fixture_version": "physics-40-v1",
+      "marker": "C",
+      "condition": "D",
+      "source_turn": "T26",
+      "included_turn_ids": [
+        "T20",
+        "T21",
+        "T22",
+        "T23",
+        "T24",
+        "T25",
+        "T26"
+      ],
+      "context_utf16": 730,
+      "input_utf16": 902,
+      "source_text": "この方法では、実際の軌道のまわりで作用の一次の変化がゼロになります。",
+      "question": "ここがよく分かりません。",
+      "anchor": {
+        "highlight_id": "C",
+        "turn_id": "T26",
+        "start_offset": 59,
+        "end_offset": 93,
+        "source_text": "この方法では、実際の軌道のまわりで作用の一次の変化がゼロになります。",
+        "target_text": "この方法では、実際の軌道のまわりで作用の一次の変化がゼロになります。",
+        "color": "yellow",
+        "note": "",
+        "created_at": "2026-09-29T00:00:00Z",
+        "updated_at": "2026-09-29T00:00:00Z",
+        "status": "resolved",
+        "reason": null
+      },
+      "local_range": null,
+      "request": {
+        "model": "unsloth/gemma-4-12b-it-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "[参照文脈]\n[T20 assistant]\nでは同じニュートン力学を、座標とエネルギーの関数で書き直します。新しい自然法則を追加するのではなく、同じ運動を別の形式で表します。\n\n[T21 user]\nニュートンの運動方程式と保存則は理解しています。ラグランジアンはまだ分かりません。\n\n[T22 assistant]\nここでは通常の保存力を受ける一次元粒子に限定し、L=T−Vと置きます。Tは運動エネルギー、Vは位置エネルギーです。全エネルギーT+Vとは役割が違います。\n\n[T23 user]\n引き算なのが不思議です。Lは保存する量だと思えばいいのでしょうか。変分はまだ知りません。\n\n[T24 assistant]\nL自体は一般には保存量ではありません。位置と速度を入れる関数として、運動方程式を作る材料だと考えてください。運動の軌道全体を比べるには、その時間積分を使います。\n\n[T25 user]\nベクトルやF=maの説明は不要です。Lが保存量でないことは分かりましたが、作用と変分は初めてです。まず何を比べるのか知りたいです。\n\n[T26 assistant]\n開始と終了の時刻と位置を固定し、その間をつなぐ候補の軌道を比べます。各軌道についてLを時間積分したSを作用と呼びます。この方法では、実際の軌道のまわりで作用の一次の変化がゼロになります。これは停留条件であって、常に最小という断定ではありません。位置を少し変えた候補を用意し、どちらが単に短い道かではなく、その道をどの速さで通るかも含めて評価します。固定するのは両端の条件で、途中の位置と速度は候補によって変わります。式の導出は次の段階で扱い、まず軌道全体に一つの数Sを割り当てる操作を押さえましょう。\n\n[Marker Focus]\nこの方法では、実際の軌道のまわりで作用の一次の変化がゼロになります。\n\n[質問]\nここがよく分かりません。"
+          }
+        ]
+      },
+      "automatic": {
+        "marker_match": true,
+        "no_future_turns": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "context-correction-v0.1",
+      "fixture_version": "physics-40-v1",
+      "marker": "D",
+      "condition": "A",
+      "source_turn": "T36",
+      "included_turn_ids": [],
+      "context_utf16": 0,
+      "input_utf16": 148,
+      "source_text": "この量は小さい",
+      "question": "これはどういう意味ですか？",
+      "anchor": {
+        "highlight_id": "D",
+        "turn_id": "T36",
+        "start_offset": 56,
+        "end_offset": 63,
+        "source_text": "この量は小さい",
+        "target_text": "この量は小さい",
+        "color": "yellow",
+        "note": "",
+        "created_at": "2026-09-29T00:00:00Z",
+        "updated_at": "2026-09-29T00:00:00Z",
+        "status": "resolved",
+        "reason": null
+      },
+      "local_range": null,
+      "request": {
+        "model": "unsloth/gemma-4-12b-it-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "[参照文脈]\nなし\n\n[Marker Focus]\nこの量は小さい\n\n[質問]\nこれはどういう意味ですか？"
+          }
+        ]
+      },
+      "automatic": {
+        "marker_match": true,
+        "no_future_turns": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "context-correction-v0.1",
+      "fixture_version": "physics-40-v1",
+      "marker": "D",
+      "condition": "B",
+      "source_turn": "T36",
+      "included_turn_ids": [
+        "T36"
+      ],
+      "context_utf16": 262,
+      "input_utf16": 408,
+      "source_text": "この量は小さい",
+      "question": "これはどういう意味ですか？",
+      "anchor": {
+        "highlight_id": "D",
+        "turn_id": "T36",
+        "start_offset": 56,
+        "end_offset": 63,
+        "source_text": "この量は小さい",
+        "target_text": "この量は小さい",
+        "color": "yellow",
+        "note": "",
+        "created_at": "2026-09-29T00:00:00Z",
+        "updated_at": "2026-09-29T00:00:00Z",
+        "status": "resolved",
+        "reason": null
+      },
+      "local_range": {
+        "context_start_offset": 0,
+        "highlight_start_offset": 56,
+        "highlight_end_offset": 63,
+        "context_end_offset": 243
+      },
+      "request": {
+        "model": "unsloth/gemma-4-12b-it-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "[参照文脈]\n[T36 assistant 局所]\nこの近似では、平衡点からの変位xをポテンシャルが変化する代表的な長さℓと比較します。比ε=|x|/ℓを見ており、この量は小さい、というのが近似の条件です。絶対的なエネルギーの値が小さいという意味ではありません。基準エネルギーを定数だけずらしても運動は変わらないからです。ただし小さい比だけで全ての系に誤差保証ができるわけではなく、高次項の係数が極端に大きくないことや二次項が消えないことも必要です。実際には三次以上の項と二次項の大きさを比較し、目的とする精度の範囲で省略可能かを見ます。\n\n[Marker Focus]\nこの量は小さい\n\n[質問]\nこれはどういう意味ですか？"
+          }
+        ]
+      },
+      "automatic": {
+        "marker_match": true,
+        "no_future_turns": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "context-correction-v0.1",
+      "fixture_version": "physics-40-v1",
+      "marker": "D",
+      "condition": "C",
+      "source_turn": "T36",
+      "included_turn_ids": [
+        "T34",
+        "T35",
+        "T36"
+      ],
+      "context_utf16": 438,
+      "input_utf16": 584,
+      "source_text": "この量は小さい",
+      "question": "これはどういう意味ですか？",
+      "anchor": {
+        "highlight_id": "D",
+        "turn_id": "T36",
+        "start_offset": 56,
+        "end_offset": 63,
+        "source_text": "この量は小さい",
+        "target_text": "この量は小さい",
+        "color": "yellow",
+        "note": "",
+        "created_at": "2026-09-29T00:00:00Z",
+        "updated_at": "2026-09-29T00:00:00Z",
+        "status": "resolved",
+        "reason": null
+      },
+      "local_range": null,
+      "request": {
+        "model": "unsloth/gemma-4-12b-it-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "[参照文脈]\n[T34 assistant]\n平衡点近くの滑らかな位置エネルギーをテイラー展開します。平衡点で一次項が消え、安定な極小なら二次項の係数が正です。高次項が十分小さい範囲で調和振動の近似になります。\n\n[T35 user]\n小さいというとエネルギーがゼロに近い意味ですか。位置エネルギーの基準値は任意だと理解しています。無次元量やテイラー展開は分かります。\n\n[T36 assistant]\nこの近似では、平衡点からの変位xをポテンシャルが変化する代表的な長さℓと比較します。比ε=|x|/ℓを見ており、この量は小さい、というのが近似の条件です。絶対的なエネルギーの値が小さいという意味ではありません。基準エネルギーを定数だけずらしても運動は変わらないからです。ただし小さい比だけで全ての系に誤差保証ができるわけではなく、高次項の係数が極端に大きくないことや二次項が消えないことも必要です。実際には三次以上の項と二次項の大きさを比較し、目的とする精度の範囲で省略可能かを見ます。\n\n[Marker Focus]\nこの量は小さい\n\n[質問]\nこれはどういう意味ですか？"
+          }
+        ]
+      },
+      "automatic": {
+        "marker_match": true,
+        "no_future_turns": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "context-correction-v0.1",
+      "fixture_version": "physics-40-v1",
+      "marker": "D",
+      "condition": "D",
+      "source_turn": "T36",
+      "included_turn_ids": [
+        "T30",
+        "T31",
+        "T32",
+        "T33",
+        "T34",
+        "T35",
+        "T36"
+      ],
+      "context_utf16": 742,
+      "input_utf16": 888,
+      "source_text": "この量は小さい",
+      "question": "これはどういう意味ですか？",
+      "anchor": {
+        "highlight_id": "D",
+        "turn_id": "T36",
+        "start_offset": 56,
+        "end_offset": 63,
+        "source_text": "この量は小さい",
+        "target_text": "この量は小さい",
+        "color": "yellow",
+        "note": "",
+        "created_at": "2026-09-29T00:00:00Z",
+        "updated_at": "2026-09-29T00:00:00Z",
+        "status": "resolved",
+        "reason": null
+      },
+      "local_range": null,
+      "request": {
+        "model": "unsloth/gemma-4-12b-it-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "[参照文脈]\n[T30 assistant]\n固定端の変分からd/dt(∂L/∂速度)−∂L/∂位置=0が得られます。L=m速度²/2−Vならm加速度=−dV/d位置となり、ニュートンの運動方程式へ戻ります。\n\n[T31 user]\n自由粒子で確認したいです。VがゼロならLは運動エネルギーだけですか。\n\n[T32 assistant]\nその設定でL=m速度²/2です。位置がLに明示的に現れないため、∂L/∂速度=m速度が一定になります。これは保存されます。ここでは自由粒子の運動量を指します。\n\n[T33 user]\n自由粒子で運動量一定になることは理解しました。次はばねの近くで小さい量を扱う近似を知りたいです。\n\n[T34 assistant]\n平衡点近くの滑らかな位置エネルギーをテイラー展開します。平衡点で一次項が消え、安定な極小なら二次項の係数が正です。高次項が十分小さい範囲で調和振動の近似になります。\n\n[T35 user]\n小さいというとエネルギーがゼロに近い意味ですか。位置エネルギーの基準値は任意だと理解しています。無次元量やテイラー展開は分かります。\n\n[T36 assistant]\nこの近似では、平衡点からの変位xをポテンシャルが変化する代表的な長さℓと比較します。比ε=|x|/ℓを見ており、この量は小さい、というのが近似の条件です。絶対的なエネルギーの値が小さいという意味ではありません。基準エネルギーを定数だけずらしても運動は変わらないからです。ただし小さい比だけで全ての系に誤差保証ができるわけではなく、高次項の係数が極端に大きくないことや二次項が消えないことも必要です。実際には三次以上の項と二次項の大きさを比較し、目的とする精度の範囲で省略可能かを見ます。\n\n[Marker Focus]\nこの量は小さい\n\n[質問]\nこれはどういう意味ですか？"
+          }
+        ]
+      },
+      "automatic": {
+        "marker_match": true,
+        "no_future_turns": true
+      },
+      "human_review": "pending"
+    }
+  ]
+}

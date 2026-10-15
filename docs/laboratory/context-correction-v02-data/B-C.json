@@ -1,0 +1,76 @@
+{
+  "experiment": "context-correction-v0.2",
+  "fixture_version": "physics-long-32-v2",
+  "marker": "B",
+  "condition": "C",
+  "source_turn": "T20",
+  "source_utf16": 2650,
+  "source_text": "この比を十分小さくします。",
+  "question": "質問です。これはどういう意味ですか？",
+  "anchor": {
+    "highlight_id": "B",
+    "turn_id": "T20",
+    "start_offset": 1208,
+    "end_offset": 1221,
+    "source_text": "この比を十分小さくします。",
+    "target_text": "この比を十分小さくします。",
+    "color": "yellow",
+    "note": "",
+    "created_at": "2026-09-29T00:00:00Z",
+    "updated_at": "2026-09-29T00:00:00Z",
+    "status": "resolved",
+    "reason": null
+  },
+  "local_range": {
+    "context_start_offset": 808,
+    "highlight_start_offset": 1208,
+    "highlight_end_offset": 1221,
+    "context_end_offset": 1621
+  },
+  "context_utf16": 813,
+  "included_percentage": 30.67924528301887,
+  "input_utf16": 986,
+  "included_turn_ids": [
+    "T20"
+  ],
+  "request": {
+    "model": "unsloth/gemma-4-12b-it-qat",
+    "temperature": 0,
+    "max_tokens": 2048,
+    "stream": true,
+    "messages": [
+      {
+        "role": "system",
+        "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+      },
+      {
+        "role": "user",
+        "content": "[参照文脈]\nを使いましょう。\n\n【時間分解能】次は保存則と独立した測定の注意です。ここだけで使うΔは、カメラの連続フレーム間隔を台車とばねの振動周期で割った比と定義します。Δは位置の誤差でもエネルギー変化でもありません。たとえば周期一秒を百等分して撮影するとΔは百分の一です。これは時間方向に運動を細かく観測するための尺度で、画素の大きさを変えることとは別です。周期が変わったら同じカメラ設定でも比を計算し直します。\n\n撮影装置の時計と位置センサーの時計がずれていないかも確認します。露光時間が長いと一枚の中で像が流れるため、フレーム間隔だけで観測精度を保証することはできません。照明の不足や読み出しの遅延も別の要因です。ここではそれらを十分に小さくして、時間方向の標本間隔だけを議論しているものとします。測定値の補間で滑らかな曲線を描けても、観測していない急激な変化まで確実に復元できるわけではありません。\n\n【選択箇所開始】この比を十分小さくします。【選択箇所終了】そうすると一周期の間に多くの測定点が得られ、速い動きの取りこぼしを減らせます。これは測定上の条件であって、物体の運動そのものを弱める操作ではありません。小さいという言葉だけを見て振幅や力を小さくする指示と取り違えないでください。具体的な必要点数は求める精度や運動に含まれる周波数によります。一定の点数で全ての運動を完全に記録できるという保証ではありません。\n\n【エネルギーの整理】台車がばねへ近づくと、並進運動から弾性変形へエネルギーが移ります。ばねが戻ると逆の移動が起こります。途中の時刻を二つ選んで比べると、運動エネルギーだけの値は一致しないことがあります。そのことと合計の保存を混同しないでください。位置エネルギーのゼロ点は同じ規約で比較し、時刻ごとに勝手に取り直さないようにします。\n\n冒頭で定義した台帳Qに戻ります。これは保存されます。意味は各項が固定されるということではなく、項の間の移し\n\n[Marker Focus]\nこの比を十分小さくします。\n\n[質問]\n質問です。これはどういう意味ですか？"
+      }
+    ]
+  },
+  "automatic": {
+    "marker_match": true,
+    "window_boundaries": true,
+    "source_only": true,
+    "no_future_turns": true
+  },
+  "human_review": "pending",
+  "provider_base_url": "http://127.0.0.1:1234/v1",
+  "request_sha256": "6e74dbbad14042c73e0ba4126b9673f32a42f68eaff2cb33378d9819db5db59d",
+  "started": "2026-09-29T11:44:27.304Z",
+  "finished": "2026-09-29T11:44:41.079Z",
+  "answer": "「この比」とは、カメラの連続フレーム間隔を台車とばねの振動周期で割った比（$\\Delta$）のことを指します。\n\nこれを十分小さくするということは、一周期の間に多くの測定点を得ることで、速い動きの取りこぼしを減らすための測定条件を整えることを意味します。\n\nなお、この「小さくする」という操作は、物体の運動そのもの（振幅や力など）を弱めることではなく、あくまで観測上の精度を高めるための条件です。",
+  "output_utf16": 198,
+  "diagnostics": {
+    "finish_reason": "stop",
+    "completion_tokens": null,
+    "prompt_tokens": null,
+    "total_tokens": null,
+    "content_chars": 198,
+    "reasoning_chars": 1989,
+    "duration_ms": 13775,
+    "terminal_chunk_received": true
+  },
+  "error": null
+}

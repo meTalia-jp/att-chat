@@ -7,6 +7,9 @@ import type { Conversation } from '../shared/contracts.ts';
 import { laboratoryJson, RunResults } from './RunResults.tsx';
 import { MarkerColorSample } from './MarkerColorSample.tsx';
 import { MarkerQuickActionPrototype } from './MarkerQuickActionPrototype.tsx';
+import { TurnMapPrototype } from './TurnMapPrototype.tsx';
+import { ContextCorrectionPreview } from './context-correction/Preview.tsx';
+import { AttChatIntegratedDummy } from './AttChatIntegratedDummy.tsx';
 
 export function Laboratory({ definitions = experiments }: { definitions?: readonly ExperimentDefinition[] } = {}) {
   const [selected, setSelected] = useState(definitions[0].id);
@@ -88,11 +91,15 @@ export function Laboratory({ definitions = experiments }: { definitions?: readon
             ? <SingleTextGeneration onBusy={setBusy} />
             : <button onClick={() => setSingleOpened(true)}>Single Text Generationを開く</button>)}
           {entry === 'marker-color-sample' && <MarkerColorSample />}
-          {entry === 'marker-quick-action-prototype' && <MarkerQuickActionPrototype />}
+          {entry === 'marker-quick-action-prototype' && <><ContextCorrectionPreview /><MarkerQuickActionPrototype /></>}
+          {entry === 'turn-minimap-important' && <TurnMapPrototype />}
+          {entry === 'att-chat-integrated-dummy' && <AttChatIntegratedDummy />}
           {selected === 'study-p0' && <><p>Record only。StudyをLaboratory内では起動・統合しません。</p>
             <p>既存の起動方法は src/study-poc/serve.ts と vite.study.config.ts、docs/study-p0-design.md を参照してください。</p></>}
         </section>
         <section hidden={tab !== 'Results'} aria-label="Results">
+          {entry === 'turn-minimap-important' && <p>Turn単位の移動と★/●の識別を評価するmemory-only Prototypeです。ユーザー評価待ち。Run JSONは保存しません。</p>}
+          {entry === 'att-chat-integrated-dummy' && <p>完成予想のレイアウト確認用です。fixture / local stateだけで動作し、本番DB・API・LLM・GenerationRunへ接続しません。</p>}
           {entry === 'simple-marker-chat' && tab === 'Results' && <><RunResults kind="simple" onConversation={id=>{
             if(session) { if(id===session.conversation_id)setTab('Run');else setError('別会話の確認はセッション終了後に行ってください'); }
             else setViewConversation(id);

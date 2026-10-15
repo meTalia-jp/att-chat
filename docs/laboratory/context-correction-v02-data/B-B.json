@@ -1,0 +1,76 @@
+{
+  "experiment": "context-correction-v0.2",
+  "fixture_version": "physics-long-32-v2",
+  "marker": "B",
+  "condition": "B",
+  "source_turn": "T20",
+  "source_utf16": 2650,
+  "source_text": "この比を十分小さくします。",
+  "question": "質問です。これはどういう意味ですか？",
+  "anchor": {
+    "highlight_id": "B",
+    "turn_id": "T20",
+    "start_offset": 1208,
+    "end_offset": 1221,
+    "source_text": "この比を十分小さくします。",
+    "target_text": "この比を十分小さくします。",
+    "color": "yellow",
+    "note": "",
+    "created_at": "2026-09-29T00:00:00Z",
+    "updated_at": "2026-09-29T00:00:00Z",
+    "status": "resolved",
+    "reason": null
+  },
+  "local_range": {
+    "context_start_offset": 1058,
+    "highlight_start_offset": 1208,
+    "highlight_end_offset": 1221,
+    "context_end_offset": 1371
+  },
+  "context_utf16": 313,
+  "included_percentage": 11.81132075471698,
+  "input_utf16": 486,
+  "included_turn_ids": [
+    "T20"
+  ],
+  "request": {
+    "model": "unsloth/gemma-4-12b-it-qat",
+    "temperature": 0,
+    "max_tokens": 2048,
+    "stream": true,
+    "messages": [
+      {
+        "role": "system",
+        "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+      },
+      {
+        "role": "user",
+        "content": "[参照文脈]\nが流れるため、フレーム間隔だけで観測精度を保証することはできません。照明の不足や読み出しの遅延も別の要因です。ここではそれらを十分に小さくして、時間方向の標本間隔だけを議論しているものとします。測定値の補間で滑らかな曲線を描けても、観測していない急激な変化まで確実に復元できるわけではありません。\n\n【選択箇所開始】この比を十分小さくします。【選択箇所終了】そうすると一周期の間に多くの測定点が得られ、速い動きの取りこぼしを減らせます。これは測定上の条件であって、物体の運動そのものを弱める操作ではありません。小さいという言葉だけを見て振幅や力を小さくする指示と取り違えないでください。具体的な必要点数は求める精度や運動に含まれる周波数によります。一定の点数\n\n[Marker Focus]\nこの比を十分小さくします。\n\n[質問]\n質問です。これはどういう意味ですか？"
+      }
+    ]
+  },
+  "automatic": {
+    "marker_match": true,
+    "window_boundaries": true,
+    "source_only": true,
+    "no_future_turns": true
+  },
+  "human_review": "pending",
+  "provider_base_url": "http://127.0.0.1:1234/v1",
+  "request_sha256": "a7360addb880ec3e813db0925e86b52f1f7ad4a83b5c7e93c1d402217292c6cd",
+  "started": "2026-09-29T11:44:08.625Z",
+  "finished": "2026-09-29T11:44:27.292Z",
+  "answer": "この文脈における「この比」とは、**標本間隔（データを取り込む時間の間隔）と、観測対象の運動の周期（または変化の速さ）との比率**のことを指しています。\n\n具体的には、以下のことを意味しています。\n\n1.  **測定の密度を上げる**: 標本間隔を十分に小さくすることで、物体の動きが一周期する間に多くの測定点が得られるようにします。\n2.  **取りこぼしの防止**: これにより、速い動きの変化を見落とす（取りこぼす）ことを防ぎ、観測の精度を高めます。\n3.  **操作の内容**: これは「物体の振幅や力を小さくする」ことではなく、「測定を行う頻度を高くして、より細かくデータを取る」という条件の設定を指しています。\n\nつまり、「対象の動きに対して十分な密度でデータを取得できるように、時間的な間隔を十分に短く設定する」という意味です。",
+  "output_utf16": 371,
+  "diagnostics": {
+    "finish_reason": "stop",
+    "completion_tokens": null,
+    "prompt_tokens": null,
+    "total_tokens": null,
+    "content_chars": 371,
+    "reasoning_chars": 2720,
+    "duration_ms": 18666,
+    "terminal_chunk_received": true
+  },
+  "error": null
+}

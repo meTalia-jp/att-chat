@@ -1,0 +1,59 @@
+Retrieval Chunking Laboratory — Reading Observation
+===================================================
+
+Scope
+-----
+This is an experiment-local SQLite fixture. It does not modify the production
+database, migrations, API, semantic index, or Conversation storage.
+
+Input and rule
+--------------
+- 3 Turns
+- T2 is a 1,741 UTF-16-character Japanese technical explanation.
+- Turn boundaries are hard boundaries.
+- Blank-line paragraphs are DB-specific hard boundaries.
+- 。！？ are candidate sentence boundaries.
+- Quoted punctuation is tracked so 「これは保存されます。」と言った remains
+  in one sentence candidate.
+- Sentence candidates are packed with minimum 120, target 220, maximum 360.
+- Original Turn text remains authoritative; segments retain Turn ID and offsets.
+
+Observed result
+---------------
+- 47 sentence candidates became 11 retrieval segments.
+- Sentence-only extraction is often too short to identify meaning:
+  - 「これは保存されます。」: 10 characters; the conserved quantity is unknown.
+  - 「重要です。」: 5 characters; the important subject is unknown.
+  - 「この比を十分小さくします。」: 13 characters; the ratio is unknown.
+- Paragraph-based segments of 152–218 characters were readable in this fixture.
+  Momentum, energy, measurement, and approximation remained separate, and each
+  demonstrative had a nearby definition.
+- T2-S2 identified 「これは保存されます。」 as total momentum P.
+- T2-S3 identified 「これも保存されます。」 as energy quantity Q.
+- T2-S4 retained the definition of the camera interval/period ratio around
+  「重要です。」.
+- T2-S7 retained epsilon=abs(x)/ell around 「この比を十分小さくします。」.
+
+Meaning-loss case
+-----------------
+The long measurement-error paragraph was split by length into T2-S5 and T2-S6.
+T2-S5 defines residual R. T2-S6 begins with the next step and later says
+「その値」 and R, but it no longer contains the definition of R. The latter
+segment is broadly understandable as an error-analysis procedure, but it is not
+self-contained enough for a precise retrieval result.
+
+Assessment
+----------
+1. A raw 。 unit is useful as a boundary candidate, not as the final retrieval
+   payload.
+2. Joining short sentences within a topic paragraph materially improves meaning.
+3. Length control alone can still cut between a definition and its later use.
+4. A practical next rule should preserve a small overlap, repeat the paragraph
+   heading as metadata, or expand the selected hit by one previous sentence at
+   retrieval time.
+5. Short complete Turns such as T1 and T3 should remain below the minimum rather
+   than cross a Turn boundary.
+
+Human evaluation
+----------------
+Pending. The generated plaintext to read is retrieval-chunking-output.txt.

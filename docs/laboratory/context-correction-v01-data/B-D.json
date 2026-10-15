@@ -1,0 +1,73 @@
+{
+  "experiment": "context-correction-v0.1",
+  "fixture_version": "physics-40-v1",
+  "marker": "B",
+  "condition": "D",
+  "source_turn": "T18",
+  "included_turn_ids": [
+    "T12",
+    "T13",
+    "T14",
+    "T15",
+    "T16",
+    "T17",
+    "T18"
+  ],
+  "context_utf16": 731,
+  "input_utf16": 871,
+  "source_text": "それが重要です。",
+  "question": "なぜですか？",
+  "anchor": {
+    "highlight_id": "B",
+    "turn_id": "T18",
+    "start_offset": 69,
+    "end_offset": 77,
+    "source_text": "それが重要です。",
+    "target_text": "それが重要です。",
+    "color": "yellow",
+    "note": "",
+    "created_at": "2026-09-29T00:00:00Z",
+    "updated_at": "2026-09-29T00:00:00Z",
+    "status": "resolved",
+    "reason": null
+  },
+  "local_range": null,
+  "request": {
+    "model": "unsloth/gemma-4-12b-it-qat",
+    "temperature": 0,
+    "max_tokens": 2048,
+    "stream": true,
+    "messages": [
+      {
+        "role": "system",
+        "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+      },
+      {
+        "role": "user",
+        "content": "[参照文脈]\n[T12 assistant]\n物理での対称性は、ある変換をしても法則の形が変わらないことです。連続的な変換と保存量の関係を、後で作用を使って整理します。今は空間と時間の移動を区別しましょう。\n\n[T13 user]\n空間をずらす話からお願いします。実験装置全体を水平移動するイメージですか。\n\n[T14 assistant]\n孤立した同じ装置を同じ環境で移し、絶対位置で法則が変わらないなら空間並進対称性があります。この対称性は総運動量保存に対応します。固定された外部ポテンシャルが位置を特別扱いする場合には注意が要ります。\n\n[T15 user]\n空間並進と運動量の対応は理解しました。今度は時間をずらす場合を知りたいです。まだラグランジアンやネーターの定理の式は習っていません。\n\n[T16 assistant]\n同じ初期条件の実験を今日始めても明日始めても、装置の法則が同じなら時間並進対称性があります。外部から設定を時間変化させる駆動装置はここでは除きます。\n\n[T17 user]\n時刻が変わっても粒子の位置が同じ、という意味ではないですね。空間並進と取り違えずに、対応する量だけ確認したいです。\n\n[T18 assistant]\nここで考えるのは時間並進です。開始時刻のラベルをまとめてずらしても法則が変わらないという性質であり、粒子が停止していることではありません。それが重要です。この対称性に対応する保存量はエネルギーで、先ほどの空間並進に対応する運動量とは区別します。通常の時間に依存しない保存力の力学では、運動エネルギーと位置エネルギーの和を考えます。厳密な導出は作用の形式を学んでからにし、今は対称性と保存量の対応を整理しておきましょう。\n\n[Marker Focus]\nそれが重要です。\n\n[質問]\nなぜですか？"
+      }
+    ]
+  },
+  "automatic": {
+    "marker_match": true,
+    "no_future_turns": true
+  },
+  "human_review": "pending",
+  "provider_base_url": "http://127.0.0.1:1234/v1",
+  "request_sha256": "a2aa4df644cdeead699d9d024947c8ef43bb57a2604f7f5060c789b8d0533427",
+  "started": "2026-09-29T05:24:53.822Z",
+  "finished": "2026-09-29T05:25:10.147Z",
+  "answer": "「それが重要です」という言葉は、時間並進対称性が「開始時刻のラベルをまとめてずらしても法則が変わらないという性質」であることを指しており、「粒子が停止していること（＝時刻が変わっても位置が変わらないこと）」ではないという区別を強調しています。\n\nこの区別が重要な理由は、ユーザーが前の発言で「空間並進と取り違えずに、対応する量だけ確認したい」と述べていたためです。時間並進対称性を正しく理解するためには、粒子の物理的な状態（位置）の固定ではなく、物理法則の不変性として捉える必要があることを明確にするためです。",
+  "output_utf16": 255,
+  "diagnostics": {
+    "finish_reason": "stop",
+    "completion_tokens": null,
+    "prompt_tokens": null,
+    "total_tokens": null,
+    "content_chars": 255,
+    "reasoning_chars": 2687,
+    "duration_ms": 16325,
+    "terminal_chunk_received": true
+  },
+  "error": null
+}

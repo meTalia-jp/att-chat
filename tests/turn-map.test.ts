@@ -1,0 +1,110 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { mkdtemp, mkdir, rm } from 'node:fs/promises';
+import { resolve, join } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { build } from 'vite';
+import { JSDOM } from 'jsdom';
+import { act, createElement } from 'react';
+import { turnMapFixture } from '../src/laboratory/turn-map-fixture.ts';
+import { hundredTurnMapFixture, longTurnMapFixture } from '../src/laboratory/turn-map-fixture.ts';
+import { currentTurnAtAnchor, turnJumpScrollTop } from '../src/laboratory/turn-map-position.ts';
+
+test('jump aligns the target center with the current anchor and clamps at document edges',()=>{
+  const scroll=turnJumpScrollTop(800,1200,300,1000,5000);
+  assert.equal(scroll,700);
+  assert.equal(currentTurnAtAnchor([{id:'before',top:100,bottom:300},{id:'target',top:1100-scroll,bottom:1500-scroll},{id:'after',top:900,bottom:1100}],1000),'target');
+  assert.equal(turnJumpScrollTop(0,100,0,1000,5000),0);
+  assert.equal(turnJumpScrollTop(900,1100,4000,1000,5000),4000);
+  assert.equal(turnJumpScrollTop(0,100,0,1000,500),0);
+});
+
+test('current follows closest Turn center at 60 percent, including scroll and resize',()=>{
+  const turns=[{id:'T1',top:0,bottom:200},{id:'T2',top:200,bottom:600},{id:'T3',top:600,bottom:1000}];
+  assert.equal(currentTurnAtAnchor(turns,1000),'T2');
+  assert.equal(currentTurnAtAnchor(turns,1400),'T3');
+  assert.equal(currentTurnAtAnchor(turns.map(t=>({...t,top:t.top-300,bottom:t.bottom-300})),1000),'T3');
+  assert.equal(currentTurnAtAnchor([],1000),null);
+  assert.equal(longTurnMapFixture.length,50);
+  assert.equal(longTurnMapFixture.slice(23,28).filter(t=>t.important&&t.markers.length===3).length,5);
+  assert.equal(hundredTurnMapFixture.length,100);
+  assert.equal(hundredTurnMapFixture.slice(47,53).filter(t=>t.important&&t.markers.length===3).length,6);
+});
+
+test('Turn fixture covers important-only, multiple markers, coexistence, long and plain turns',()=>{
+  assert.equal(turnMapFixture.length,16);
+  assert.ok(turnMapFixture.some(t=>t.important&&!t.markers.length));
+  assert.ok(turnMapFixture.some(t=>t.important&&t.markers.length===3&&t.text.length>500));
+  assert.ok(turnMapFixture.some(t=>!t.important&&!t.markers.length));
+  assert.equal(new Set(turnMapFixture.map(t=>t.id)).size,16);
+});
+
+test('Turn / star / marker jump, binary toggle, scroll and resize stay independent',async()=>{
+  await mkdir('.cache',{recursive:true});const out=await mkdtemp(resolve('.cache/turn-map-test-'));
+  const dom=new JSDOM('<div id="root"></div>');const keys=['window','document','HTMLElement','IS_REACT_ACT_ENVIRONMENT','fetch'];
+  const saved=keys.map(k=>Object.getOwnPropertyDescriptor(globalThis,k));let root:any;
+  try{
+    await build({configFile:false,logLevel:'silent',build:{ssr:true,outDir:out,rollupOptions:{input:resolve('src/laboratory/TurnMapPrototype.tsx'),output:{entryFileNames:'app.mjs'}}}});
+    Object.defineProperty(globalThis,'window',{configurable:true,value:dom.window});Object.defineProperty(globalThis,'document',{configurable:true,value:dom.window.document});Object.defineProperty(globalThis,'HTMLElement',{configurable:true,value:dom.window.HTMLElement});Object.defineProperty(globalThis,'IS_REACT_ACT_ENVIRONMENT',{configurable:true,value:true});
+    let jumped='';dom.window.scrollTo=()=>{};
+    dom.window.document.addEventListener('focusin',()=>{jumped=(dom.window.document.activeElement as HTMLElement)?.dataset.mapTurn??'';});
+    const {createRoot}=await import('react-dom/client');const {TurnMapPrototype}=await import(pathToFileURL(join(out,'app.mjs')).href);
+    root=createRoot(dom.window.document.getElementById('root')!);await act(async()=>root.render(createElement(TurnMapPrototype)));
+    const click=async(label:string)=>{await act(async()=>dom.window.document.querySelector<HTMLButtonElement>(`[aria-label="${label}"]`)!.click());};
+    assert.equal(dom.window.document.querySelectorAll('[data-map-row="T8"] .turn-map-dots button').length,3);
+    await click('T8 Important切替');assert.equal(dom.window.document.querySelector('[aria-label="T8 Importantへ移動"]'),null);
+    assert.equal(dom.window.document.querySelectorAll('[data-map-row="T8"] .turn-map-dots button').length,3);
+    await click('T8 Important切替');await click('T8 Importantへ移動');assert.equal(jumped,'T8');assert.equal(dom.window.document.activeElement?.getAttribute('data-map-turn'),'T8');
+    await click('T15 Marker 1 blueへ移動');assert.equal(jumped,'T15');
+    await act(async()=>dom.window.document.querySelector<HTMLButtonElement>('[data-map-row="T1"] button')!.click());assert.equal(jumped,'T1');
+    await act(async()=>{dom.window.dispatchEvent(new dom.window.Event('scroll'));dom.window.dispatchEvent(new dom.window.Event('resize'));});
+    await click('T8 Marker 3 blueへ移動');assert.equal(jumped,'T8');
+    await act(async()=>{const select=dom.window.document.querySelector<HTMLSelectElement>('[aria-label="会話fixture"]')!;select.value='50';select.dispatchEvent(new dom.window.Event('change',{bubbles:true}));});
+    assert.equal(dom.window.document.querySelectorAll('[data-map-turn]').length,50);
+    await act(async()=>Array.from(dom.window.document.querySelectorAll<HTMLButtonElement>('.turn-map-mode button')).find(b=>b.textContent==='全体')!.click());
+    assert.equal(dom.window.document.querySelectorAll('[data-overview-turn]').length,50);
+    await click('T25 Importantへ移動');assert.equal(jumped,'T25');
+    await click('T25 Marker 3 blueへ移動');assert.equal(jumped,'T25');
+    await click('T50へ移動');assert.equal(jumped,'T50');
+    await act(async()=>Array.from(dom.window.document.querySelectorAll<HTMLButtonElement>('.turn-map-mode button')).find(b=>b.textContent==='詳細')!.click());
+    assert.equal(dom.window.document.querySelectorAll('[data-map-row]').length,50);
+    await act(async()=>{const select=dom.window.document.querySelector<HTMLSelectElement>('[aria-label="会話fixture"]')!;select.value='100';select.dispatchEvent(new dom.window.Event('change',{bubbles:true}));});
+    assert.equal(dom.window.document.querySelectorAll('[data-map-turn]').length,100);
+    await act(async()=>Array.from(dom.window.document.querySelectorAll<HTMLButtonElement>('.turn-map-mode button')).find(b=>b.textContent==='全体')!.click());
+    assert.equal(dom.window.document.querySelectorAll('[data-overview-turn]').length,100);
+    await click('T50 Importantへ移動');assert.equal(jumped,'T50');
+    await click('T100へ移動');assert.equal(jumped,'T100');
+    const d=dom.window.document;
+    await act(async()=>d.querySelector<HTMLInputElement>('input[type="checkbox"]')!.click());
+    assert.equal(d.querySelectorAll('[data-map-turn]').length,50);
+    const button=(text:string)=>Array.from(d.querySelectorAll<HTMLButtonElement>('button')).find(b=>b.textContent===text)!;
+    const press=async(text:string)=>act(async()=>button(text).click());
+    assert.equal(button('Quick辞書').getAttribute('aria-selected'),'true');
+    await press('Quickメモ');assert.equal(d.querySelectorAll('.quick-memo-scroll li').length,0);
+    await press('全体');await click('T1 Important切替');
+    await press('Quick辞書');await press('Quickメモ');
+    assert.equal(button('全体').getAttribute('aria-pressed'),'true');
+    assert.ok(d.querySelector('[aria-label="T1 Importantへ移動"]'));
+    for(let i=0;i<25;i++)await press('Quick Memoへ追加');
+    assert.equal(d.querySelectorAll('.quick-memo-scroll li').length,25);
+    const memo=d.querySelector<HTMLElement>('.quick-memo-scroll')!;
+    memo.scrollTop=123;
+    await press('Quick辞書');await press('Quickメモ');assert.equal(memo.scrollTop,123);
+    Object.defineProperty(globalThis,'fetch',{configurable:true,value:async()=>new Response('',{status:404})});
+    await press('Dictionary検索');assert.equal(button('Quick辞書').getAttribute('aria-selected'),'true');
+    assert.ok(d.querySelector('.quick-dictionary-result')!.textContent!.includes('未配置'));
+    Object.defineProperty(globalThis,'fetch',{configurable:true,value:async()=>new Response(JSON.stringify({experiment:'実験'}),{headers:{'content-type':'application/json'}})});
+    await press('Dictionary検索');assert.ok(d.querySelector('.quick-dictionary-result')!.textContent!.includes('実験'));
+    await press('Quickメモ');await press('Quick辞書');assert.ok(d.querySelector('.quick-dictionary-result')!.textContent!.includes('実験'));
+    await press('Quick Memoへ追加');assert.equal(button('Quick辞書').getAttribute('aria-selected'),'true');
+    assert.equal(d.querySelectorAll('.tools-toast').length,1);
+    await act(async()=>{await new Promise(resolve=>setTimeout(resolve,650));});
+    await press('Quick Memoへ追加');
+    await act(async()=>{await new Promise(resolve=>setTimeout(resolve,650));});
+    assert.equal(d.querySelectorAll('.tools-toast').length,1);
+    await act(async()=>{await new Promise(resolve=>setTimeout(resolve,550));});
+    assert.equal(d.querySelectorAll('.tools-toast').length,0);
+    await press('Quickメモ');assert.equal(d.querySelectorAll('.quick-memo-scroll li').length,27);
+    assert.ok(d.querySelector('.tools-persistent-map nav'));
+  }finally{if(root)await act(async()=>root.unmount());keys.forEach((k,i)=>{if(saved[i])Object.defineProperty(globalThis,k,saved[i]!);else Reflect.deleteProperty(globalThis,k);});dom.window.close();await rm(out,{recursive:true,force:true});}
+});

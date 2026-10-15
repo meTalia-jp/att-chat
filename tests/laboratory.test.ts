@@ -21,13 +21,14 @@ test('Catalog primary documents exist inside the repository and Experiment IDs a
   }
 });
 
-test('Catalog has five fixed entries and switching respects generation and Simple session',()=>{
-  assert.equal(experiments.length,5);
-  assert.equal(new Set(experiments.map(e=>e.id)).size,5);
-  assert.deepEqual(experiments.map(e=>e.runnable),[true,true,false,true,true]);
+test('Catalog has seven fixed entries and switching respects generation and Simple session',()=>{
+  assert.equal(experiments.length,7);
+  assert.equal(new Set(experiments.map(e=>e.id)).size,7);
+  assert.deepEqual(experiments.map(e=>e.runnable),[true,true,false,true,true,true,true]);
   assert.equal(experiments[2].kind,'existing-experiment');assert.equal(experiments[2].execution,null);
   assert.equal(experiments[3].execution?.entry,'marker-color-sample');
   assert.equal(experiments[4].execution?.entry,'marker-quick-action-prototype');
+  assert.equal(experiments[6].execution?.entry,'att-chat-integrated-dummy');
   for(const e of experiments){assert.ok(e.title&&e.purpose&&e.hypothesis&&e.version&&e.status&&e.equipment.length);if(e.runnable)assert.equal(e.execution!.entry,e.id);}
   assert.equal(canSwitchExperiment(false,false),true);
   for(const [busy,session] of [[true,false],[false,true],[true,true]])assert.equal(canSwitchExperiment(busy,session),false);
@@ -122,5 +123,26 @@ test('Lab gateway reuses existing servers, isolates data, streams and stops, no 
     assert.equal((await fetch(base+'/api/models',{headers:{Origin:'http://example.com'}})).status,403);
     assert.ok(readdirSync(data).includes('simple-marker.sqlite'));
     assert.equal(readdirSync(join(data,'single-text-runs')).filter(n=>n.endsWith('.json')).length,2);
+  }finally{await lab.shutdown();rmSync(directory,{recursive:true,force:true});}
+});
+
+test('New Chat Handoff endpoint is memory-only and sends exactly system + edited user',async()=>{
+  const directory=mkdtempSync(join(tmpdir(),'att-lab-handoff-')),dist=join(directory,'dist'),data=join(directory,'data');
+  mkdirSync(dist);writeFileSync(join(dist,'laboratory.html'),'<h1>Lab</h1>');
+  let requestBody:Record<string,unknown>|null=null;
+  class Provider extends LMStudioProvider{
+    override async models(){return ['google/gemma-4-12b-qat'];}
+    override async generate(body:Record<string,unknown>,_signal:AbortSignal,emit:(s:string)=>void,diagnostics?:any){requestBody=body;emit('memory only answer');diagnostics?.({finish_reason:'stop'});}
+  }
+  const lab=await startLaboratory({port:0,dataDirectory:data,distPath:dist,provider:new Provider()});
+  const base='http://127.0.0.1:'+lab.port,input={sourceConversation:'Conversation A',sourceConversationId:'fixture-a',sourceTurn:'T25',markerId:'marker-a',markerSourceText:'対象',markerStatus:'resolved',handoff:true,handoffLevel:'標準',pastContextUtf16:800,futureContextUtf16:0,finalFirstUserMessage:'edited first user message'};
+  try{
+    const response=await fetch(base+'/api/laboratory/new-chat-handoff',{method:'POST',headers:{'Content-Type':'application/json',Origin:base},body:JSON.stringify(input)});
+    assert.equal(response.status,200);const run=await response.json();
+    assert.equal(run.assistantResponse,'memory only answer');assert.equal(run.oldConversationMessageCount,0);
+    assert.deepEqual(run.messageRoles,['system','user']);assert.equal(run.firstUserMessage,input.finalFirstUserMessage);
+    assert.equal(run.model,'google/gemma-4-12b-qat');assert.equal(run.finishReason,'stop');assert.equal(run.humanReview,'pending');
+    assert.ok(run.temporaryConversationId);assert.equal((await(await fetch(base+'/api/conversations')).json()).length,0);
+    const messages=(requestBody as any).messages;assert.equal(messages.length,2);assert.equal(messages[0].role,'system');assert.deepEqual(messages[1],{role:'user',content:input.finalFirstUserMessage});
   }finally{await lab.shutdown();rmSync(directory,{recursive:true,force:true});}
 });

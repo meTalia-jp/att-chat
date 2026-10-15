@@ -1,4 +1,5 @@
 import { createServer, request, type Server } from 'node:http';
+import { randomUUID } from 'node:crypto';
 import { resolve, join } from 'node:path';
 import { openDatabase } from '../server/storage/database.ts';
 import { Repository } from '../server/storage/repository.ts';
@@ -12,6 +13,26 @@ import { SimpleSessions } from './simple-sessions.ts';
 import type { SimpleRun } from './run-contracts.ts';
 import { SingleTextError } from './single-text/contracts.ts';
 import { experiments, type ExperimentDefinition } from './catalog.ts';
+import {
+  buildNewChatHandoffRequest, newChatHandoffGeneration,
+  type NewChatHandoffRun, type NewChatHandoffSendInput,
+} from './new-chat-handoff.ts';
+
+function newChatHandoffInput(value: unknown): NewChatHandoffSendInput {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new SingleTextError('INVALID_INPUT','入力が不正です');
+  const item=value as Record<string,unknown>;
+  const keys=['sourceConversation','sourceConversationId','sourceTurn','markerId','markerSourceText','markerStatus','handoff','handoffLevel','pastContextUtf16','futureContextUtf16','finalFirstUserMessage'];
+  if (Object.keys(item).some(key=>!keys.includes(key)) || keys.some(key=>!(key in item))) throw new SingleTextError('INVALID_INPUT','入力項目が不正です');
+  for(const key of ['sourceConversation','sourceConversationId','sourceTurn','markerId','markerSourceText','handoffLevel','finalFirstUserMessage'] as const) {
+    if(typeof item[key]!=='string') throw new SingleTextError('INVALID_INPUT',`${key}が不正です`);
+  }
+  if(typeof item.handoff!=='boolean' || !['resolved','unresolved'].includes(String(item.markerStatus))) throw new SingleTextError('INVALID_INPUT','引継ぎ状態が不正です');
+  if(!Number.isInteger(item.pastContextUtf16) || !Number.isInteger(item.futureContextUtf16) || Number(item.pastContextUtf16)<0 || Number(item.futureContextUtf16)<0) throw new SingleTextError('INVALID_INPUT','Context量が不正です');
+  if(!(item.finalFirstUserMessage as string).trim() || (item.finalFirstUserMessage as string).length>12000) throw new SingleTextError('INVALID_INPUT','最初のUser Messageが不正です');
+  if(item.handoff && item.markerStatus==='unresolved') throw new SingleTextError('INVALID_INPUT','Marker位置未解決のため引継ぎありでは送信できません');
+  if(!item.handoff && (item.pastContextUtf16!==0 || item.futureContextUtf16!==0)) throw new SingleTextError('INVALID_INPUT','引継ぎなしへContextを含められません');
+  return item as NewChatHandoffSendInput;
+}
 
 function listen(server: Server, port: number): Promise<number> {
   return new Promise((ok, fail) => {
@@ -24,8 +45,8 @@ async function close(server: Server) {
   if (server.listening) await new Promise<void>(done => server.close(() => done()));
 }
 
-// A fixed loopback gateway to the two existing HTTP implementations.
-// It does not implement experiment execution, prompts, storage or streaming parsing.
+// A fixed loopback gateway to the two existing HTTP implementations plus one
+// memory-only New Chat Handoff experiment endpoint. It never stores that run.
 export async function startLaboratory(options: { port: number; dataDirectory: string; distPath: string; provider?: LMStudioProvider; definitions?: readonly ExperimentDefinition[] }) {
   const definitions = options.definitions ?? experiments;
   const directory = resolve(options.dataDirectory);
@@ -71,6 +92,32 @@ export async function startLaboratory(options: { port: number; dataDirectory: st
       if (url.pathname.startsWith('/api/laboratory/')) {
         try {
           const json = (value: unknown) => { res.writeHead(200, {'Content-Type':'application/json','Cache-Control':'no-store'}); res.end(JSON.stringify(value)); };
+          if (req.method === 'POST' && url.pathname === '/api/laboratory/new-chat-handoff') {
+            if (generating) return send(409,'Laboratoryで生成中です');
+            let body='',size=0;
+            for await (const chunk of req) { size+=chunk.length; if(size>16384) throw new SingleTextError('INVALID_INPUT','入力が大きすぎます'); body+=chunk; }
+            const input=newChatHandoffInput(JSON.parse(body));
+            const available=await provider.models();
+            if(!available.includes(newChatHandoffGeneration.model)) {
+              res.writeHead(409,{'Content-Type':'application/json','Cache-Control':'no-store'});
+              res.end(JSON.stringify({error:{message:`固定モデル ${newChatHandoffGeneration.model} を利用できません`,available_models:available}}));
+              return;
+            }
+            generating=true;
+            let answer='',finishReason:'stop'|'length'|null=null,error:string|null=null;
+            const startedAt=new Date().toISOString(),requestBody=buildNewChatHandoffRequest(input.finalFirstUserMessage);
+            try {
+              await provider.generate(requestBody,AbortSignal.timeout(240000),delta=>{answer+=delta;},value=>{finishReason=value.finish_reason;});
+              if(!answer.trim()) throw new Error('回答本文が空です');
+            } catch(cause) { error=String(cause instanceof Error ? cause.message : cause); }
+            finally { generating=false; }
+            const run:NewChatHandoffRun={...input,temporaryConversationId:randomUUID(),firstUserMessage:input.finalFirstUserMessage,
+              assistantResponse:answer,model:newChatHandoffGeneration.model,
+              generationSettings:{temperature:newChatHandoffGeneration.temperature,max_tokens:newChatHandoffGeneration.max_tokens},
+              messageRoles:['system','user'],oldConversationMessageCount:0,finishReason,error,
+              startedAt,completedAt:new Date().toISOString(),sourcePositionUnresolved:input.markerStatus==='unresolved',humanReview:'pending'};
+            return json(run);
+          }
           if (req.method === 'GET' && url.pathname === '/api/laboratory/sessions/current') return json(sessions!.current());
           if (req.method === 'GET' && url.pathname === '/api/laboratory/runs/simple') {
             if (sessionStorageError) { sessions!.checkpoint(); sessionStorageError = false; }

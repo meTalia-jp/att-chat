@@ -1,0 +1,127 @@
+{
+  "experiment": "new-chat-handoff-user-reasoning-v0.5",
+  "reviewer": "Codex first observation",
+  "reviews": [
+    {
+      "case": "A",
+      "condition": "Minimal",
+      "target_identification": "mostly_correct",
+      "user_statement_attribution": "correct",
+      "misunderstanding_correction_distinction": "partial",
+      "observation": "接近速度2cと個々の光速cは区別したが、一方の光から見た速度は定義できないというT2の訂正と両立しない形で、元の理解を正しいと一部評価した",
+      "context_assessment": "insufficient_for_stable_correction_candidate",
+      "human_review": "pending"
+    },
+    {
+      "case": "A",
+      "condition": "Standard",
+      "target_identification": "mostly_correct",
+      "user_statement_attribution": "correct",
+      "misunderstanding_correction_distinction": "partial",
+      "observation": "会話端clampによりMinimalと同じT1-T2・同一出力。条件差の評価材料にはならない",
+      "context_assessment": "same_input_as_minimal",
+      "human_review": "pending"
+    },
+    {
+      "case": "A",
+      "condition": "Wide",
+      "target_identification": "correct",
+      "user_statement_attribution": "correct",
+      "misunderstanding_correction_distinction": "clear",
+      "observation": "T3のユーザー自身による『距離の縮み方』という言い換えとT2の訂正を整合的に使い、相対速度を単にcとは断定できないと説明した。T3後半の波粒子話題の混入は観察しなかった",
+      "context_assessment": "user_rephrase_helped_candidate",
+      "human_review": "pending"
+    },
+    {
+      "case": "B",
+      "condition": "Minimal",
+      "target_identification": "correct",
+      "user_statement_attribution": "correct",
+      "misunderstanding_correction_distinction": "clear",
+      "observation": "T3のユーザーの言い換えを質問対象として扱い、T4の古典概念に完全には収まらないという補正へ結びつけた",
+      "context_assessment": "sufficient_candidate",
+      "human_review": "pending"
+    },
+    {
+      "case": "B",
+      "condition": "Standard",
+      "target_identification": "correct",
+      "user_statement_attribution": "correct",
+      "misunderstanding_correction_distinction": "clear",
+      "observation": "T1-T2の相対速度話題を含むが混入せず、ユーザーの言い方の許容範囲を説明した",
+      "context_assessment": "sufficient_no_clear_improvement",
+      "human_review": "pending"
+    },
+    {
+      "case": "B",
+      "condition": "Wide",
+      "target_identification": "correct",
+      "user_statement_attribution": "correct",
+      "misunderstanding_correction_distinction": "clear",
+      "observation": "T5の日常語の話題を加えても対象を保ち、別話題の明確な混入は観察しなかった",
+      "context_assessment": "sufficient_no_noise_observed",
+      "human_review": "pending"
+    },
+    {
+      "case": "C",
+      "condition": "Minimal",
+      "target_identification": "correct",
+      "user_statement_attribution": "correct",
+      "misunderstanding_correction_distinction": "clear",
+      "observation": "T5のユーザー推論を受け、日常語の限界と物理学上の不明を区別した。断定を避けたため回答はやや慎重",
+      "context_assessment": "sufficient_candidate",
+      "human_review": "pending"
+    },
+    {
+      "case": "C",
+      "condition": "Standard",
+      "target_identification": "correct",
+      "user_statement_attribution": "correct",
+      "misunderstanding_correction_distinction": "clear",
+      "observation": "波粒子の前提を使い、日常語の限界であって理解不足ではないと直接回答した",
+      "context_assessment": "sufficient_but_no_required_improvement",
+      "human_review": "pending"
+    },
+    {
+      "case": "C",
+      "condition": "Wide",
+      "target_identification": "correct",
+      "user_statement_attribution": "correct",
+      "misunderstanding_correction_distinction": "clear",
+      "observation": "区別は維持したが、fixture外の半導体・レーザー例を加えて477文字へ長文化した。誤答ではないが一般論拡大候補",
+      "context_assessment": "verbose_external_generalization_candidate",
+      "human_review": "pending"
+    },
+    {
+      "case": "D",
+      "condition": "Minimal",
+      "target_identification": "correct",
+      "user_statement_attribution": "correct",
+      "misunderstanding_correction_distinction": "clear",
+      "observation": "T7のユーザー表現をそのまま評価し、数式の重要性と文章・図による補足の両方を説明した",
+      "context_assessment": "sufficient_candidate",
+      "human_review": "pending"
+    },
+    {
+      "case": "D",
+      "condition": "Standard",
+      "target_identification": "correct",
+      "user_statement_attribution": "correct",
+      "misunderstanding_correction_distinction": "clear",
+      "observation": "日常語と数式の流れを含めつつ、Minimalより短く同じ要点へ直接回答した",
+      "context_assessment": "sufficient_no_clear_improvement",
+      "human_review": "pending"
+    },
+    {
+      "case": "D",
+      "condition": "Wide",
+      "target_identification": "correct",
+      "user_statement_attribution": "correct",
+      "misunderstanding_correction_distinction": "clear",
+      "observation": "波粒子の話題を含むが回答へ混ぜず、数式だけで完結しないという補正を維持した",
+      "context_assessment": "sufficient_no_noise_observed",
+      "human_review": "pending"
+    }
+  ],
+  "human_review": "pending"
+}

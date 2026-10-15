@@ -6,15 +6,18 @@ type Active = { controller: AbortController; text: string; cancelled: boolean; d
 export class GenerationService {
   private active = new Map<string, Active>();
   private repo: Repository;
-  readonly provider: LMStudioProvider;
-  constructor(repo: Repository, provider = new LMStudioProvider()) { this.repo = repo; this.provider = provider; }
+  private currentProvider: LMStudioProvider;
+  get provider() { return this.currentProvider; }
+  constructor(repo: Repository, provider = new LMStudioProvider()) { this.repo = repo; this.currentProvider = provider; }
+  replaceProvider(provider: LMStudioProvider) { this.currentProvider = provider; }
   async execute(run: GenerationRun, emit: (event: Record<string, unknown>) => void) {
     const state: Active = { controller: new AbortController(), text: '', cancelled: false, done: Promise.resolve() };
+    const provider = this.currentProvider;
     this.active.set(run.run_id, state);
-    state.done = this.perform(run, state, emit);
+    state.done = this.perform(run, state, emit, provider);
     await state.done;
   }
-  private async perform(run: GenerationRun, state: Active, emit: (event: Record<string, unknown>) => void) {
+  private async perform(run: GenerationRun, state: Active, emit: (event: Record<string, unknown>) => void, provider: LMStudioProvider) {
     const generationStarted = performance.now();
     let persistenceError: unknown;
     const diagnosticState: { value: GenerationDiagnostics | null } = { value: null };
@@ -29,7 +32,7 @@ export class GenerationService {
     try {
       this.repo.startRun(run.conversation_id, run.run_id);
       emit({ type: 'running' });
-      await this.provider.generate(run.request_snapshot, state.controller.signal, delta => {
+      await provider.generate(run.request_snapshot, state.controller.signal, delta => {
         state.text += delta;
         if (state.text.length > 1_000_000) throw new Error('生成本文の上限を超えました');
         emit({ type: 'delta', text: delta });

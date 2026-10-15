@@ -1,0 +1,69 @@
+{
+  "experiment": "context-correction-v0.2",
+  "fixture_version": "physics-long-32-v2",
+  "marker": "B",
+  "condition": "A",
+  "source_turn": "T20",
+  "source_utf16": 2650,
+  "source_text": "この比を十分小さくします。",
+  "question": "質問です。これはどういう意味ですか？",
+  "anchor": {
+    "highlight_id": "B",
+    "turn_id": "T20",
+    "start_offset": 1208,
+    "end_offset": 1221,
+    "source_text": "この比を十分小さくします。",
+    "target_text": "この比を十分小さくします。",
+    "color": "yellow",
+    "note": "",
+    "created_at": "2026-09-29T00:00:00Z",
+    "updated_at": "2026-09-29T00:00:00Z",
+    "status": "resolved",
+    "reason": null
+  },
+  "local_range": null,
+  "context_utf16": 0,
+  "included_percentage": 0,
+  "input_utf16": 159,
+  "included_turn_ids": [],
+  "request": {
+    "model": "unsloth/gemma-4-12b-it-qat",
+    "temperature": 0,
+    "max_tokens": 2048,
+    "stream": true,
+    "messages": [
+      {
+        "role": "system",
+        "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+      },
+      {
+        "role": "user",
+        "content": "[参照文脈]\nなし\n\n[Marker Focus]\nこの比を十分小さくします。\n\n[質問]\n質問です。これはどういう意味ですか？"
+      }
+    ]
+  },
+  "automatic": {
+    "marker_match": true,
+    "window_boundaries": true,
+    "source_only": true,
+    "no_future_turns": true
+  },
+  "human_review": "pending",
+  "provider_base_url": "http://127.0.0.1:1234/v1",
+  "request_sha256": "1d31fd062546823955577c68d8910c4525be6efd727ff20f96f77ee45045fc44",
+  "started": "2026-09-29T11:43:51.696Z",
+  "finished": "2026-09-29T11:44:08.624Z",
+  "answer": "「この比を十分小さくします」という言葉は、主に数学、物理学、工学などの技術的な文脈で使われる表現です。\n\n意味を分解すると以下のようになります。\n\n1.  **この比**: 2つの数値や量の関係（割合）のことを指します。\n2.  **十分小さくする**: 単に「小さくする」だけでなく、「目的を達成するために必要な程度まで、十分に小さくする」という意味です。\n\n**具体的なニュアンス：**\nある計算や実験において、特定の比率が大きすぎると結果に大きな影響を与えてしまう（あるいは誤差の原因になる）ため、その**影響を無視できるほど、あるいは許容範囲内に収まるほど値を小さくする**という操作を指します。\n\n例えば、「誤差を無視できるほど小さくする」といった状況で使われることが多い表現です。",
+  "output_utf16": 346,
+  "diagnostics": {
+    "finish_reason": "stop",
+    "completion_tokens": null,
+    "prompt_tokens": null,
+    "total_tokens": null,
+    "content_chars": 346,
+    "reasoning_chars": 2238,
+    "duration_ms": 16927,
+    "terminal_chunk_received": true
+  },
+  "error": null
+}

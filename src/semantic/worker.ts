@@ -4,6 +4,15 @@ import { BackgroundIndexer } from './indexer.ts';
 import { BuiltinEmbeddingProvider, spec } from './builtin-provider.ts';
 
 // Dedicated process: errors and native runtime failures cannot change chat Turn/Run outcomes.
+let stop = false;
+let cancel = () => {};
+const stopWorker = () => { stop = true; cancel(); };
+process.once('SIGINT', stopWorker); process.once('SIGTERM', stopWorker);
+process.once('disconnect', () => {
+  stopWorker();
+  setTimeout(() => { console.error('SEMANTIC_PARENT_DISCONNECT_TIMEOUT'); process.exit(1); }, 1_500).unref();
+});
+process.on('message', message => { if (message && typeof message === 'object' && 'type' in message && message.type === 'shutdown') stopWorker(); });
 async function main() {
   const modelDir=process.env.ATTCHAT_EMBEDDING_MODEL_DIR;
   const dbPath=process.env.ATTCHAT_DB;
@@ -18,16 +27,13 @@ async function main() {
     if (command!=='run' && command!=='once') throw new Error('INVALID_COMMAND');
     provider=await BuiltinEmbeddingProvider.load(modelDir);
     const indexer=new BackgroundIndexer(repo,provider,spec);
-    let stop=false;
-    const stopWorker=() => { stop=true; indexer.cancel(); };
-    process.once('SIGINT',stopWorker); process.once('SIGTERM',stopWorker);
-    process.once('disconnect',stopWorker);
-    do {
+    cancel = () => indexer.cancel();
+    while (!stop) {
       try { const worked=await indexer.tick(); if (command==='once' && !worked) break; }
       catch { console.error('SEMANTIC_INDEX_TICK_FAILED'); if (command==='once') throw new Error('SEMANTIC_INDEX_FAILED'); }
       if (command!=='once') await new Promise(resolve=>setTimeout(resolve,1000));
-    } while (!stop);
+    }
     if (command==='once') console.log(JSON.stringify({space_id:space,...repo.counts(space)}));
   } finally { await provider?.dispose(); db.close(); }
 }
-main().catch(() => { console.error('SEMANTIC_INDEX_UNAVAILABLE'); process.exitCode=1; });
+main().catch(() => { console.error('SEMANTIC_INDEX_UNAVAILABLE'); process.exitCode=1; }).finally(() => { if (process.connected) process.disconnect(); });

@@ -1,0 +1,72 @@
+{
+  "experiment": "context-correction-v0.1",
+  "fixture_version": "physics-40-v1",
+  "marker": "B",
+  "condition": "B",
+  "source_turn": "T18",
+  "included_turn_ids": [
+    "T18"
+  ],
+  "context_utf16": 228,
+  "input_utf16": 368,
+  "source_text": "それが重要です。",
+  "question": "なぜですか？",
+  "anchor": {
+    "highlight_id": "B",
+    "turn_id": "T18",
+    "start_offset": 69,
+    "end_offset": 77,
+    "source_text": "それが重要です。",
+    "target_text": "それが重要です。",
+    "color": "yellow",
+    "note": "",
+    "created_at": "2026-09-29T00:00:00Z",
+    "updated_at": "2026-09-29T00:00:00Z",
+    "status": "resolved",
+    "reason": null
+  },
+  "local_range": {
+    "context_start_offset": 0,
+    "highlight_start_offset": 69,
+    "highlight_end_offset": 77,
+    "context_end_offset": 209
+  },
+  "request": {
+    "model": "unsloth/gemma-4-12b-it-qat",
+    "temperature": 0,
+    "max_tokens": 2048,
+    "stream": true,
+    "messages": [
+      {
+        "role": "system",
+        "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+      },
+      {
+        "role": "user",
+        "content": "[参照文脈]\n[T18 assistant 局所]\nここで考えるのは時間並進です。開始時刻のラベルをまとめてずらしても法則が変わらないという性質であり、粒子が停止していることではありません。それが重要です。この対称性に対応する保存量はエネルギーで、先ほどの空間並進に対応する運動量とは区別します。通常の時間に依存しない保存力の力学では、運動エネルギーと位置エネルギーの和を考えます。厳密な導出は作用の形式を学んでからにし、今は対称性と保存量の対応を整理しておきましょう。\n\n[Marker Focus]\nそれが重要です。\n\n[質問]\nなぜですか？"
+      }
+    ]
+  },
+  "automatic": {
+    "marker_match": true,
+    "no_future_turns": true
+  },
+  "human_review": "pending",
+  "provider_base_url": "http://127.0.0.1:1234/v1",
+  "request_sha256": "089bfba5bde6b7f58271d7bbf85c5fa6562fa7c78682514d22263bacdafbf266",
+  "started": "2026-09-29T05:24:24.910Z",
+  "finished": "2026-09-29T05:24:37.720Z",
+  "answer": "時間並進が「開始時刻のラベルをまとめてずらしても法則が変わらないという性質」であり、「粒子が停止していることではない」という区別が重要だからです。\n\nこの区別を正しく行うことで、時間並進という対称性に対応する保存量がエネルギーであることを正確に理解でき、空間並進に対応する運動量とは異なる概念として整理することができるためです。",
+  "output_utf16": 164,
+  "diagnostics": {
+    "finish_reason": "stop",
+    "completion_tokens": null,
+    "prompt_tokens": null,
+    "total_tokens": null,
+    "content_chars": 164,
+    "reasoning_chars": 2534,
+    "duration_ms": 12810,
+    "terminal_chunk_received": true
+  },
+  "error": null
+}

@@ -1,0 +1,84 @@
+{
+  "experiment": "context-correction-v0.3",
+  "fixture_version": "physics-long-32-v2",
+  "marker": "C",
+  "mode": "N",
+  "level": 800,
+  "condition": "N-800",
+  "source_turn": "T20",
+  "source_utf16": 2650,
+  "source_text": "これは保存されます。",
+  "question": "質問です。これはどういう意味ですか？",
+  "anchor": {
+    "highlight_id": "C",
+    "turn_id": "T20",
+    "start_offset": 1584,
+    "end_offset": 1594,
+    "source_text": "これは保存されます。",
+    "target_text": "これは保存されます。",
+    "color": "yellow",
+    "note": "",
+    "created_at": "2026-09-29T00:00:00Z",
+    "updated_at": "2026-09-29T00:00:00Z",
+    "status": "resolved",
+    "reason": null
+  },
+  "local_range": {
+    "start": 1184,
+    "end": 1994
+  },
+  "context_utf16": 810,
+  "included_percentage": 30.566037735849058,
+  "history_turn_ids": [],
+  "included_turn_ids": [
+    "T20"
+  ],
+  "history_utf16": 0,
+  "input_utf16": 980,
+  "request": {
+    "model": "google/gemma-4-12b-qat",
+    "temperature": 0,
+    "max_tokens": 2048,
+    "stream": true,
+    "messages": [
+      {
+        "role": "system",
+        "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+      },
+      {
+        "role": "user",
+        "content": "[参照文脈]\n変化まで確実に復元できるわけではありません。\n\nこの比を十分小さくします。そうすると一周期の間に多くの測定点が得られ、速い動きの取りこぼしを減らせます。これは測定上の条件であって、物体の運動そのものを弱める操作ではありません。小さいという言葉だけを見て振幅や力を小さくする指示と取り違えないでください。具体的な必要点数は求める精度や運動に含まれる周波数によります。一定の点数で全ての運動を完全に記録できるという保証ではありません。\n\n【エネルギーの整理】台車がばねへ近づくと、並進運動から弾性変形へエネルギーが移ります。ばねが戻ると逆の移動が起こります。途中の時刻を二つ選んで比べると、運動エネルギーだけの値は一致しないことがあります。そのことと合計の保存を混同しないでください。位置エネルギーのゼロ点は同じ規約で比較し、時刻ごとに勝手に取り直さないようにします。\n\n冒頭で定義した台帳Qに戻ります。【選択箇所開始】これは保存されます。【選択箇所終了】意味は各項が固定されるということではなく、項の間の移し替えがあっても合計を維持するということです。途中の説明で使った撮影間隔の比や、速度のベクトル和をこの台帳へ代入してはいけません。どの量を合計し、どの区間に条件を限定したかは最初の約束を参照してください。ここでは記号の定義を省略して同じ名前を使っています。\n\n実際の装置で摩擦が大きいと、ばねと台車の見える運動だけでは説明できない変化が起きます。温度や音への移動まで含めた全エネルギーの議論と、選んだ力学的な量の議論は分けて扱います。測定した差をすぐに法則の破れと判断せず、系の境界、外部からの仕事、測定誤差を順番に調べます。この段落は理想条件を外したときの補足であり、先ほど設定した理想実験に新たな摩擦を追加する指示ではありません。\n\n【空間の近似】最後に、撮影とは別の解析上の尺度を使います。平衡点からの変位xと、ポテンシャルが変化する代表長さ\n\n[Marker Focus]\nこれは保存されます。\n\n[質問]\n質問です。これはどういう意味ですか？"
+      }
+    ]
+  },
+  "automatic": {
+    "marker_match": true,
+    "window_boundaries": true,
+    "source_only": true,
+    "marker_contained": true,
+    "no_future_turns": true,
+    "mode_match": true,
+    "level_match": true
+  },
+  "human_review": "pending",
+  "escalation_candidate": false,
+  "escalation_evidence": [],
+  "escalation_method": "literal-screen-v1; review for false positives/negatives; no retry",
+  "provider_base_url": "http://127.0.0.1:1234/v1",
+  "request_sha256": "fbb0e6018d182013b199423dad0c954cf03785c276e1b1651f12e11e8702f3ff",
+  "started": "2026-09-30T03:55:16.241Z",
+  "finished": "2026-09-30T03:56:58.297Z",
+  "answer": "「これは保存されます」という言葉は、冒頭で定義された「台帳Q」に関する記述であり、以下のことを意味しています。\n\n*   **合計の維持：** 台帳の各項（個々の項目）が固定されている（変化しない）という意味ではなく、項の間で移し替え（変化）が起きたとしても、**その合計が維持されること**を意味します。\n*   **注意点：** 途中の説明で使われた「撮影間隔の比」や「速度のベクトル和」などをこの台帳に代入してはいけません。どの量を合計し、どの区間に条件を限定したかについては、最初の約束（定義）を参照する必要があります。",
+  "output_utf16": 264,
+  "diagnostics": {
+    "finish_reason": "stop",
+    "completion_tokens": null,
+    "prompt_tokens": null,
+    "total_tokens": null,
+    "content_chars": 264,
+    "reasoning_chars": 3052,
+    "duration_ms": 102058,
+    "terminal_chunk_received": true
+  },
+  "error": null
+}

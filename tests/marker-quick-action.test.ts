@@ -56,7 +56,12 @@ test('Quick Memoは選択・既設Markerから独立追加し、順序・重複�
     Object.defineProperty(dom.window.Range.prototype,'getClientRects',{configurable:true,value:()=>[{left:20,right:120,top:90,bottom:110,width:100,height:20}]});
     const {createRoot}=await import('react-dom/client'),{MarkerQuickActionPrototype}=await import(pathToFileURL(join(out,'app.mjs')).href);
     let loads=0;
-    Object.defineProperty(globalThis,'fetch',{configurable:true,value:async()=>{loads++;if(loads===1)throw new Error('load failed');return {ok:true,json:async()=>({experiment:'実験、試み'})};}});
+    Object.defineProperty(globalThis,'fetch',{configurable:true,value:async(input:RequestInfo|URL,init?:RequestInit)=>{
+      if(String(input)==='/api/laboratory/new-chat-handoff'){
+        const sent=JSON.parse(String(init?.body));return {ok:true,json:async()=>({...sent,temporaryConversationId:'temporary-test',firstUserMessage:sent.finalFirstUserMessage,assistantResponse:'実モデル相当のfixture回答',model:'google/gemma-4-12b-qat',generationSettings:{temperature:0,max_tokens:2048},messageRoles:['system','user'],oldConversationMessageCount:0,finishReason:'stop',error:null,startedAt:'2026-10-01T00:00:00Z',completedAt:'2026-10-01T00:00:01Z',sourcePositionUnresolved:false,humanReview:'pending'})};
+      }
+      loads++;if(loads===1)throw new Error('load failed');return {ok:true,json:async()=>({experiment:'実験、試み'})};
+    }});
     const container=dom.window.document.getElementById('root')!;root=createRoot(container);await act(async()=>root!.render(createElement(MarkerQuickActionPrototype)));
     const memoTexts=()=>Array.from(container.querySelectorAll('[aria-label="Quick Memo項目"] li')).map(e=>e.textContent);
     const addMemo=async(label='Quick Memo')=>{
@@ -155,6 +160,142 @@ test('Quick Memoは選択・既設Markerから独立追加し、順序・重複�
     await act(async()=>container.querySelector<HTMLButtonElement>('[aria-label="Quick Menuを開く"]')!.click());
     await act(async()=>{dom.window.document.dispatchEvent(new dom.window.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));});assert.equal(container.querySelector('[role="toolbar"]'),null);
     assert.equal(container.querySelector('[aria-label="Quick Menu"]'),null);assert.equal(memoTexts().length,7);
+
+    // Immediate Ask is a Lab-only handoff; no request is made by any action below.
+    const loadsBeforeAsk=loads;
+    const press=async(text:string)=>{await act(async()=>Array.from(container.querySelectorAll<HTMLButtonElement>('button')).find(b=>b.textContent===text)!.click());};
+    const field=()=>container.querySelector<HTMLTextAreaElement>('[aria-label="Lab Chat draft"]')!;
+    const openAsk=async(id:string)=>{dom.window.getSelection()!.removeAllRanges();await act(async()=>container.querySelector<HTMLElement>(`[data-quick-marker="${id}"]`)!.click());await act(async()=>container.querySelector<HTMLButtonElement>('[aria-label="Marker Detailを開く"]')!.click());await press('今すぐ質問');};
+    const questions=()=>container.querySelectorAll('.ask-question');
+    const previewButton=()=>Array.from(container.querySelectorAll<HTMLButtonElement>('button')).find(b=>b.textContent==='送信Preview')!;
+    assert.equal(previewButton().disabled,true);
+    await press('質問受け渡しfixtureを準備（T10 C / T25 A・B）');
+    await openAsk('ask-fixture-0');assert.equal(container.querySelector('[aria-label="質問準備"]'),null);
+    await openAsk('ask-fixture-1');await press('質問');await press('確定');
+    assert.equal(field().value,'');assert.equal(questions().length,1);assert.equal(previewButton().disabled,false);
+    await press('送信Preview');assert.match(container.querySelector('[aria-label="送信Preview結果"]')!.textContent!,/・「月がきれいですね」/);
+    await act(async()=>{Object.getOwnPropertyDescriptor(dom.window.HTMLTextAreaElement.prototype,'value')!.set!.call(field(),'先に書いた本文');field().dispatchEvent(new dom.window.Event('input',{bubbles:true}));});
+    await openAsk('ask-fixture-2');await press('しかし…');await press('確定');
+    assert.equal(questions().length,2);assert.equal(field().value,'先に書いた本文');
+    await openAsk('ask-fixture-1');await press('意見');await press('確定');assert.equal(questions().length,2);
+    await press('送信Preview');const preview=container.querySelector('[aria-label="送信Preview結果"]')!.textContent!;
+    assert.equal((preview.match(/・「/g)||[]).length,2);assert.match(preview,/## メッセージ\n\n先に書いた本文/);assert.doesNotMatch(preview,/ask-fixture|fixture-turn/);
+    assert.equal(container.querySelectorAll('.ask-question q input').length,0);
+    await act(async()=>container.querySelector<HTMLButtonElement>('[aria-label="再質問を削除 ask-fixture-1"]')!.click());
+    assert.equal(questions().length,1);assert.ok(container.querySelector('[data-quick-marker="ask-fixture-1"]'));assert.equal(field().value,'先に書いた本文');
+    await act(async()=>container.querySelector<HTMLButtonElement>('[aria-label="再質問を削除 ask-fixture-2"]')!.click());
+    assert.equal(container.querySelector('[aria-label="回答への再質問"]'),null);assert.equal(field().value,'先に書いた本文');
+    await openAsk('ask-fixture-1');await press('質問');await act(async()=>dom.window.document.dispatchEvent(new dom.window.KeyboardEvent('keydown',{key:'Escape',bubbles:true})));assert.equal(questions().length,0);
+    await openAsk('ask-fixture-1');await press('意見');await act(async()=>dom.window.document.body.dispatchEvent(new dom.window.MouseEvent('pointerdown',{bubbles:true})));assert.equal(questions().length,0);assert.equal(loads,loadsBeforeAsk);
+    await openAsk('ask-fixture-0');await press('後で質問');await press('質問');
+    assert.equal(Array.from(container.querySelectorAll('button')).find(b=>b.textContent==='後で質問')!.getAttribute('aria-pressed'),'true');
+    await press('確定');assert.equal(container.querySelectorAll('[aria-label="Lab Question Keep"] li').length,1);
+    assert.match(container.querySelector('[aria-label="Lab Question Keep"]')!.textContent!,/T10/);
+    assert.equal(container.querySelector('[data-quick-marker="ask-fixture-0"]')!.getAttribute('data-question-info'),'true');
+    assert.equal(container.querySelector('[data-quick-marker="ask-fixture-2"]')!.getAttribute('data-question-info'),null);
+    await openAsk('ask-fixture-2');await press('後で質問');
+    assert.equal(Array.from(container.querySelectorAll('button')).find(b=>b.textContent==='今すぐ質問')!.getAttribute('aria-pressed'),'false');
+    await press('今すぐ質問');assert.equal(Array.from(container.querySelectorAll('button')).find(b=>b.textContent==='後で質問')!.getAttribute('aria-pressed'),'false');
+    await press('後で質問');await press('確定');assert.equal(container.querySelectorAll('[aria-label="Lab Question Keep"] li').length,2);
+    assert.equal(field().value,'先に書いた本文');assert.equal(loads,loadsBeforeAsk);
+
+    // Question Box: cross-conversation source restoration is keyed by IDs, not quote text.
+    const sidebar=container.querySelector('[aria-label="Lab左Sidebar"]')!;
+    const chatTab=sidebar.querySelector<HTMLButtonElement>('[role="tab"][id="question-box-chat-tab"]')!;
+    const boxTab=sidebar.querySelector<HTMLButtonElement>('[role="tab"][id="question-box-keeps-tab"]')!;
+    assert.equal(chatTab.getAttribute('aria-selected'),'true');
+    await press('質問箱fixtureを準備（6会話・20件）');
+    const keeps=()=>Array.from(sidebar.querySelectorAll<HTMLElement>('[data-keep-id]'));
+    assert.equal(keeps().length,22);
+    await press('質問箱fixtureを準備（6会話・20件）');assert.equal(keeps().length,22);
+    await act(async()=>boxTab.click());assert.equal(boxTab.getAttribute('aria-selected'),'true');
+    const groups=()=>Array.from(sidebar.querySelectorAll<HTMLElement>('[data-question-group]'));
+    const headings=()=>groups().map(g=>g.querySelector<HTMLButtonElement>('button')!);
+    assert.deepEqual(groups().map(g=>g.dataset.questionGroup),['quick-action-fixture','question-box-f','question-box-e','question-box-d','question-box-c','question-box-b']);
+    assert.deepEqual(headings().map(h=>h.getAttribute('aria-expanded')),['true','false','false','false','false','false']);
+    assert.deepEqual(headings().map(h=>h.textContent!.match(/\d+件/)![0]),['5件','4件','5件','5件','1件','2件']);
+    assert.equal(sidebar.querySelector('[data-question-group="question-box-empty"]'),null);
+    assert.deepEqual(Array.from(groups()[5].querySelectorAll<HTMLElement>('[data-keep-id]')).map(k=>k.dataset.keepId),['box-unresolved','box-d']);
+    await act(async()=>headings()[1].click());assert.equal(headings()[1].getAttribute('aria-expanded'),'true');
+    assert.equal(chatTab.getAttribute('aria-selected'),'false'); // heading is not navigation
+    await press('すべて閉じる');assert.ok(headings().every(h=>h.getAttribute('aria-expanded')==='false'));
+    await act(async()=>headings()[0].click());assert.equal(headings()[0].getAttribute('aria-expanded'),'true');
+    assert.match(keeps()[0].textContent!,/T25/); // user-created Keep remains newer than fixture seeds
+    assert.match(sidebar.querySelector('[data-keep-id="box-d"]')!.closest('[data-question-group]')!.textContent!,/Conversation B/);
+    assert.equal(sidebar.querySelector('[data-keep-id="box-unresolved"] p'),null);
+    const scrolled:Element[]=[];
+    Object.defineProperty(dom.window.HTMLElement.prototype,'scrollIntoView',{configurable:true,value:function(this:Element){scrolled.push(this);}});
+    const restore=async(id:string)=>{await act(async()=>boxTab.click());const item=sidebar.querySelector<HTMLElement>(`[data-keep-id="${id}"]`)!; const heading=item.closest('[data-question-group]')!.querySelector<HTMLButtonElement>('button')!; if(heading.getAttribute('aria-expanded')!=='true')await act(async()=>heading.click()); await act(async()=>item.querySelector<HTMLButtonElement>('button')!.click());};
+    await restore('box-b');
+    assert.equal(chatTab.getAttribute('aria-selected'),'true');
+    assert.equal(scrolled.at(-1)?.getAttribute('data-quick-marker'),'ask-fixture-2');
+    assert.ok(container.querySelector('[data-quick-marker="ask-fixture-2"]')!.classList.contains('question-box-marker-pulse'));
+    assert.equal(container.querySelector('[data-quick-marker="ask-fixture-2"]')!.getAttribute('data-question-info'),'true');
+    assert.ok(!container.querySelector('[data-quick-marker="ask-fixture-1"]')!.classList.contains('question-box-marker-pulse'));
+    await restore('box-d');
+    assert.equal(container.querySelector<HTMLElement>('[data-box-conversation="question-box-b"]')!.hidden,false);
+    assert.equal(container.querySelector<HTMLElement>('[data-box-conversation="quick-action-fixture"]')!.hidden,true);
+    assert.equal(scrolled.at(-1)?.getAttribute('data-quick-marker'),'box-marker-d');
+    assert.ok(container.querySelector('[data-quick-marker="box-marker-d"]')!.classList.contains('question-box-marker-pulse'));
+    await restore('box-unresolved');
+    assert.equal(scrolled.at(-1)?.getAttribute('data-box-turn'),'box-b-turn-9');
+    assert.equal(container.querySelectorAll('.question-box-marker-pulse').length,0);
+    assert.match(sidebar.textContent!,/Marker位置を確認できません/);
+    await act(async()=>new Promise(resolve=>setTimeout(resolve,1850)));
+    assert.equal(container.querySelectorAll('.question-box-turn-pulse').length,0);
+    await restore('box-c');assert.equal(scrolled.at(-1)?.getAttribute('data-quick-marker'),'ask-fixture-0');
+    assert.equal(field().value,'先に書いた本文');
+    await openAsk('ask-fixture-2');await press('後で質問');await press('意見');await press('確定');
+    await act(async()=>boxTab.click());assert.equal(keeps().length,23);assert.match(keeps()[0].textContent!,/私の考えでは、/);
+    assert.equal(sidebar.querySelectorAll('li .question-box-return').length,23);
+    const more=()=>sidebar.querySelectorAll<HTMLButtonElement>('.question-box-more');
+    await act(async()=>more()[0].click());assert.equal(sidebar.querySelectorAll('.question-box-secondary-actions').length,1);
+    await act(async()=>more()[0].click());assert.equal(sidebar.querySelectorAll('.question-box-secondary-actions').length,0);
+    await act(async()=>more()[0].click());await act(async()=>more()[1].click());
+    assert.equal(more()[0].getAttribute('aria-expanded'),'false');assert.equal(more()[1].getAttribute('aria-expanded'),'true');
+    await act(async()=>document.dispatchEvent(new dom.window.KeyboardEvent('keydown',{key:'Escape',bubbles:true})));
+    assert.equal(sidebar.querySelectorAll('.question-box-secondary-actions').length,0);
+    await act(async()=>more()[0].click());await act(async()=>document.body.dispatchEvent(new dom.window.Event('pointerdown',{bubbles:true})));
+    assert.equal(sidebar.querySelectorAll('.question-box-secondary-actions').length,0);
+    await act(async()=>more()[0].click());await press('質問する');assert.match(sidebar.textContent!,/質問する：未実装/);
+    assert.equal(keeps().length,23);assert.equal(field().value,'先に書いた本文');
+    const newChatFor=async(id:string)=>{
+      const item=sidebar.querySelector<HTMLElement>(`[data-keep-id="${id}"]`)!;
+      await act(async()=>item.querySelector<HTMLButtonElement>('.question-box-more')!.click());
+      await act(async()=>Array.from(item.querySelectorAll<HTMLButtonElement>('.question-box-secondary-actions button')).find(b=>b.textContent==='新規チャット')!.click());
+      return sidebar.querySelector<HTMLElement>('[aria-label="New Chat Handoff Setup"]')!;
+    };
+    let setup=await newChatFor('box-b');assert.ok(setup);assert.match(setup.textContent!,/新しいチャットへ/);
+    assert.equal(setup.querySelector<HTMLSelectElement>('[aria-label="Experimental Past context"]')!.value,'800');
+    assert.equal(setup.querySelector<HTMLSelectElement>('[aria-label="Experimental Future context"]')!.value,'0');
+    await act(async()=>Array.from(setup.querySelectorAll<HTMLButtonElement>('button')).find(b=>b.textContent==='準備')!.click());
+    let handoffPreview=setup.querySelector<HTMLElement>('[aria-label="New Chat Handoff Preview"]')!;
+    assert.match(handoffPreview.textContent!,/Past context800 UTF-16/);assert.match(handoffPreview.textContent!,/Future context0 UTF-16/);
+    const firstMessage=handoffPreview.querySelector<HTMLTextAreaElement>('textarea')!;assert.equal(firstMessage.readOnly,false);assert.match(firstMessage.value,/前の会話からの引継ぎ/);
+    await act(async()=>{Object.getOwnPropertyDescriptor(dom.window.HTMLTextAreaElement.prototype,'value')!.set!.call(firstMessage,firstMessage.value+'\n\n編集追記');firstMessage.dispatchEvent(new dom.window.Event('input',{bubbles:true}));});
+    await act(async()=>{Array.from(setup.querySelectorAll<HTMLButtonElement>('button')).find(b=>b.textContent==='新規チャットとして送信')!.click();await new Promise(resolve=>setImmediate(resolve));});
+    const newChatResult=setup.querySelector<HTMLElement>('[aria-label="New Chat Result"]')!;assert.match(newChatResult.textContent!,/実モデル相当のfixture回答/);assert.match(newChatResult.textContent!,/system \+ user/);assert.match(newChatResult.querySelector('pre')!.textContent!,/編集追記/);
+    await act(async()=>setup.querySelectorAll<HTMLInputElement>('input[name="handoff-enabled"]')[1].click());
+    await act(async()=>Array.from(setup.querySelectorAll<HTMLButtonElement>('button')).find(b=>b.textContent==='準備')!.click());
+    handoffPreview=setup.querySelector<HTMLElement>('[aria-label="New Chat Handoff Preview"]')!;
+    assert.doesNotMatch(handoffPreview.querySelector('textarea')!.value,/前提文脈/);assert.match(handoffPreview.textContent!,/HandoffOFF/);
+    await act(async()=>Array.from(setup.querySelectorAll<HTMLButtonElement>('button')).find(b=>b.textContent==='キャンセル')!.click());
+    assert.equal(sidebar.querySelector('[aria-label="New Chat Handoff Setup"]'),null);
+    setup=await newChatFor('box-b');
+    const pastSelect=setup.querySelector<HTMLSelectElement>('[aria-label="Experimental Past context"]')!, futureSelect=setup.querySelector<HTMLSelectElement>('[aria-label="Experimental Future context"]')!;
+    await act(async()=>{Object.getOwnPropertyDescriptor(dom.window.HTMLSelectElement.prototype,'value')!.set!.call(pastSelect,'1100');pastSelect.dispatchEvent(new dom.window.Event('change',{bubbles:true}));Object.getOwnPropertyDescriptor(dom.window.HTMLSelectElement.prototype,'value')!.set!.call(futureSelect,'300');futureSelect.dispatchEvent(new dom.window.Event('change',{bubbles:true}));});
+    await act(async()=>Array.from(setup.querySelectorAll<HTMLButtonElement>('button')).find(b=>b.textContent==='準備')!.click());
+    handoffPreview=setup.querySelector<HTMLElement>('[aria-label="New Chat Handoff Preview"]')!;
+    assert.match(handoffPreview.textContent!,/Experimental 1100/);assert.match(handoffPreview.textContent!,/Past context1100 UTF-16/);assert.match(handoffPreview.textContent!,/Future context300 UTF-16/);
+    await act(async()=>setup.querySelector<HTMLButtonElement>('[aria-label="New Chat Handoffを閉じる"]')!.click());
+    setup=await newChatFor('box-unresolved');assert.match(setup.textContent!,/Marker位置未解決/);
+    await act(async()=>Array.from(setup.querySelectorAll<HTMLButtonElement>('button')).find(b=>b.textContent==='準備')!.click());assert.match(setup.querySelector('[role="alert"]')!.textContent!,/自動re-anchorは行いません/);
+    await act(async()=>setup.querySelectorAll<HTMLInputElement>('input[name="handoff-enabled"]')[1].click());await act(async()=>Array.from(setup.querySelectorAll<HTMLButtonElement>('button')).find(b=>b.textContent==='準備')!.click());
+    assert.match(setup.querySelector<HTMLElement>('[aria-label="New Chat Handoff Preview"]')!.textContent!,/Question draft（空）/);
+    await act(async()=>Array.from(setup.querySelectorAll<HTMLButtonElement>('button')).find(b=>b.textContent==='キャンセル')!.click());
+    await act(async()=>more()[0].click());await act(async()=>headings()[0].click());assert.equal(sidebar.querySelectorAll('.question-box-secondary-actions').length,0);
+    await act(async()=>headings()[0].click());await act(async()=>more()[0].click());await press('すべて閉じる');assert.equal(sidebar.querySelectorAll('.question-box-secondary-actions').length,0);
+    assert.equal(loads,loadsBeforeAsk);
   } finally { if(root)await act(async()=>root!.unmount());for(const[key,descriptor]of saved){if(descriptor)Object.defineProperty(globalThis,key,descriptor);else Reflect.deleteProperty(globalThis,key);}dom.window.close();await rm(out,{recursive:true,force:true}); }
 });
 

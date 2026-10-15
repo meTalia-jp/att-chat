@@ -30,13 +30,13 @@ test('same-chat Keep確認は標準Contextを初期選択し、Preview後だけ�
       throw new Error('Unexpected API '+path);
     }) as typeof fetch;
     const container=dom.window.document.getElementById('app')!;root=createRoot(container);
-    await act(async()=>{root!.render(createElement(Chat,{detail,normalLayout:true,question:keep,onCloseQuestion:()=>{},onBusy:()=>{},refresh:async()=>{}}));await new Promise(resolve=>setTimeout(resolve,30))});
+    await act(async()=>{root!.render(createElement(Chat,{detail,normalLayout:true,question:keep,onCloseQuestion:()=>{},onBusy:()=>{},refresh:async()=>{}}));for(let attempt=0;attempt<20;attempt+=1){await new Promise(resolve=>setTimeout(resolve,10));if(container.querySelector('option[value="fake"]'))break}});
     const radios=Array.from(container.querySelectorAll<HTMLInputElement>('input[type=radio]'));assert.equal(radios.length,3);assert.equal(radios[1].checked,true);
     const buttons=()=>Array.from(container.querySelectorAll('button'));
     const button=(name:string)=>{const found=buttons().find(item=>item.textContent===name);assert.ok(found,name);return found};
-    const select=container.querySelector('select')!;await act(async()=>{Object.getOwnPropertyDescriptor(dom.window.HTMLSelectElement.prototype,'value')!.set!.call(select,'fake');select.dispatchEvent(new dom.window.Event('change',{bubbles:true}));await new Promise(resolve=>setTimeout(resolve,40))});
+    const select=container.querySelector<HTMLSelectElement>('[aria-label="モデル"]')!;await act(async()=>{Object.getOwnPropertyDescriptor(dom.window.HTMLSelectElement.prototype,'value')!.set!.call(select,'fake');select.dispatchEvent(new dom.window.Event('change',{bubbles:true}));await new Promise(resolve=>setTimeout(resolve,40))});
     assert.equal(button('送信').disabled,true);
-    await act(async()=>{button('Preview').click();await new Promise(resolve=>setTimeout(resolve,40))});
+    await act(async()=>{button('Preview').click();await new Promise(resolve=>setTimeout(resolve,100))});
     const call=requests.find(request=>request.path.endsWith('/context-preview'));assert.deepEqual(call?.body,{user_question:'なぜですか？',context_level:'standard'});
     assert.match(container.querySelector('[aria-label="Keep Context Preview"]')!.textContent!,/T7, T8/);assert.equal(button('送信').disabled,false);
   }finally{
@@ -76,7 +76,7 @@ test('accepted送信だけPreviewを消しvalidation失敗とPreview-onlyでは�
     const settle=async(fn:()=>void,delay=60)=>{await act(async()=>{fn();await new Promise(resolve=>setTimeout(resolve,delay))})};
     const button=(name:string)=>{const found=Array.from(container.querySelectorAll('button')).find(item=>item.textContent===name);assert.ok(found,name);return found};
     await settle(()=>render(keep));
-    const select=container.querySelector('select')!;await settle(()=>{Object.getOwnPropertyDescriptor(dom.window.HTMLSelectElement.prototype,'value')!.set!.call(select,'fake');select.dispatchEvent(new dom.window.Event('change',{bubbles:true}))});
+    const select=container.querySelector<HTMLSelectElement>('[aria-label="モデル"]')!;await settle(()=>{Object.getOwnPropertyDescriptor(dom.window.HTMLSelectElement.prototype,'value')!.set!.call(select,'fake');select.dispatchEvent(new dom.window.Event('change',{bubbles:true}))});
 
     await settle(()=>button('Preview').click());
     assert.ok(container.querySelector('[aria-label="Keep Context Preview"]'));assert.equal(requests.filter(item=>item.path.endsWith('/ask')).length,0);

@@ -1,0 +1,88 @@
+{
+  "experiment": "new-chat-handoff-natural-v0.4",
+  "reviewer": "Codex first observation",
+  "reviews": [
+    {
+      "case": "A",
+      "condition": "Minimal",
+      "target_identification": "mostly_correct",
+      "meaning_confusion": "distinguished LLM quantization from physical discreteness, but answered more broadly than the local marker required",
+      "context_assessment": "sufficient_candidate",
+      "naturalness": "natural_but_overexplained",
+      "human_review": "pending"
+    },
+    {
+      "case": "A",
+      "condition": "Standard",
+      "target_identification": "correct",
+      "meaning_confusion": "none_observed",
+      "context_assessment": "sufficient_candidate",
+      "naturalness": "direct",
+      "human_review": "pending"
+    },
+    {
+      "case": "A",
+      "condition": "Wide",
+      "target_identification": "incorrect_comparison_target",
+      "meaning_confusion": "compared LLM quantization with quantum computing instead of answering whether the marked use itself was LLM quantization",
+      "context_assessment": "noise_candidate",
+      "naturalness": "fluent_but_misdirected",
+      "human_review": "pending"
+    },
+    {
+      "case": "B",
+      "condition": "Minimal",
+      "target_identification": "correct",
+      "meaning_confusion": "did not reduce superposition to simple parallel calculation; identified interference",
+      "context_assessment": "sufficient_candidate",
+      "naturalness": "direct",
+      "human_review": "pending"
+    },
+    {
+      "case": "B",
+      "condition": "Standard",
+      "target_identification": "correct",
+      "meaning_confusion": "none_observed",
+      "context_assessment": "sufficient_but_no_clear_improvement",
+      "naturalness": "direct",
+      "human_review": "pending"
+    },
+    {
+      "case": "B",
+      "condition": "Wide",
+      "target_identification": "correct",
+      "meaning_confusion": "none_observed; added the useful limitation that not every computation becomes faster",
+      "context_assessment": "sufficient_no_noise_observed",
+      "naturalness": "natural",
+      "human_review": "pending"
+    },
+    {
+      "case": "C",
+      "condition": "Minimal",
+      "target_identification": "correct",
+      "meaning_confusion": "distinguished measurement outcomes from hidden classical bits",
+      "context_assessment": "sufficient_candidate",
+      "naturalness": "direct",
+      "human_review": "pending"
+    },
+    {
+      "case": "C",
+      "condition": "Standard",
+      "target_identification": "correct",
+      "meaning_confusion": "none_observed; retained the measurement-axis condition",
+      "context_assessment": "sufficient_but_no_clear_improvement",
+      "naturalness": "natural",
+      "human_review": "pending"
+    },
+    {
+      "case": "C",
+      "condition": "Wide",
+      "target_identification": "correct",
+      "meaning_confusion": "none_observed",
+      "context_assessment": "sufficient_no_noise_observed",
+      "naturalness": "natural",
+      "human_review": "pending"
+    }
+  ],
+  "human_review": "pending"
+}

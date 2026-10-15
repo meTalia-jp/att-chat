@@ -54,7 +54,7 @@ test('Catalog / Workspace reuse experiments and gate session / generation switch
     const settle=async(fn:()=>void)=>{await act(async()=>{fn();await new Promise(r=>setTimeout(r,15));});};
     const button=(name:string)=>{const b=Array.from(container.querySelectorAll('button')).find(b=>b.textContent===name);assert.ok(b,name);return b;};
     await settle(()=>root!.render(createElement(Laboratory)));
-    assert.equal(container.querySelectorAll('[aria-label="Experiment Catalog"] li').length,5);
+    assert.equal(container.querySelectorAll('[aria-label="Experiment Catalog"] li').length,7);
     assert.deepEqual(calls,['/api/laboratory/sessions/current','/api/conversations']);
     for(const definition of experiments){
       await settle(()=>button(definition.title).click());
@@ -109,11 +109,18 @@ test('Catalog / Workspace reuse experiments and gate session / generation switch
     assert.match(container.querySelector('[aria-label="Overview"]')!.textContent!,/marker-quick-action-prototype/);
     await settle(()=>button('Run').click());
     assert.ok(container.querySelector('[aria-label="Marker Quick Action Prototype"]'));
-    assert.equal(container.querySelectorAll('[data-quick-paragraph]').length,7);
+    assert.equal(container.querySelectorAll('[data-quick-paragraph]').length,10);
     assert.match(container.querySelector('[data-quick-paragraph="0"]')!.textContent!,/experiment/);
     assert.equal(container.querySelectorAll('input[name="quick-ui-variant"]').length,2);
     await settle(()=>button('Results').click());
     assert.match(container.querySelector('[aria-label="Results"]')!.textContent!,/メモリ内だけに保持/);
+    await settle(()=>button('Att-Chat Integrated Dummy UI').click());
+    await settle(()=>button('Run').click());
+    assert.ok(container.querySelector('[aria-label="Att-Chat Integrated Dummy UI"]'));
+    assert.equal(container.querySelectorAll('[aria-label="表示fixture"] option').length,9);
+    assert.ok(container.querySelector('[aria-label="Dummy Left Sidebar"]'));
+    assert.ok(container.querySelector('[aria-label="Dummy Conversation"]'));
+    assert.ok(container.querySelector('[aria-label="Dummy Right Sidebar"]'));
     await settle(()=>root!.render(createElement(Laboratory,{key:'derived',definitions:[...experiments,derivedExperiment]})));
     await settle(()=>button(derivedExperiment.title).click());
     assert.match(container.querySelector('[aria-label="Overview"]')!.textContent!,/fixture-marker-review/);

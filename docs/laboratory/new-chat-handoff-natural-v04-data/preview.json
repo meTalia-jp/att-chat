@@ -1,0 +1,427 @@
+{
+  "previews": [
+    {
+      "experiment": "new-chat-handoff-natural-v0.4",
+      "case_id": "A",
+      "condition": "Minimal",
+      "source_conversation": "Quantum natural conversation fixture",
+      "target_turn": "T4",
+      "included_turn_numbers": [
+        "T3",
+        "T4"
+      ],
+      "included_turn_count": 2,
+      "input_chars": 311,
+      "marker_source_text": "量子化",
+      "question": "これはLLMの量子化と同じ意味ですか？",
+      "first_user_message": "## 前の会話からの参考文脈\n\n[T3 / User]\nLLMモデルでは、重みを4ビットや8ビットにする話を聞きます。時計の目盛りを粗くするのと同じですか。\n\n[T4 / Assistant / Target]\nLLMでは多数の重みを、表現できる値が少ない4ビットや8ビットへ近似します。この工学的な処理を量子化と呼び、容量や計算量を減らす代わりに丸め誤差が生じます。量子力学でエネルギー準位などが離散的になる現象とは仕組みが違います。また量子コンピュータは、重みを低ビット化する装置ではなく、量子力学に従う状態を計算資源として使います。\n\n## 質問対象\n\n量子化\n\n## 質問\n\nこれはLLMの量子化と同じ意味ですか？",
+      "request": {
+        "model": "google/gemma-4-12b-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用された箇所を質問対象として、日本語で質問に直接答えてください。最初のUser Messageに含まれる情報だけを新しい会話の前提として扱い、過去会話の履歴が別に存在すると仮定しないでください。対象を特定できない場合は断定せず、不足を述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "## 前の会話からの参考文脈\n\n[T3 / User]\nLLMモデルでは、重みを4ビットや8ビットにする話を聞きます。時計の目盛りを粗くするのと同じですか。\n\n[T4 / Assistant / Target]\nLLMでは多数の重みを、表現できる値が少ない4ビットや8ビットへ近似します。この工学的な処理を量子化と呼び、容量や計算量を減らす代わりに丸め誤差が生じます。量子力学でエネルギー準位などが離散的になる現象とは仕組みが違います。また量子コンピュータは、重みを低ビット化する装置ではなく、量子力学に従う状態を計算資源として使います。\n\n## 質問対象\n\n量子化\n\n## 質問\n\nこれはLLMの量子化と同じ意味ですか？"
+          }
+        ]
+      },
+      "automatic": {
+        "system_user_only": true,
+        "old_history_not_sent_as_messages": true,
+        "turn_order_preserved": true,
+        "target_turn_included_exactly_once": true,
+        "marker_unique_in_target": true,
+        "marker_included": true,
+        "question_included": true,
+        "fixed_settings": true,
+        "no_automatic_retry": true,
+        "no_production_db_write": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "new-chat-handoff-natural-v0.4",
+      "case_id": "A",
+      "condition": "Standard",
+      "source_conversation": "Quantum natural conversation fixture",
+      "target_turn": "T4",
+      "included_turn_numbers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "included_turn_count": 4,
+      "input_chars": 543,
+      "marker_source_text": "量子化",
+      "question": "これはLLMの量子化と同じ意味ですか？",
+      "first_user_message": "## 前の会話からの参考文脈\n\n[T1 / User]\n量子力学、LLMモデル、量子コンピュータで「量子」や似た言葉が出てきます。そもそも同じ意味なのでしょうか。\n\n[T2 / Assistant]\n共通する核は、連続的に見える量を飛び飛びの単位や有限個の値として扱うことです。時計の針で例えるなら、どこでも止まれる針ではなく、決められた目盛りだけに止まる時計です。ただし物理では許される値が系の法則から決まり、工学では計算しやすい段階へ人為的に丸めます。似た言葉でも原因と目的は異なります。\n\n[T3 / User]\nLLMモデルでは、重みを4ビットや8ビットにする話を聞きます。時計の目盛りを粗くするのと同じですか。\n\n[T4 / Assistant / Target]\nLLMでは多数の重みを、表現できる値が少ない4ビットや8ビットへ近似します。この工学的な処理を量子化と呼び、容量や計算量を減らす代わりに丸め誤差が生じます。量子力学でエネルギー準位などが離散的になる現象とは仕組みが違います。また量子コンピュータは、重みを低ビット化する装置ではなく、量子力学に従う状態を計算資源として使います。\n\n## 質問対象\n\n量子化\n\n## 質問\n\nこれはLLMの量子化と同じ意味ですか？",
+      "request": {
+        "model": "google/gemma-4-12b-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用された箇所を質問対象として、日本語で質問に直接答えてください。最初のUser Messageに含まれる情報だけを新しい会話の前提として扱い、過去会話の履歴が別に存在すると仮定しないでください。対象を特定できない場合は断定せず、不足を述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "## 前の会話からの参考文脈\n\n[T1 / User]\n量子力学、LLMモデル、量子コンピュータで「量子」や似た言葉が出てきます。そもそも同じ意味なのでしょうか。\n\n[T2 / Assistant]\n共通する核は、連続的に見える量を飛び飛びの単位や有限個の値として扱うことです。時計の針で例えるなら、どこでも止まれる針ではなく、決められた目盛りだけに止まる時計です。ただし物理では許される値が系の法則から決まり、工学では計算しやすい段階へ人為的に丸めます。似た言葉でも原因と目的は異なります。\n\n[T3 / User]\nLLMモデルでは、重みを4ビットや8ビットにする話を聞きます。時計の目盛りを粗くするのと同じですか。\n\n[T4 / Assistant / Target]\nLLMでは多数の重みを、表現できる値が少ない4ビットや8ビットへ近似します。この工学的な処理を量子化と呼び、容量や計算量を減らす代わりに丸め誤差が生じます。量子力学でエネルギー準位などが離散的になる現象とは仕組みが違います。また量子コンピュータは、重みを低ビット化する装置ではなく、量子力学に従う状態を計算資源として使います。\n\n## 質問対象\n\n量子化\n\n## 質問\n\nこれはLLMの量子化と同じ意味ですか？"
+          }
+        ]
+      },
+      "automatic": {
+        "system_user_only": true,
+        "old_history_not_sent_as_messages": true,
+        "turn_order_preserved": true,
+        "target_turn_included_exactly_once": true,
+        "marker_unique_in_target": true,
+        "marker_included": true,
+        "question_included": true,
+        "fixed_settings": true,
+        "no_automatic_retry": true,
+        "no_production_db_write": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "new-chat-handoff-natural-v0.4",
+      "case_id": "A",
+      "condition": "Wide",
+      "source_conversation": "Quantum natural conversation fixture",
+      "target_turn": "T4",
+      "included_turn_numbers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4",
+        "T5"
+      ],
+      "included_turn_count": 5,
+      "input_chars": 615,
+      "marker_source_text": "量子化",
+      "question": "これはLLMの量子化と同じ意味ですか？",
+      "first_user_message": "## 前の会話からの参考文脈\n\n[T1 / User]\n量子力学、LLMモデル、量子コンピュータで「量子」や似た言葉が出てきます。そもそも同じ意味なのでしょうか。\n\n[T2 / Assistant]\n共通する核は、連続的に見える量を飛び飛びの単位や有限個の値として扱うことです。時計の針で例えるなら、どこでも止まれる針ではなく、決められた目盛りだけに止まる時計です。ただし物理では許される値が系の法則から決まり、工学では計算しやすい段階へ人為的に丸めます。似た言葉でも原因と目的は異なります。\n\n[T3 / User]\nLLMモデルでは、重みを4ビットや8ビットにする話を聞きます。時計の目盛りを粗くするのと同じですか。\n\n[T4 / Assistant / Target]\nLLMでは多数の重みを、表現できる値が少ない4ビットや8ビットへ近似します。この工学的な処理を量子化と呼び、容量や計算量を減らす代わりに丸め誤差が生じます。量子力学でエネルギー準位などが離散的になる現象とは仕組みが違います。また量子コンピュータは、重みを低ビット化する装置ではなく、量子力学に従う状態を計算資源として使います。\n\n[T5 / User]\n量子コンピュータでは、電子スピンの二つの測定結果を0と1に対応させると聞きました。普通のデジタルビットと同じですか。\n\n## 質問対象\n\n量子化\n\n## 質問\n\nこれはLLMの量子化と同じ意味ですか？",
+      "request": {
+        "model": "google/gemma-4-12b-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用された箇所を質問対象として、日本語で質問に直接答えてください。最初のUser Messageに含まれる情報だけを新しい会話の前提として扱い、過去会話の履歴が別に存在すると仮定しないでください。対象を特定できない場合は断定せず、不足を述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "## 前の会話からの参考文脈\n\n[T1 / User]\n量子力学、LLMモデル、量子コンピュータで「量子」や似た言葉が出てきます。そもそも同じ意味なのでしょうか。\n\n[T2 / Assistant]\n共通する核は、連続的に見える量を飛び飛びの単位や有限個の値として扱うことです。時計の針で例えるなら、どこでも止まれる針ではなく、決められた目盛りだけに止まる時計です。ただし物理では許される値が系の法則から決まり、工学では計算しやすい段階へ人為的に丸めます。似た言葉でも原因と目的は異なります。\n\n[T3 / User]\nLLMモデルでは、重みを4ビットや8ビットにする話を聞きます。時計の目盛りを粗くするのと同じですか。\n\n[T4 / Assistant / Target]\nLLMでは多数の重みを、表現できる値が少ない4ビットや8ビットへ近似します。この工学的な処理を量子化と呼び、容量や計算量を減らす代わりに丸め誤差が生じます。量子力学でエネルギー準位などが離散的になる現象とは仕組みが違います。また量子コンピュータは、重みを低ビット化する装置ではなく、量子力学に従う状態を計算資源として使います。\n\n[T5 / User]\n量子コンピュータでは、電子スピンの二つの測定結果を0と1に対応させると聞きました。普通のデジタルビットと同じですか。\n\n## 質問対象\n\n量子化\n\n## 質問\n\nこれはLLMの量子化と同じ意味ですか？"
+          }
+        ]
+      },
+      "automatic": {
+        "system_user_only": true,
+        "old_history_not_sent_as_messages": true,
+        "turn_order_preserved": true,
+        "target_turn_included_exactly_once": true,
+        "marker_unique_in_target": true,
+        "marker_included": true,
+        "question_included": true,
+        "fixed_settings": true,
+        "no_automatic_retry": true,
+        "no_production_db_write": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "new-chat-handoff-natural-v0.4",
+      "case_id": "B",
+      "condition": "Minimal",
+      "source_conversation": "Quantum natural conversation fixture",
+      "target_turn": "T8",
+      "included_turn_numbers": [
+        "T7",
+        "T8"
+      ],
+      "included_turn_count": 2,
+      "input_chars": 329,
+      "marker_source_text": "重ね合わせ",
+      "question": "これがあると、なぜ計算に有利になるのですか？",
+      "first_user_message": "## 前の会話からの参考文脈\n\n[T7 / User]\n0か1を測定すると一つしか得られないのに、そのような状態を使うと、なぜ計算に有利になるのですか。\n\n[T8 / Assistant / Target]\n重ね合わせだけで答えを全部取り出せるわけではありません。量子アルゴリズムは確率振幅を干渉させ、望ましい結果へつながる振幅を強め、不要な結果の振幅を打ち消すように操作します。そのため特定の問題では必要な計算回数を減らせますが、あらゆる計算が速くなるわけではありません。単純な大量並列計算という説明だけでは、測定時に一つの結果しか得られない点を説明できません。\n\n## 質問対象\n\n重ね合わせ\n\n## 質問\n\nこれがあると、なぜ計算に有利になるのですか？",
+      "request": {
+        "model": "google/gemma-4-12b-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用された箇所を質問対象として、日本語で質問に直接答えてください。最初のUser Messageに含まれる情報だけを新しい会話の前提として扱い、過去会話の履歴が別に存在すると仮定しないでください。対象を特定できない場合は断定せず、不足を述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "## 前の会話からの参考文脈\n\n[T7 / User]\n0か1を測定すると一つしか得られないのに、そのような状態を使うと、なぜ計算に有利になるのですか。\n\n[T8 / Assistant / Target]\n重ね合わせだけで答えを全部取り出せるわけではありません。量子アルゴリズムは確率振幅を干渉させ、望ましい結果へつながる振幅を強め、不要な結果の振幅を打ち消すように操作します。そのため特定の問題では必要な計算回数を減らせますが、あらゆる計算が速くなるわけではありません。単純な大量並列計算という説明だけでは、測定時に一つの結果しか得られない点を説明できません。\n\n## 質問対象\n\n重ね合わせ\n\n## 質問\n\nこれがあると、なぜ計算に有利になるのですか？"
+          }
+        ]
+      },
+      "automatic": {
+        "system_user_only": true,
+        "old_history_not_sent_as_messages": true,
+        "turn_order_preserved": true,
+        "target_turn_included_exactly_once": true,
+        "marker_unique_in_target": true,
+        "marker_included": true,
+        "question_included": true,
+        "fixed_settings": true,
+        "no_automatic_retry": true,
+        "no_production_db_write": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "new-chat-handoff-natural-v0.4",
+      "case_id": "B",
+      "condition": "Standard",
+      "source_conversation": "Quantum natural conversation fixture",
+      "target_turn": "T8",
+      "included_turn_numbers": [
+        "T5",
+        "T6",
+        "T7",
+        "T8"
+      ],
+      "included_turn_count": 4,
+      "input_chars": 579,
+      "marker_source_text": "重ね合わせ",
+      "question": "これがあると、なぜ計算に有利になるのですか？",
+      "first_user_message": "## 前の会話からの参考文脈\n\n[T5 / User]\n量子コンピュータでは、電子スピンの二つの測定結果を0と1に対応させると聞きました。普通のデジタルビットと同じですか。\n\n[T6 / Assistant]\nある測定軸に沿った電子スピンでは、上向きと下向きという二つの結果を得られ、それぞれを|0⟩と|1⟩へ対応させられます。ただし量子ビットは測定前に、二つの基底状態へ確率振幅を持つ一つの状態を取れます。古典的な0と1が二つ隠れているわけではありません。量子ビットは電子以外にも、超伝導回路、イオン、光子などで実装できます。\n\n[T7 / User]\n0か1を測定すると一つしか得られないのに、そのような状態を使うと、なぜ計算に有利になるのですか。\n\n[T8 / Assistant / Target]\n重ね合わせだけで答えを全部取り出せるわけではありません。量子アルゴリズムは確率振幅を干渉させ、望ましい結果へつながる振幅を強め、不要な結果の振幅を打ち消すように操作します。そのため特定の問題では必要な計算回数を減らせますが、あらゆる計算が速くなるわけではありません。単純な大量並列計算という説明だけでは、測定時に一つの結果しか得られない点を説明できません。\n\n## 質問対象\n\n重ね合わせ\n\n## 質問\n\nこれがあると、なぜ計算に有利になるのですか？",
+      "request": {
+        "model": "google/gemma-4-12b-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用された箇所を質問対象として、日本語で質問に直接答えてください。最初のUser Messageに含まれる情報だけを新しい会話の前提として扱い、過去会話の履歴が別に存在すると仮定しないでください。対象を特定できない場合は断定せず、不足を述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "## 前の会話からの参考文脈\n\n[T5 / User]\n量子コンピュータでは、電子スピンの二つの測定結果を0と1に対応させると聞きました。普通のデジタルビットと同じですか。\n\n[T6 / Assistant]\nある測定軸に沿った電子スピンでは、上向きと下向きという二つの結果を得られ、それぞれを|0⟩と|1⟩へ対応させられます。ただし量子ビットは測定前に、二つの基底状態へ確率振幅を持つ一つの状態を取れます。古典的な0と1が二つ隠れているわけではありません。量子ビットは電子以外にも、超伝導回路、イオン、光子などで実装できます。\n\n[T7 / User]\n0か1を測定すると一つしか得られないのに、そのような状態を使うと、なぜ計算に有利になるのですか。\n\n[T8 / Assistant / Target]\n重ね合わせだけで答えを全部取り出せるわけではありません。量子アルゴリズムは確率振幅を干渉させ、望ましい結果へつながる振幅を強め、不要な結果の振幅を打ち消すように操作します。そのため特定の問題では必要な計算回数を減らせますが、あらゆる計算が速くなるわけではありません。単純な大量並列計算という説明だけでは、測定時に一つの結果しか得られない点を説明できません。\n\n## 質問対象\n\n重ね合わせ\n\n## 質問\n\nこれがあると、なぜ計算に有利になるのですか？"
+          }
+        ]
+      },
+      "automatic": {
+        "system_user_only": true,
+        "old_history_not_sent_as_messages": true,
+        "turn_order_preserved": true,
+        "target_turn_included_exactly_once": true,
+        "marker_unique_in_target": true,
+        "marker_included": true,
+        "question_included": true,
+        "fixed_settings": true,
+        "no_automatic_retry": true,
+        "no_production_db_write": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "new-chat-handoff-natural-v0.4",
+      "case_id": "B",
+      "condition": "Wide",
+      "source_conversation": "Quantum natural conversation fixture",
+      "target_turn": "T8",
+      "included_turn_numbers": [
+        "T3",
+        "T4",
+        "T5",
+        "T6",
+        "T7",
+        "T8"
+      ],
+      "included_turn_count": 6,
+      "input_chars": 825,
+      "marker_source_text": "重ね合わせ",
+      "question": "これがあると、なぜ計算に有利になるのですか？",
+      "first_user_message": "## 前の会話からの参考文脈\n\n[T3 / User]\nLLMモデルでは、重みを4ビットや8ビットにする話を聞きます。時計の目盛りを粗くするのと同じですか。\n\n[T4 / Assistant]\nLLMでは多数の重みを、表現できる値が少ない4ビットや8ビットへ近似します。この工学的な処理を量子化と呼び、容量や計算量を減らす代わりに丸め誤差が生じます。量子力学でエネルギー準位などが離散的になる現象とは仕組みが違います。また量子コンピュータは、重みを低ビット化する装置ではなく、量子力学に従う状態を計算資源として使います。\n\n[T5 / User]\n量子コンピュータでは、電子スピンの二つの測定結果を0と1に対応させると聞きました。普通のデジタルビットと同じですか。\n\n[T6 / Assistant]\nある測定軸に沿った電子スピンでは、上向きと下向きという二つの結果を得られ、それぞれを|0⟩と|1⟩へ対応させられます。ただし量子ビットは測定前に、二つの基底状態へ確率振幅を持つ一つの状態を取れます。古典的な0と1が二つ隠れているわけではありません。量子ビットは電子以外にも、超伝導回路、イオン、光子などで実装できます。\n\n[T7 / User]\n0か1を測定すると一つしか得られないのに、そのような状態を使うと、なぜ計算に有利になるのですか。\n\n[T8 / Assistant / Target]\n重ね合わせだけで答えを全部取り出せるわけではありません。量子アルゴリズムは確率振幅を干渉させ、望ましい結果へつながる振幅を強め、不要な結果の振幅を打ち消すように操作します。そのため特定の問題では必要な計算回数を減らせますが、あらゆる計算が速くなるわけではありません。単純な大量並列計算という説明だけでは、測定時に一つの結果しか得られない点を説明できません。\n\n## 質問対象\n\n重ね合わせ\n\n## 質問\n\nこれがあると、なぜ計算に有利になるのですか？",
+      "request": {
+        "model": "google/gemma-4-12b-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用された箇所を質問対象として、日本語で質問に直接答えてください。最初のUser Messageに含まれる情報だけを新しい会話の前提として扱い、過去会話の履歴が別に存在すると仮定しないでください。対象を特定できない場合は断定せず、不足を述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "## 前の会話からの参考文脈\n\n[T3 / User]\nLLMモデルでは、重みを4ビットや8ビットにする話を聞きます。時計の目盛りを粗くするのと同じですか。\n\n[T4 / Assistant]\nLLMでは多数の重みを、表現できる値が少ない4ビットや8ビットへ近似します。この工学的な処理を量子化と呼び、容量や計算量を減らす代わりに丸め誤差が生じます。量子力学でエネルギー準位などが離散的になる現象とは仕組みが違います。また量子コンピュータは、重みを低ビット化する装置ではなく、量子力学に従う状態を計算資源として使います。\n\n[T5 / User]\n量子コンピュータでは、電子スピンの二つの測定結果を0と1に対応させると聞きました。普通のデジタルビットと同じですか。\n\n[T6 / Assistant]\nある測定軸に沿った電子スピンでは、上向きと下向きという二つの結果を得られ、それぞれを|0⟩と|1⟩へ対応させられます。ただし量子ビットは測定前に、二つの基底状態へ確率振幅を持つ一つの状態を取れます。古典的な0と1が二つ隠れているわけではありません。量子ビットは電子以外にも、超伝導回路、イオン、光子などで実装できます。\n\n[T7 / User]\n0か1を測定すると一つしか得られないのに、そのような状態を使うと、なぜ計算に有利になるのですか。\n\n[T8 / Assistant / Target]\n重ね合わせだけで答えを全部取り出せるわけではありません。量子アルゴリズムは確率振幅を干渉させ、望ましい結果へつながる振幅を強め、不要な結果の振幅を打ち消すように操作します。そのため特定の問題では必要な計算回数を減らせますが、あらゆる計算が速くなるわけではありません。単純な大量並列計算という説明だけでは、測定時に一つの結果しか得られない点を説明できません。\n\n## 質問対象\n\n重ね合わせ\n\n## 質問\n\nこれがあると、なぜ計算に有利になるのですか？"
+          }
+        ]
+      },
+      "automatic": {
+        "system_user_only": true,
+        "old_history_not_sent_as_messages": true,
+        "turn_order_preserved": true,
+        "target_turn_included_exactly_once": true,
+        "marker_unique_in_target": true,
+        "marker_included": true,
+        "question_included": true,
+        "fixed_settings": true,
+        "no_automatic_retry": true,
+        "no_production_db_write": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "new-chat-handoff-natural-v0.4",
+      "case_id": "C",
+      "condition": "Minimal",
+      "source_conversation": "Quantum natural conversation fixture",
+      "target_turn": "T6",
+      "included_turn_numbers": [
+        "T5",
+        "T6"
+      ],
+      "included_turn_count": 2,
+      "input_chars": 319,
+      "marker_source_text": "上向きと下向き",
+      "question": "これはそのまま0と1という意味ですか？",
+      "first_user_message": "## 前の会話からの参考文脈\n\n[T5 / User]\n量子コンピュータでは、電子スピンの二つの測定結果を0と1に対応させると聞きました。普通のデジタルビットと同じですか。\n\n[T6 / Assistant / Target]\nある測定軸に沿った電子スピンでは、上向きと下向きという二つの結果を得られ、それぞれを|0⟩と|1⟩へ対応させられます。ただし量子ビットは測定前に、二つの基底状態へ確率振幅を持つ一つの状態を取れます。古典的な0と1が二つ隠れているわけではありません。量子ビットは電子以外にも、超伝導回路、イオン、光子などで実装できます。\n\n## 質問対象\n\n上向きと下向き\n\n## 質問\n\nこれはそのまま0と1という意味ですか？",
+      "request": {
+        "model": "google/gemma-4-12b-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用された箇所を質問対象として、日本語で質問に直接答えてください。最初のUser Messageに含まれる情報だけを新しい会話の前提として扱い、過去会話の履歴が別に存在すると仮定しないでください。対象を特定できない場合は断定せず、不足を述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "## 前の会話からの参考文脈\n\n[T5 / User]\n量子コンピュータでは、電子スピンの二つの測定結果を0と1に対応させると聞きました。普通のデジタルビットと同じですか。\n\n[T6 / Assistant / Target]\nある測定軸に沿った電子スピンでは、上向きと下向きという二つの結果を得られ、それぞれを|0⟩と|1⟩へ対応させられます。ただし量子ビットは測定前に、二つの基底状態へ確率振幅を持つ一つの状態を取れます。古典的な0と1が二つ隠れているわけではありません。量子ビットは電子以外にも、超伝導回路、イオン、光子などで実装できます。\n\n## 質問対象\n\n上向きと下向き\n\n## 質問\n\nこれはそのまま0と1という意味ですか？"
+          }
+        ]
+      },
+      "automatic": {
+        "system_user_only": true,
+        "old_history_not_sent_as_messages": true,
+        "turn_order_preserved": true,
+        "target_turn_included_exactly_once": true,
+        "marker_unique_in_target": true,
+        "marker_included": true,
+        "question_included": true,
+        "fixed_settings": true,
+        "no_automatic_retry": true,
+        "no_production_db_write": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "new-chat-handoff-natural-v0.4",
+      "case_id": "C",
+      "condition": "Standard",
+      "source_conversation": "Quantum natural conversation fixture",
+      "target_turn": "T6",
+      "included_turn_numbers": [
+        "T3",
+        "T4",
+        "T5",
+        "T6"
+      ],
+      "included_turn_count": 4,
+      "input_chars": 565,
+      "marker_source_text": "上向きと下向き",
+      "question": "これはそのまま0と1という意味ですか？",
+      "first_user_message": "## 前の会話からの参考文脈\n\n[T3 / User]\nLLMモデルでは、重みを4ビットや8ビットにする話を聞きます。時計の目盛りを粗くするのと同じですか。\n\n[T4 / Assistant]\nLLMでは多数の重みを、表現できる値が少ない4ビットや8ビットへ近似します。この工学的な処理を量子化と呼び、容量や計算量を減らす代わりに丸め誤差が生じます。量子力学でエネルギー準位などが離散的になる現象とは仕組みが違います。また量子コンピュータは、重みを低ビット化する装置ではなく、量子力学に従う状態を計算資源として使います。\n\n[T5 / User]\n量子コンピュータでは、電子スピンの二つの測定結果を0と1に対応させると聞きました。普通のデジタルビットと同じですか。\n\n[T6 / Assistant / Target]\nある測定軸に沿った電子スピンでは、上向きと下向きという二つの結果を得られ、それぞれを|0⟩と|1⟩へ対応させられます。ただし量子ビットは測定前に、二つの基底状態へ確率振幅を持つ一つの状態を取れます。古典的な0と1が二つ隠れているわけではありません。量子ビットは電子以外にも、超伝導回路、イオン、光子などで実装できます。\n\n## 質問対象\n\n上向きと下向き\n\n## 質問\n\nこれはそのまま0と1という意味ですか？",
+      "request": {
+        "model": "google/gemma-4-12b-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用された箇所を質問対象として、日本語で質問に直接答えてください。最初のUser Messageに含まれる情報だけを新しい会話の前提として扱い、過去会話の履歴が別に存在すると仮定しないでください。対象を特定できない場合は断定せず、不足を述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "## 前の会話からの参考文脈\n\n[T3 / User]\nLLMモデルでは、重みを4ビットや8ビットにする話を聞きます。時計の目盛りを粗くするのと同じですか。\n\n[T4 / Assistant]\nLLMでは多数の重みを、表現できる値が少ない4ビットや8ビットへ近似します。この工学的な処理を量子化と呼び、容量や計算量を減らす代わりに丸め誤差が生じます。量子力学でエネルギー準位などが離散的になる現象とは仕組みが違います。また量子コンピュータは、重みを低ビット化する装置ではなく、量子力学に従う状態を計算資源として使います。\n\n[T5 / User]\n量子コンピュータでは、電子スピンの二つの測定結果を0と1に対応させると聞きました。普通のデジタルビットと同じですか。\n\n[T6 / Assistant / Target]\nある測定軸に沿った電子スピンでは、上向きと下向きという二つの結果を得られ、それぞれを|0⟩と|1⟩へ対応させられます。ただし量子ビットは測定前に、二つの基底状態へ確率振幅を持つ一つの状態を取れます。古典的な0と1が二つ隠れているわけではありません。量子ビットは電子以外にも、超伝導回路、イオン、光子などで実装できます。\n\n## 質問対象\n\n上向きと下向き\n\n## 質問\n\nこれはそのまま0と1という意味ですか？"
+          }
+        ]
+      },
+      "automatic": {
+        "system_user_only": true,
+        "old_history_not_sent_as_messages": true,
+        "turn_order_preserved": true,
+        "target_turn_included_exactly_once": true,
+        "marker_unique_in_target": true,
+        "marker_included": true,
+        "question_included": true,
+        "fixed_settings": true,
+        "no_automatic_retry": true,
+        "no_production_db_write": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "new-chat-handoff-natural-v0.4",
+      "case_id": "C",
+      "condition": "Wide",
+      "source_conversation": "Quantum natural conversation fixture",
+      "target_turn": "T6",
+      "included_turn_numbers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4",
+        "T5",
+        "T6",
+        "T7"
+      ],
+      "included_turn_count": 7,
+      "input_chars": 859,
+      "marker_source_text": "上向きと下向き",
+      "question": "これはそのまま0と1という意味ですか？",
+      "first_user_message": "## 前の会話からの参考文脈\n\n[T1 / User]\n量子力学、LLMモデル、量子コンピュータで「量子」や似た言葉が出てきます。そもそも同じ意味なのでしょうか。\n\n[T2 / Assistant]\n共通する核は、連続的に見える量を飛び飛びの単位や有限個の値として扱うことです。時計の針で例えるなら、どこでも止まれる針ではなく、決められた目盛りだけに止まる時計です。ただし物理では許される値が系の法則から決まり、工学では計算しやすい段階へ人為的に丸めます。似た言葉でも原因と目的は異なります。\n\n[T3 / User]\nLLMモデルでは、重みを4ビットや8ビットにする話を聞きます。時計の目盛りを粗くするのと同じですか。\n\n[T4 / Assistant]\nLLMでは多数の重みを、表現できる値が少ない4ビットや8ビットへ近似します。この工学的な処理を量子化と呼び、容量や計算量を減らす代わりに丸め誤差が生じます。量子力学でエネルギー準位などが離散的になる現象とは仕組みが違います。また量子コンピュータは、重みを低ビット化する装置ではなく、量子力学に従う状態を計算資源として使います。\n\n[T5 / User]\n量子コンピュータでは、電子スピンの二つの測定結果を0と1に対応させると聞きました。普通のデジタルビットと同じですか。\n\n[T6 / Assistant / Target]\nある測定軸に沿った電子スピンでは、上向きと下向きという二つの結果を得られ、それぞれを|0⟩と|1⟩へ対応させられます。ただし量子ビットは測定前に、二つの基底状態へ確率振幅を持つ一つの状態を取れます。古典的な0と1が二つ隠れているわけではありません。量子ビットは電子以外にも、超伝導回路、イオン、光子などで実装できます。\n\n[T7 / User]\n0か1を測定すると一つしか得られないのに、そのような状態を使うと、なぜ計算に有利になるのですか。\n\n## 質問対象\n\n上向きと下向き\n\n## 質問\n\nこれはそのまま0と1という意味ですか？",
+      "request": {
+        "model": "google/gemma-4-12b-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用された箇所を質問対象として、日本語で質問に直接答えてください。最初のUser Messageに含まれる情報だけを新しい会話の前提として扱い、過去会話の履歴が別に存在すると仮定しないでください。対象を特定できない場合は断定せず、不足を述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "## 前の会話からの参考文脈\n\n[T1 / User]\n量子力学、LLMモデル、量子コンピュータで「量子」や似た言葉が出てきます。そもそも同じ意味なのでしょうか。\n\n[T2 / Assistant]\n共通する核は、連続的に見える量を飛び飛びの単位や有限個の値として扱うことです。時計の針で例えるなら、どこでも止まれる針ではなく、決められた目盛りだけに止まる時計です。ただし物理では許される値が系の法則から決まり、工学では計算しやすい段階へ人為的に丸めます。似た言葉でも原因と目的は異なります。\n\n[T3 / User]\nLLMモデルでは、重みを4ビットや8ビットにする話を聞きます。時計の目盛りを粗くするのと同じですか。\n\n[T4 / Assistant]\nLLMでは多数の重みを、表現できる値が少ない4ビットや8ビットへ近似します。この工学的な処理を量子化と呼び、容量や計算量を減らす代わりに丸め誤差が生じます。量子力学でエネルギー準位などが離散的になる現象とは仕組みが違います。また量子コンピュータは、重みを低ビット化する装置ではなく、量子力学に従う状態を計算資源として使います。\n\n[T5 / User]\n量子コンピュータでは、電子スピンの二つの測定結果を0と1に対応させると聞きました。普通のデジタルビットと同じですか。\n\n[T6 / Assistant / Target]\nある測定軸に沿った電子スピンでは、上向きと下向きという二つの結果を得られ、それぞれを|0⟩と|1⟩へ対応させられます。ただし量子ビットは測定前に、二つの基底状態へ確率振幅を持つ一つの状態を取れます。古典的な0と1が二つ隠れているわけではありません。量子ビットは電子以外にも、超伝導回路、イオン、光子などで実装できます。\n\n[T7 / User]\n0か1を測定すると一つしか得られないのに、そのような状態を使うと、なぜ計算に有利になるのですか。\n\n## 質問対象\n\n上向きと下向き\n\n## 質問\n\nこれはそのまま0と1という意味ですか？"
+          }
+        ]
+      },
+      "automatic": {
+        "system_user_only": true,
+        "old_history_not_sent_as_messages": true,
+        "turn_order_preserved": true,
+        "target_turn_included_exactly_once": true,
+        "marker_unique_in_target": true,
+        "marker_included": true,
+        "question_included": true,
+        "fixed_settings": true,
+        "no_automatic_retry": true,
+        "no_production_db_write": true
+      },
+      "human_review": "pending"
+    }
+  ]
+}

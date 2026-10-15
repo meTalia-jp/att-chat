@@ -1,0 +1,563 @@
+{
+  "previews": [
+    {
+      "experiment": "new-chat-handoff-user-reasoning-v0.5",
+      "case_id": "A",
+      "condition": "Minimal",
+      "source_conversation": "User reasoning continuity fixture",
+      "target_turn": "T2",
+      "included_turn_numbers": [
+        "T1",
+        "T2"
+      ],
+      "included_turn_count": 2,
+      "input_chars": 306,
+      "marker_source_text": "毎秒2cで縮みます",
+      "question": "じゃあ最初に私が言っていた「相対速度も光速でOK」は、どこが違うの？",
+      "first_user_message": "## 前の会話からの参考文脈\n\n[T1 / User]\n対向する光の相対速度は一見、光速×2倍のように思えるが、光速度以上の速度はないので、相対速度も光速でOK？？\n\n[T2 / Assistant / Target]\n二つの意味を分ける必要があります。\n地上の観測者から見れば、二つの光の間隔は毎秒2cで縮みます。\nこれは接近速度であり、一つの光が2cで運動しているという意味ではありません。\n一方の光から見た他方の速度は、光の静止系を作れないため通常の相対速度として定義できません。\n\n## 質問対象\n\n毎秒2cで縮みます\n\n## 質問\n\nじゃあ最初に私が言っていた「相対速度も光速でOK」は、どこが違うの？",
+      "request": {
+        "model": "google/gemma-4-12b-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用された箇所を質問対象として、日本語で質問に直接答えてください。最初のUser Messageに含まれる情報だけを新しい会話の前提として扱い、過去会話の履歴が別に存在すると仮定しないでください。対象を特定できない場合は断定せず、不足を述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "## 前の会話からの参考文脈\n\n[T1 / User]\n対向する光の相対速度は一見、光速×2倍のように思えるが、光速度以上の速度はないので、相対速度も光速でOK？？\n\n[T2 / Assistant / Target]\n二つの意味を分ける必要があります。\n地上の観測者から見れば、二つの光の間隔は毎秒2cで縮みます。\nこれは接近速度であり、一つの光が2cで運動しているという意味ではありません。\n一方の光から見た他方の速度は、光の静止系を作れないため通常の相対速度として定義できません。\n\n## 質問対象\n\n毎秒2cで縮みます\n\n## 質問\n\nじゃあ最初に私が言っていた「相対速度も光速でOK」は、どこが違うの？"
+          }
+        ]
+      },
+      "automatic": {
+        "system_user_only": true,
+        "old_history_not_sent_as_messages": true,
+        "turn_order_preserved": true,
+        "target_turn_included_exactly_once": true,
+        "marker_unique_in_target": true,
+        "marker_included": true,
+        "question_included": true,
+        "fixed_settings": true,
+        "no_automatic_retry": true,
+        "no_production_db_write": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "new-chat-handoff-user-reasoning-v0.5",
+      "case_id": "A",
+      "condition": "Standard",
+      "source_conversation": "User reasoning continuity fixture",
+      "target_turn": "T2",
+      "included_turn_numbers": [
+        "T1",
+        "T2"
+      ],
+      "included_turn_count": 2,
+      "input_chars": 306,
+      "marker_source_text": "毎秒2cで縮みます",
+      "question": "じゃあ最初に私が言っていた「相対速度も光速でOK」は、どこが違うの？",
+      "first_user_message": "## 前の会話からの参考文脈\n\n[T1 / User]\n対向する光の相対速度は一見、光速×2倍のように思えるが、光速度以上の速度はないので、相対速度も光速でOK？？\n\n[T2 / Assistant / Target]\n二つの意味を分ける必要があります。\n地上の観測者から見れば、二つの光の間隔は毎秒2cで縮みます。\nこれは接近速度であり、一つの光が2cで運動しているという意味ではありません。\n一方の光から見た他方の速度は、光の静止系を作れないため通常の相対速度として定義できません。\n\n## 質問対象\n\n毎秒2cで縮みます\n\n## 質問\n\nじゃあ最初に私が言っていた「相対速度も光速でOK」は、どこが違うの？",
+      "request": {
+        "model": "google/gemma-4-12b-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用された箇所を質問対象として、日本語で質問に直接答えてください。最初のUser Messageに含まれる情報だけを新しい会話の前提として扱い、過去会話の履歴が別に存在すると仮定しないでください。対象を特定できない場合は断定せず、不足を述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "## 前の会話からの参考文脈\n\n[T1 / User]\n対向する光の相対速度は一見、光速×2倍のように思えるが、光速度以上の速度はないので、相対速度も光速でOK？？\n\n[T2 / Assistant / Target]\n二つの意味を分ける必要があります。\n地上の観測者から見れば、二つの光の間隔は毎秒2cで縮みます。\nこれは接近速度であり、一つの光が2cで運動しているという意味ではありません。\n一方の光から見た他方の速度は、光の静止系を作れないため通常の相対速度として定義できません。\n\n## 質問対象\n\n毎秒2cで縮みます\n\n## 質問\n\nじゃあ最初に私が言っていた「相対速度も光速でOK」は、どこが違うの？"
+          }
+        ]
+      },
+      "automatic": {
+        "system_user_only": true,
+        "old_history_not_sent_as_messages": true,
+        "turn_order_preserved": true,
+        "target_turn_included_exactly_once": true,
+        "marker_unique_in_target": true,
+        "marker_included": true,
+        "question_included": true,
+        "fixed_settings": true,
+        "no_automatic_retry": true,
+        "no_production_db_write": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "new-chat-handoff-user-reasoning-v0.5",
+      "case_id": "A",
+      "condition": "Wide",
+      "source_conversation": "User reasoning continuity fixture",
+      "target_turn": "T2",
+      "included_turn_numbers": [
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "included_turn_count": 3,
+      "input_chars": 401,
+      "marker_source_text": "毎秒2cで縮みます",
+      "question": "じゃあ最初に私が言っていた「相対速度も光速でOK」は、どこが違うの？",
+      "first_user_message": "## 前の会話からの参考文脈\n\n[T1 / User]\n対向する光の相対速度は一見、光速×2倍のように思えるが、光速度以上の速度はないので、相対速度も光速でOK？？\n\n[T2 / Assistant / Target]\n二つの意味を分ける必要があります。\n地上の観測者から見れば、二つの光の間隔は毎秒2cで縮みます。\nこれは接近速度であり、一つの光が2cで運動しているという意味ではありません。\n一方の光から見た他方の速度は、光の静止系を作れないため通常の相対速度として定義できません。\n\n[T3 / User]\n2cになるのは距離の縮み方であって、光そのものの速度ではないのですね。\n光については「波であり粒子である」とも言いますが、実際には波でも粒子でもないのでしょうか。\n\n## 質問対象\n\n毎秒2cで縮みます\n\n## 質問\n\nじゃあ最初に私が言っていた「相対速度も光速でOK」は、どこが違うの？",
+      "request": {
+        "model": "google/gemma-4-12b-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用された箇所を質問対象として、日本語で質問に直接答えてください。最初のUser Messageに含まれる情報だけを新しい会話の前提として扱い、過去会話の履歴が別に存在すると仮定しないでください。対象を特定できない場合は断定せず、不足を述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "## 前の会話からの参考文脈\n\n[T1 / User]\n対向する光の相対速度は一見、光速×2倍のように思えるが、光速度以上の速度はないので、相対速度も光速でOK？？\n\n[T2 / Assistant / Target]\n二つの意味を分ける必要があります。\n地上の観測者から見れば、二つの光の間隔は毎秒2cで縮みます。\nこれは接近速度であり、一つの光が2cで運動しているという意味ではありません。\n一方の光から見た他方の速度は、光の静止系を作れないため通常の相対速度として定義できません。\n\n[T3 / User]\n2cになるのは距離の縮み方であって、光そのものの速度ではないのですね。\n光については「波であり粒子である」とも言いますが、実際には波でも粒子でもないのでしょうか。\n\n## 質問対象\n\n毎秒2cで縮みます\n\n## 質問\n\nじゃあ最初に私が言っていた「相対速度も光速でOK」は、どこが違うの？"
+          }
+        ]
+      },
+      "automatic": {
+        "system_user_only": true,
+        "old_history_not_sent_as_messages": true,
+        "turn_order_preserved": true,
+        "target_turn_included_exactly_once": true,
+        "marker_unique_in_target": true,
+        "marker_included": true,
+        "question_included": true,
+        "fixed_settings": true,
+        "no_automatic_retry": true,
+        "no_production_db_write": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "new-chat-handoff-user-reasoning-v0.5",
+      "case_id": "B",
+      "condition": "Minimal",
+      "source_conversation": "User reasoning continuity fixture",
+      "target_turn": "T4",
+      "included_turn_numbers": [
+        "T3",
+        "T4"
+      ],
+      "included_turn_count": 2,
+      "input_chars": 329,
+      "marker_source_text": "波でも粒子でもない",
+      "question": "私が考えた「波でも粒子でもない」という言い方でもよいの？",
+      "first_user_message": "## 前の会話からの参考文脈\n\n[T3 / User]\n2cになるのは距離の縮み方であって、光そのものの速度ではないのですね。\n光については「波であり粒子である」とも言いますが、実際には波でも粒子でもないのでしょうか。\n\n[T4 / Assistant / Target]\n光は古典的な波にも古典的な粒子にも完全には一致しません。\n干渉や回折では波のような性質が現れ、検出では一個ずつ局所的に現れます。\n「波でもあり粒子でもある」は両方の特徴が現れるという意味で、\n「波でも粒子でもない」はどちらの古典概念にも完全には収まらないという意味です。\n\n## 質問対象\n\n波でも粒子でもない\n\n## 質問\n\n私が考えた「波でも粒子でもない」という言い方でもよいの？",
+      "request": {
+        "model": "google/gemma-4-12b-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用された箇所を質問対象として、日本語で質問に直接答えてください。最初のUser Messageに含まれる情報だけを新しい会話の前提として扱い、過去会話の履歴が別に存在すると仮定しないでください。対象を特定できない場合は断定せず、不足を述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "## 前の会話からの参考文脈\n\n[T3 / User]\n2cになるのは距離の縮み方であって、光そのものの速度ではないのですね。\n光については「波であり粒子である」とも言いますが、実際には波でも粒子でもないのでしょうか。\n\n[T4 / Assistant / Target]\n光は古典的な波にも古典的な粒子にも完全には一致しません。\n干渉や回折では波のような性質が現れ、検出では一個ずつ局所的に現れます。\n「波でもあり粒子でもある」は両方の特徴が現れるという意味で、\n「波でも粒子でもない」はどちらの古典概念にも完全には収まらないという意味です。\n\n## 質問対象\n\n波でも粒子でもない\n\n## 質問\n\n私が考えた「波でも粒子でもない」という言い方でもよいの？"
+          }
+        ]
+      },
+      "automatic": {
+        "system_user_only": true,
+        "old_history_not_sent_as_messages": true,
+        "turn_order_preserved": true,
+        "target_turn_included_exactly_once": true,
+        "marker_unique_in_target": true,
+        "marker_included": true,
+        "question_included": true,
+        "fixed_settings": true,
+        "no_automatic_retry": true,
+        "no_production_db_write": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "new-chat-handoff-user-reasoning-v0.5",
+      "case_id": "B",
+      "condition": "Standard",
+      "source_conversation": "User reasoning continuity fixture",
+      "target_turn": "T4",
+      "included_turn_numbers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "included_turn_count": 4,
+      "input_chars": 549,
+      "marker_source_text": "波でも粒子でもない",
+      "question": "私が考えた「波でも粒子でもない」という言い方でもよいの？",
+      "first_user_message": "## 前の会話からの参考文脈\n\n[T1 / User]\n対向する光の相対速度は一見、光速×2倍のように思えるが、光速度以上の速度はないので、相対速度も光速でOK？？\n\n[T2 / Assistant]\n二つの意味を分ける必要があります。\n地上の観測者から見れば、二つの光の間隔は毎秒2cで縮みます。\nこれは接近速度であり、一つの光が2cで運動しているという意味ではありません。\n一方の光から見た他方の速度は、光の静止系を作れないため通常の相対速度として定義できません。\n\n[T3 / User]\n2cになるのは距離の縮み方であって、光そのものの速度ではないのですね。\n光については「波であり粒子である」とも言いますが、実際には波でも粒子でもないのでしょうか。\n\n[T4 / Assistant / Target]\n光は古典的な波にも古典的な粒子にも完全には一致しません。\n干渉や回折では波のような性質が現れ、検出では一個ずつ局所的に現れます。\n「波でもあり粒子でもある」は両方の特徴が現れるという意味で、\n「波でも粒子でもない」はどちらの古典概念にも完全には収まらないという意味です。\n\n## 質問対象\n\n波でも粒子でもない\n\n## 質問\n\n私が考えた「波でも粒子でもない」という言い方でもよいの？",
+      "request": {
+        "model": "google/gemma-4-12b-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用された箇所を質問対象として、日本語で質問に直接答えてください。最初のUser Messageに含まれる情報だけを新しい会話の前提として扱い、過去会話の履歴が別に存在すると仮定しないでください。対象を特定できない場合は断定せず、不足を述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "## 前の会話からの参考文脈\n\n[T1 / User]\n対向する光の相対速度は一見、光速×2倍のように思えるが、光速度以上の速度はないので、相対速度も光速でOK？？\n\n[T2 / Assistant]\n二つの意味を分ける必要があります。\n地上の観測者から見れば、二つの光の間隔は毎秒2cで縮みます。\nこれは接近速度であり、一つの光が2cで運動しているという意味ではありません。\n一方の光から見た他方の速度は、光の静止系を作れないため通常の相対速度として定義できません。\n\n[T3 / User]\n2cになるのは距離の縮み方であって、光そのものの速度ではないのですね。\n光については「波であり粒子である」とも言いますが、実際には波でも粒子でもないのでしょうか。\n\n[T4 / Assistant / Target]\n光は古典的な波にも古典的な粒子にも完全には一致しません。\n干渉や回折では波のような性質が現れ、検出では一個ずつ局所的に現れます。\n「波でもあり粒子でもある」は両方の特徴が現れるという意味で、\n「波でも粒子でもない」はどちらの古典概念にも完全には収まらないという意味です。\n\n## 質問対象\n\n波でも粒子でもない\n\n## 質問\n\n私が考えた「波でも粒子でもない」という言い方でもよいの？"
+          }
+        ]
+      },
+      "automatic": {
+        "system_user_only": true,
+        "old_history_not_sent_as_messages": true,
+        "turn_order_preserved": true,
+        "target_turn_included_exactly_once": true,
+        "marker_unique_in_target": true,
+        "marker_included": true,
+        "question_included": true,
+        "fixed_settings": true,
+        "no_automatic_retry": true,
+        "no_production_db_write": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "new-chat-handoff-user-reasoning-v0.5",
+      "case_id": "B",
+      "condition": "Wide",
+      "source_conversation": "User reasoning continuity fixture",
+      "target_turn": "T4",
+      "included_turn_numbers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4",
+        "T5"
+      ],
+      "included_turn_count": 5,
+      "input_chars": 602,
+      "marker_source_text": "波でも粒子でもない",
+      "question": "私が考えた「波でも粒子でもない」という言い方でもよいの？",
+      "first_user_message": "## 前の会話からの参考文脈\n\n[T1 / User]\n対向する光の相対速度は一見、光速×2倍のように思えるが、光速度以上の速度はないので、相対速度も光速でOK？？\n\n[T2 / Assistant]\n二つの意味を分ける必要があります。\n地上の観測者から見れば、二つの光の間隔は毎秒2cで縮みます。\nこれは接近速度であり、一つの光が2cで運動しているという意味ではありません。\n一方の光から見た他方の速度は、光の静止系を作れないため通常の相対速度として定義できません。\n\n[T3 / User]\n2cになるのは距離の縮み方であって、光そのものの速度ではないのですね。\n光については「波であり粒子である」とも言いますが、実際には波でも粒子でもないのでしょうか。\n\n[T4 / Assistant / Target]\n光は古典的な波にも古典的な粒子にも完全には一致しません。\n干渉や回折では波のような性質が現れ、検出では一個ずつ局所的に現れます。\n「波でもあり粒子でもある」は両方の特徴が現れるという意味で、\n「波でも粒子でもない」はどちらの古典概念にも完全には収まらないという意味です。\n\n[T5 / User]\n日常には存在しないものなので、正確に表現できる言葉がないということでしょうか。\n\n## 質問対象\n\n波でも粒子でもない\n\n## 質問\n\n私が考えた「波でも粒子でもない」という言い方でもよいの？",
+      "request": {
+        "model": "google/gemma-4-12b-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用された箇所を質問対象として、日本語で質問に直接答えてください。最初のUser Messageに含まれる情報だけを新しい会話の前提として扱い、過去会話の履歴が別に存在すると仮定しないでください。対象を特定できない場合は断定せず、不足を述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "## 前の会話からの参考文脈\n\n[T1 / User]\n対向する光の相対速度は一見、光速×2倍のように思えるが、光速度以上の速度はないので、相対速度も光速でOK？？\n\n[T2 / Assistant]\n二つの意味を分ける必要があります。\n地上の観測者から見れば、二つの光の間隔は毎秒2cで縮みます。\nこれは接近速度であり、一つの光が2cで運動しているという意味ではありません。\n一方の光から見た他方の速度は、光の静止系を作れないため通常の相対速度として定義できません。\n\n[T3 / User]\n2cになるのは距離の縮み方であって、光そのものの速度ではないのですね。\n光については「波であり粒子である」とも言いますが、実際には波でも粒子でもないのでしょうか。\n\n[T4 / Assistant / Target]\n光は古典的な波にも古典的な粒子にも完全には一致しません。\n干渉や回折では波のような性質が現れ、検出では一個ずつ局所的に現れます。\n「波でもあり粒子でもある」は両方の特徴が現れるという意味で、\n「波でも粒子でもない」はどちらの古典概念にも完全には収まらないという意味です。\n\n[T5 / User]\n日常には存在しないものなので、正確に表現できる言葉がないということでしょうか。\n\n## 質問対象\n\n波でも粒子でもない\n\n## 質問\n\n私が考えた「波でも粒子でもない」という言い方でもよいの？"
+          }
+        ]
+      },
+      "automatic": {
+        "system_user_only": true,
+        "old_history_not_sent_as_messages": true,
+        "turn_order_preserved": true,
+        "target_turn_included_exactly_once": true,
+        "marker_unique_in_target": true,
+        "marker_included": true,
+        "question_included": true,
+        "fixed_settings": true,
+        "no_automatic_retry": true,
+        "no_production_db_write": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "new-chat-handoff-user-reasoning-v0.5",
+      "case_id": "C",
+      "condition": "Minimal",
+      "source_conversation": "User reasoning continuity fixture",
+      "target_turn": "T6",
+      "included_turn_numbers": [
+        "T5",
+        "T6"
+      ],
+      "included_turn_count": 2,
+      "input_chars": 268,
+      "marker_source_text": "日常語だけでは表現しにくい",
+      "question": "これは「物理学でも正体が分かっていない」という意味ではないの？",
+      "first_user_message": "## 前の会話からの参考文脈\n\n[T5 / User]\n日常には存在しないものなので、正確に表現できる言葉がないということでしょうか。\n\n[T6 / Assistant / Target]\n日常語だけでは表現しにくい、という意味ではそうです。\n「粒子」「波」「スピン」なども日常語から借りた言葉ですが、量子論での意味は完全には一致しません。\n物理学では専門用語と数式で、状態や観測結果をより正確に記述します。\n\n## 質問対象\n\n日常語だけでは表現しにくい\n\n## 質問\n\nこれは「物理学でも正体が分かっていない」という意味ではないの？",
+      "request": {
+        "model": "google/gemma-4-12b-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用された箇所を質問対象として、日本語で質問に直接答えてください。最初のUser Messageに含まれる情報だけを新しい会話の前提として扱い、過去会話の履歴が別に存在すると仮定しないでください。対象を特定できない場合は断定せず、不足を述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "## 前の会話からの参考文脈\n\n[T5 / User]\n日常には存在しないものなので、正確に表現できる言葉がないということでしょうか。\n\n[T6 / Assistant / Target]\n日常語だけでは表現しにくい、という意味ではそうです。\n「粒子」「波」「スピン」なども日常語から借りた言葉ですが、量子論での意味は完全には一致しません。\n物理学では専門用語と数式で、状態や観測結果をより正確に記述します。\n\n## 質問対象\n\n日常語だけでは表現しにくい\n\n## 質問\n\nこれは「物理学でも正体が分かっていない」という意味ではないの？"
+          }
+        ]
+      },
+      "automatic": {
+        "system_user_only": true,
+        "old_history_not_sent_as_messages": true,
+        "turn_order_preserved": true,
+        "target_turn_included_exactly_once": true,
+        "marker_unique_in_target": true,
+        "marker_included": true,
+        "question_included": true,
+        "fixed_settings": true,
+        "no_automatic_retry": true,
+        "no_production_db_write": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "new-chat-handoff-user-reasoning-v0.5",
+      "case_id": "C",
+      "condition": "Standard",
+      "source_conversation": "User reasoning continuity fixture",
+      "target_turn": "T6",
+      "included_turn_numbers": [
+        "T3",
+        "T4",
+        "T5",
+        "T6"
+      ],
+      "included_turn_count": 4,
+      "input_chars": 517,
+      "marker_source_text": "日常語だけでは表現しにくい",
+      "question": "これは「物理学でも正体が分かっていない」という意味ではないの？",
+      "first_user_message": "## 前の会話からの参考文脈\n\n[T3 / User]\n2cになるのは距離の縮み方であって、光そのものの速度ではないのですね。\n光については「波であり粒子である」とも言いますが、実際には波でも粒子でもないのでしょうか。\n\n[T4 / Assistant]\n光は古典的な波にも古典的な粒子にも完全には一致しません。\n干渉や回折では波のような性質が現れ、検出では一個ずつ局所的に現れます。\n「波でもあり粒子でもある」は両方の特徴が現れるという意味で、\n「波でも粒子でもない」はどちらの古典概念にも完全には収まらないという意味です。\n\n[T5 / User]\n日常には存在しないものなので、正確に表現できる言葉がないということでしょうか。\n\n[T6 / Assistant / Target]\n日常語だけでは表現しにくい、という意味ではそうです。\n「粒子」「波」「スピン」なども日常語から借りた言葉ですが、量子論での意味は完全には一致しません。\n物理学では専門用語と数式で、状態や観測結果をより正確に記述します。\n\n## 質問対象\n\n日常語だけでは表現しにくい\n\n## 質問\n\nこれは「物理学でも正体が分かっていない」という意味ではないの？",
+      "request": {
+        "model": "google/gemma-4-12b-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用された箇所を質問対象として、日本語で質問に直接答えてください。最初のUser Messageに含まれる情報だけを新しい会話の前提として扱い、過去会話の履歴が別に存在すると仮定しないでください。対象を特定できない場合は断定せず、不足を述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "## 前の会話からの参考文脈\n\n[T3 / User]\n2cになるのは距離の縮み方であって、光そのものの速度ではないのですね。\n光については「波であり粒子である」とも言いますが、実際には波でも粒子でもないのでしょうか。\n\n[T4 / Assistant]\n光は古典的な波にも古典的な粒子にも完全には一致しません。\n干渉や回折では波のような性質が現れ、検出では一個ずつ局所的に現れます。\n「波でもあり粒子でもある」は両方の特徴が現れるという意味で、\n「波でも粒子でもない」はどちらの古典概念にも完全には収まらないという意味です。\n\n[T5 / User]\n日常には存在しないものなので、正確に表現できる言葉がないということでしょうか。\n\n[T6 / Assistant / Target]\n日常語だけでは表現しにくい、という意味ではそうです。\n「粒子」「波」「スピン」なども日常語から借りた言葉ですが、量子論での意味は完全には一致しません。\n物理学では専門用語と数式で、状態や観測結果をより正確に記述します。\n\n## 質問対象\n\n日常語だけでは表現しにくい\n\n## 質問\n\nこれは「物理学でも正体が分かっていない」という意味ではないの？"
+          }
+        ]
+      },
+      "automatic": {
+        "system_user_only": true,
+        "old_history_not_sent_as_messages": true,
+        "turn_order_preserved": true,
+        "target_turn_included_exactly_once": true,
+        "marker_unique_in_target": true,
+        "marker_included": true,
+        "question_included": true,
+        "fixed_settings": true,
+        "no_automatic_retry": true,
+        "no_production_db_write": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "new-chat-handoff-user-reasoning-v0.5",
+      "case_id": "C",
+      "condition": "Wide",
+      "source_conversation": "User reasoning continuity fixture",
+      "target_turn": "T6",
+      "included_turn_numbers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4",
+        "T5",
+        "T6",
+        "T7"
+      ],
+      "included_turn_count": 7,
+      "input_chars": 772,
+      "marker_source_text": "日常語だけでは表現しにくい",
+      "question": "これは「物理学でも正体が分かっていない」という意味ではないの？",
+      "first_user_message": "## 前の会話からの参考文脈\n\n[T1 / User]\n対向する光の相対速度は一見、光速×2倍のように思えるが、光速度以上の速度はないので、相対速度も光速でOK？？\n\n[T2 / Assistant]\n二つの意味を分ける必要があります。\n地上の観測者から見れば、二つの光の間隔は毎秒2cで縮みます。\nこれは接近速度であり、一つの光が2cで運動しているという意味ではありません。\n一方の光から見た他方の速度は、光の静止系を作れないため通常の相対速度として定義できません。\n\n[T3 / User]\n2cになるのは距離の縮み方であって、光そのものの速度ではないのですね。\n光については「波であり粒子である」とも言いますが、実際には波でも粒子でもないのでしょうか。\n\n[T4 / Assistant]\n光は古典的な波にも古典的な粒子にも完全には一致しません。\n干渉や回折では波のような性質が現れ、検出では一個ずつ局所的に現れます。\n「波でもあり粒子でもある」は両方の特徴が現れるという意味で、\n「波でも粒子でもない」はどちらの古典概念にも完全には収まらないという意味です。\n\n[T5 / User]\n日常には存在しないものなので、正確に表現できる言葉がないということでしょうか。\n\n[T6 / Assistant / Target]\n日常語だけでは表現しにくい、という意味ではそうです。\n「粒子」「波」「スピン」なども日常語から借りた言葉ですが、量子論での意味は完全には一致しません。\n物理学では専門用語と数式で、状態や観測結果をより正確に記述します。\n\n[T7 / User]\n物理の世界の人は数式で会話しているのかも。\n\n## 質問対象\n\n日常語だけでは表現しにくい\n\n## 質問\n\nこれは「物理学でも正体が分かっていない」という意味ではないの？",
+      "request": {
+        "model": "google/gemma-4-12b-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用された箇所を質問対象として、日本語で質問に直接答えてください。最初のUser Messageに含まれる情報だけを新しい会話の前提として扱い、過去会話の履歴が別に存在すると仮定しないでください。対象を特定できない場合は断定せず、不足を述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "## 前の会話からの参考文脈\n\n[T1 / User]\n対向する光の相対速度は一見、光速×2倍のように思えるが、光速度以上の速度はないので、相対速度も光速でOK？？\n\n[T2 / Assistant]\n二つの意味を分ける必要があります。\n地上の観測者から見れば、二つの光の間隔は毎秒2cで縮みます。\nこれは接近速度であり、一つの光が2cで運動しているという意味ではありません。\n一方の光から見た他方の速度は、光の静止系を作れないため通常の相対速度として定義できません。\n\n[T3 / User]\n2cになるのは距離の縮み方であって、光そのものの速度ではないのですね。\n光については「波であり粒子である」とも言いますが、実際には波でも粒子でもないのでしょうか。\n\n[T4 / Assistant]\n光は古典的な波にも古典的な粒子にも完全には一致しません。\n干渉や回折では波のような性質が現れ、検出では一個ずつ局所的に現れます。\n「波でもあり粒子でもある」は両方の特徴が現れるという意味で、\n「波でも粒子でもない」はどちらの古典概念にも完全には収まらないという意味です。\n\n[T5 / User]\n日常には存在しないものなので、正確に表現できる言葉がないということでしょうか。\n\n[T6 / Assistant / Target]\n日常語だけでは表現しにくい、という意味ではそうです。\n「粒子」「波」「スピン」なども日常語から借りた言葉ですが、量子論での意味は完全には一致しません。\n物理学では専門用語と数式で、状態や観測結果をより正確に記述します。\n\n[T7 / User]\n物理の世界の人は数式で会話しているのかも。\n\n## 質問対象\n\n日常語だけでは表現しにくい\n\n## 質問\n\nこれは「物理学でも正体が分かっていない」という意味ではないの？"
+          }
+        ]
+      },
+      "automatic": {
+        "system_user_only": true,
+        "old_history_not_sent_as_messages": true,
+        "turn_order_preserved": true,
+        "target_turn_included_exactly_once": true,
+        "marker_unique_in_target": true,
+        "marker_included": true,
+        "question_included": true,
+        "fixed_settings": true,
+        "no_automatic_retry": true,
+        "no_production_db_write": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "new-chat-handoff-user-reasoning-v0.5",
+      "case_id": "D",
+      "condition": "Minimal",
+      "source_conversation": "User reasoning continuity fixture",
+      "target_turn": "T8",
+      "included_turn_numbers": [
+        "T7",
+        "T8"
+      ],
+      "included_turn_count": 2,
+      "input_chars": 238,
+      "marker_source_text": "数式は",
+      "question": "じゃあ私が言った「物理の世界の人は数式で会話している」は、どのくらい合っているの？",
+      "first_user_message": "## 前の会話からの参考文脈\n\n[T7 / User]\n物理の世界の人は数式で会話しているのかも。\n\n[T8 / Assistant / Target]\nかなりその面があります。\n数式は量の関係、変化、対称性、保存則などを厳密に表現できます。\nただし数式だけではなく、何を測っているか、どの近似を使うか、各項が何を意味するかは文章や図でも補います。\n\n## 質問対象\n\n数式は\n\n## 質問\n\nじゃあ私が言った「物理の世界の人は数式で会話している」は、どのくらい合っているの？",
+      "request": {
+        "model": "google/gemma-4-12b-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用された箇所を質問対象として、日本語で質問に直接答えてください。最初のUser Messageに含まれる情報だけを新しい会話の前提として扱い、過去会話の履歴が別に存在すると仮定しないでください。対象を特定できない場合は断定せず、不足を述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "## 前の会話からの参考文脈\n\n[T7 / User]\n物理の世界の人は数式で会話しているのかも。\n\n[T8 / Assistant / Target]\nかなりその面があります。\n数式は量の関係、変化、対称性、保存則などを厳密に表現できます。\nただし数式だけではなく、何を測っているか、どの近似を使うか、各項が何を意味するかは文章や図でも補います。\n\n## 質問対象\n\n数式は\n\n## 質問\n\nじゃあ私が言った「物理の世界の人は数式で会話している」は、どのくらい合っているの？"
+          }
+        ]
+      },
+      "automatic": {
+        "system_user_only": true,
+        "old_history_not_sent_as_messages": true,
+        "turn_order_preserved": true,
+        "target_turn_included_exactly_once": true,
+        "marker_unique_in_target": true,
+        "marker_included": true,
+        "question_included": true,
+        "fixed_settings": true,
+        "no_automatic_retry": true,
+        "no_production_db_write": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "new-chat-handoff-user-reasoning-v0.5",
+      "case_id": "D",
+      "condition": "Standard",
+      "source_conversation": "User reasoning continuity fixture",
+      "target_turn": "T8",
+      "included_turn_numbers": [
+        "T5",
+        "T6",
+        "T7",
+        "T8"
+      ],
+      "included_turn_count": 4,
+      "input_chars": 419,
+      "marker_source_text": "数式は",
+      "question": "じゃあ私が言った「物理の世界の人は数式で会話している」は、どのくらい合っているの？",
+      "first_user_message": "## 前の会話からの参考文脈\n\n[T5 / User]\n日常には存在しないものなので、正確に表現できる言葉がないということでしょうか。\n\n[T6 / Assistant]\n日常語だけでは表現しにくい、という意味ではそうです。\n「粒子」「波」「スピン」なども日常語から借りた言葉ですが、量子論での意味は完全には一致しません。\n物理学では専門用語と数式で、状態や観測結果をより正確に記述します。\n\n[T7 / User]\n物理の世界の人は数式で会話しているのかも。\n\n[T8 / Assistant / Target]\nかなりその面があります。\n数式は量の関係、変化、対称性、保存則などを厳密に表現できます。\nただし数式だけではなく、何を測っているか、どの近似を使うか、各項が何を意味するかは文章や図でも補います。\n\n## 質問対象\n\n数式は\n\n## 質問\n\nじゃあ私が言った「物理の世界の人は数式で会話している」は、どのくらい合っているの？",
+      "request": {
+        "model": "google/gemma-4-12b-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用された箇所を質問対象として、日本語で質問に直接答えてください。最初のUser Messageに含まれる情報だけを新しい会話の前提として扱い、過去会話の履歴が別に存在すると仮定しないでください。対象を特定できない場合は断定せず、不足を述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "## 前の会話からの参考文脈\n\n[T5 / User]\n日常には存在しないものなので、正確に表現できる言葉がないということでしょうか。\n\n[T6 / Assistant]\n日常語だけでは表現しにくい、という意味ではそうです。\n「粒子」「波」「スピン」なども日常語から借りた言葉ですが、量子論での意味は完全には一致しません。\n物理学では専門用語と数式で、状態や観測結果をより正確に記述します。\n\n[T7 / User]\n物理の世界の人は数式で会話しているのかも。\n\n[T8 / Assistant / Target]\nかなりその面があります。\n数式は量の関係、変化、対称性、保存則などを厳密に表現できます。\nただし数式だけではなく、何を測っているか、どの近似を使うか、各項が何を意味するかは文章や図でも補います。\n\n## 質問対象\n\n数式は\n\n## 質問\n\nじゃあ私が言った「物理の世界の人は数式で会話している」は、どのくらい合っているの？"
+          }
+        ]
+      },
+      "automatic": {
+        "system_user_only": true,
+        "old_history_not_sent_as_messages": true,
+        "turn_order_preserved": true,
+        "target_turn_included_exactly_once": true,
+        "marker_unique_in_target": true,
+        "marker_included": true,
+        "question_included": true,
+        "fixed_settings": true,
+        "no_automatic_retry": true,
+        "no_production_db_write": true
+      },
+      "human_review": "pending"
+    },
+    {
+      "experiment": "new-chat-handoff-user-reasoning-v0.5",
+      "case_id": "D",
+      "condition": "Wide",
+      "source_conversation": "User reasoning continuity fixture",
+      "target_turn": "T8",
+      "included_turn_numbers": [
+        "T3",
+        "T4",
+        "T5",
+        "T6",
+        "T7",
+        "T8"
+      ],
+      "included_turn_count": 6,
+      "input_chars": 668,
+      "marker_source_text": "数式は",
+      "question": "じゃあ私が言った「物理の世界の人は数式で会話している」は、どのくらい合っているの？",
+      "first_user_message": "## 前の会話からの参考文脈\n\n[T3 / User]\n2cになるのは距離の縮み方であって、光そのものの速度ではないのですね。\n光については「波であり粒子である」とも言いますが、実際には波でも粒子でもないのでしょうか。\n\n[T4 / Assistant]\n光は古典的な波にも古典的な粒子にも完全には一致しません。\n干渉や回折では波のような性質が現れ、検出では一個ずつ局所的に現れます。\n「波でもあり粒子でもある」は両方の特徴が現れるという意味で、\n「波でも粒子でもない」はどちらの古典概念にも完全には収まらないという意味です。\n\n[T5 / User]\n日常には存在しないものなので、正確に表現できる言葉がないということでしょうか。\n\n[T6 / Assistant]\n日常語だけでは表現しにくい、という意味ではそうです。\n「粒子」「波」「スピン」なども日常語から借りた言葉ですが、量子論での意味は完全には一致しません。\n物理学では専門用語と数式で、状態や観測結果をより正確に記述します。\n\n[T7 / User]\n物理の世界の人は数式で会話しているのかも。\n\n[T8 / Assistant / Target]\nかなりその面があります。\n数式は量の関係、変化、対称性、保存則などを厳密に表現できます。\nただし数式だけではなく、何を測っているか、どの近似を使うか、各項が何を意味するかは文章や図でも補います。\n\n## 質問対象\n\n数式は\n\n## 質問\n\nじゃあ私が言った「物理の世界の人は数式で会話している」は、どのくらい合っているの？",
+      "request": {
+        "model": "google/gemma-4-12b-qat",
+        "temperature": 0,
+        "max_tokens": 2048,
+        "stream": true,
+        "messages": [
+          {
+            "role": "system",
+            "content": "引用された箇所を質問対象として、日本語で質問に直接答えてください。最初のUser Messageに含まれる情報だけを新しい会話の前提として扱い、過去会話の履歴が別に存在すると仮定しないでください。対象を特定できない場合は断定せず、不足を述べてください。"
+          },
+          {
+            "role": "user",
+            "content": "## 前の会話からの参考文脈\n\n[T3 / User]\n2cになるのは距離の縮み方であって、光そのものの速度ではないのですね。\n光については「波であり粒子である」とも言いますが、実際には波でも粒子でもないのでしょうか。\n\n[T4 / Assistant]\n光は古典的な波にも古典的な粒子にも完全には一致しません。\n干渉や回折では波のような性質が現れ、検出では一個ずつ局所的に現れます。\n「波でもあり粒子でもある」は両方の特徴が現れるという意味で、\n「波でも粒子でもない」はどちらの古典概念にも完全には収まらないという意味です。\n\n[T5 / User]\n日常には存在しないものなので、正確に表現できる言葉がないということでしょうか。\n\n[T6 / Assistant]\n日常語だけでは表現しにくい、という意味ではそうです。\n「粒子」「波」「スピン」なども日常語から借りた言葉ですが、量子論での意味は完全には一致しません。\n物理学では専門用語と数式で、状態や観測結果をより正確に記述します。\n\n[T7 / User]\n物理の世界の人は数式で会話しているのかも。\n\n[T8 / Assistant / Target]\nかなりその面があります。\n数式は量の関係、変化、対称性、保存則などを厳密に表現できます。\nただし数式だけではなく、何を測っているか、どの近似を使うか、各項が何を意味するかは文章や図でも補います。\n\n## 質問対象\n\n数式は\n\n## 質問\n\nじゃあ私が言った「物理の世界の人は数式で会話している」は、どのくらい合っているの？"
+          }
+        ]
+      },
+      "automatic": {
+        "system_user_only": true,
+        "old_history_not_sent_as_messages": true,
+        "turn_order_preserved": true,
+        "target_turn_included_exactly_once": true,
+        "marker_unique_in_target": true,
+        "marker_included": true,
+        "question_included": true,
+        "fixed_settings": true,
+        "no_automatic_retry": true,
+        "no_production_db_write": true
+      },
+      "human_review": "pending"
+    }
+  ]
+}

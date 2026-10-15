@@ -1,0 +1,23 @@
+@import '../client/marker-colors.css';
+.turn-map-layout{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:20px;align-items:start}
+.turn-map-article{padding:18px;margin-bottom:16px;border:1px solid #dce1e5;border-radius:8px;scroll-margin-top:16px;overflow-wrap:anywhere}
+.turn-map-article header{display:flex;align-items:center;justify-content:space-between}.turn-map-article p{line-height:1.8}
+.turn-map-layout .turn-important{color:#b65c00;font-size:22px;line-height:1;padding:4px;min-width:30px;min-height:30px;background:transparent;border:0}
+.turn-map-layout .turn-important[aria-pressed=true],.turn-map-star-slot .turn-important{color:#ef8a00}
+.turn-map-sidebar{position:sticky;top:12px;background:#f7f8f9;border:1px solid #dce1e5;padding:12px;border-radius:8px;min-width:0}
+.turn-map-sidebar h3{margin:0 0 6px}.turn-map-sidebar p{margin:8px 0}
+.turn-map-rows{max-height:calc(100dvh - 210px);overflow:auto;overscroll-behavior:contain}
+.turn-map-row{display:grid;grid-template-columns:48px 32px minmax(0,1fr);align-items:center;min-height:34px}
+.turn-map-row button{margin:0!important;padding:4px;min-height:30px;background:transparent;border:0;cursor:pointer}
+.turn-map-row button[aria-current]{background:#e0e7ed;border-radius:4px;font-weight:bold}
+.turn-map-dots{display:flex;flex-wrap:wrap}.turn-map-dots button{font-size:20px;min-width:28px}
+.turn-map-pulse{outline:3px solid #879cac;background:#f2f6f9}.turn-map-layout button:focus-visible{outline:2px solid #536c82;outline-offset:1px}
+.turn-fixture-quotes mark{display:inline-block;margin:3px;padding:0 4px}.turn-map-lower{display:block;border-top:1px solid #ddd;padding-top:10px;margin-top:10px;color:#687078}
+@media(max-width:700px){.turn-map-layout{grid-template-columns:minmax(0,1fr) 164px;gap:8px}.turn-map-sidebar{padding:6px}.turn-map-article{padding:10px}.turn-map-row{grid-template-columns:40px 30px minmax(0,1fr)}.turn-map-dots button{min-width:26px}.turn-map-lower{font-size:11px}}
+.turn-map-mode{display:flex;gap:4px;margin-top:8px}.turn-map-mode button{font-size:12px;padding:3px 8px}
+.turn-map-overview{height:clamp(200px,calc(100dvh - 265px),500px);display:grid;overflow:hidden}
+.turn-overview-row{display:grid;grid-template-columns:44px 22px minmax(0,1fr);min-height:0;align-items:stretch}
+.turn-overview-row[data-current=true]{background:#dbe5ed;outline:1px solid #72899c;outline-offset:-1px}
+.turn-overview-row button{display:block;height:100%;min-height:0;margin:0!important;padding:0;border:0;background:transparent;font-size:9px;line-height:1;cursor:pointer;width:100%}
+.turn-overview-row>span{min-height:0}.turn-overview-row .turn-overview-star{color:#ef8a00;font-size:10px}
+.turn-overview-dots{display:flex}.turn-overview-dots button{max-width:24px;font-size:8px}

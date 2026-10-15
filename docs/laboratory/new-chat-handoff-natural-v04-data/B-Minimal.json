@@ -1,0 +1,68 @@
+{
+  "experiment": "new-chat-handoff-natural-v0.4",
+  "case_id": "B",
+  "condition": "Minimal",
+  "source_conversation": "Quantum natural conversation fixture",
+  "target_turn": "T8",
+  "included_turn_numbers": [
+    "T7",
+    "T8"
+  ],
+  "included_turn_count": 2,
+  "input_chars": 329,
+  "marker_source_text": "重ね合わせ",
+  "question": "これがあると、なぜ計算に有利になるのですか？",
+  "first_user_message": "## 前の会話からの参考文脈\n\n[T7 / User]\n0か1を測定すると一つしか得られないのに、そのような状態を使うと、なぜ計算に有利になるのですか。\n\n[T8 / Assistant / Target]\n重ね合わせだけで答えを全部取り出せるわけではありません。量子アルゴリズムは確率振幅を干渉させ、望ましい結果へつながる振幅を強め、不要な結果の振幅を打ち消すように操作します。そのため特定の問題では必要な計算回数を減らせますが、あらゆる計算が速くなるわけではありません。単純な大量並列計算という説明だけでは、測定時に一つの結果しか得られない点を説明できません。\n\n## 質問対象\n\n重ね合わせ\n\n## 質問\n\nこれがあると、なぜ計算に有利になるのですか？",
+  "request": {
+    "model": "google/gemma-4-12b-qat",
+    "temperature": 0,
+    "max_tokens": 2048,
+    "stream": true,
+    "messages": [
+      {
+        "role": "system",
+        "content": "引用された箇所を質問対象として、日本語で質問に直接答えてください。最初のUser Messageに含まれる情報だけを新しい会話の前提として扱い、過去会話の履歴が別に存在すると仮定しないでください。対象を特定できない場合は断定せず、不足を述べてください。"
+      },
+      {
+        "role": "user",
+        "content": "## 前の会話からの参考文脈\n\n[T7 / User]\n0か1を測定すると一つしか得られないのに、そのような状態を使うと、なぜ計算に有利になるのですか。\n\n[T8 / Assistant / Target]\n重ね合わせだけで答えを全部取り出せるわけではありません。量子アルゴリズムは確率振幅を干渉させ、望ましい結果へつながる振幅を強め、不要な結果の振幅を打ち消すように操作します。そのため特定の問題では必要な計算回数を減らせますが、あらゆる計算が速くなるわけではありません。単純な大量並列計算という説明だけでは、測定時に一つの結果しか得られない点を説明できません。\n\n## 質問対象\n\n重ね合わせ\n\n## 質問\n\nこれがあると、なぜ計算に有利になるのですか？"
+      }
+    ]
+  },
+  "automatic": {
+    "system_user_only": true,
+    "old_history_not_sent_as_messages": true,
+    "turn_order_preserved": true,
+    "target_turn_included_exactly_once": true,
+    "marker_unique_in_target": true,
+    "marker_included": true,
+    "question_included": true,
+    "fixed_settings": true,
+    "no_automatic_retry": true,
+    "no_production_db_write": true
+  },
+  "human_review": "pending",
+  "temporary_conversation_id": "09ff244a-51bb-4639-8a00-73c18749f08e",
+  "request_sha256": "b2734552bcc7df5817ca3919c5942bd2de938a0a0c84a658af9281382e87cf11",
+  "model": "google/gemma-4-12b-qat",
+  "temperature": 0,
+  "max_tokens": 2048,
+  "started_at": "2026-10-01T11:25:48.854Z",
+  "completed_at": "2026-10-01T11:26:50.628Z",
+  "elapsed_ms": 61774,
+  "finish_reason": "stop",
+  "answer_chars": 130,
+  "reasoning_chars": 1960,
+  "response": "重ね合わせ（およびそれを用いた量子アルゴリズム）が計算に有利な理由は、確率振幅を干渉させる操作を行うためです。具体的には、望ましい結果につながる振幅を強め、不要な結果の振幅を打ち消すように操作することで、特定の問題において必要な計算回数を減らすことができます。",
+  "diagnostics": {
+    "finish_reason": "stop",
+    "completion_tokens": null,
+    "prompt_tokens": null,
+    "total_tokens": null,
+    "content_chars": 130,
+    "reasoning_chars": 1960,
+    "duration_ms": 61775,
+    "terminal_chunk_received": true
+  },
+  "error": null
+}

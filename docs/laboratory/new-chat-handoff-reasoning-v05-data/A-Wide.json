@@ -1,0 +1,69 @@
+{
+  "experiment": "new-chat-handoff-user-reasoning-v0.5",
+  "case_id": "A",
+  "condition": "Wide",
+  "source_conversation": "User reasoning continuity fixture",
+  "target_turn": "T2",
+  "included_turn_numbers": [
+    "T1",
+    "T2",
+    "T3"
+  ],
+  "included_turn_count": 3,
+  "input_chars": 401,
+  "marker_source_text": "毎秒2cで縮みます",
+  "question": "じゃあ最初に私が言っていた「相対速度も光速でOK」は、どこが違うの？",
+  "first_user_message": "## 前の会話からの参考文脈\n\n[T1 / User]\n対向する光の相対速度は一見、光速×2倍のように思えるが、光速度以上の速度はないので、相対速度も光速でOK？？\n\n[T2 / Assistant / Target]\n二つの意味を分ける必要があります。\n地上の観測者から見れば、二つの光の間隔は毎秒2cで縮みます。\nこれは接近速度であり、一つの光が2cで運動しているという意味ではありません。\n一方の光から見た他方の速度は、光の静止系を作れないため通常の相対速度として定義できません。\n\n[T3 / User]\n2cになるのは距離の縮み方であって、光そのものの速度ではないのですね。\n光については「波であり粒子である」とも言いますが、実際には波でも粒子でもないのでしょうか。\n\n## 質問対象\n\n毎秒2cで縮みます\n\n## 質問\n\nじゃあ最初に私が言っていた「相対速度も光速でOK」は、どこが違うの？",
+  "request": {
+    "model": "google/gemma-4-12b-qat",
+    "temperature": 0,
+    "max_tokens": 2048,
+    "stream": true,
+    "messages": [
+      {
+        "role": "system",
+        "content": "引用された箇所を質問対象として、日本語で質問に直接答えてください。最初のUser Messageに含まれる情報だけを新しい会話の前提として扱い、過去会話の履歴が別に存在すると仮定しないでください。対象を特定できない場合は断定せず、不足を述べてください。"
+      },
+      {
+        "role": "user",
+        "content": "## 前の会話からの参考文脈\n\n[T1 / User]\n対向する光の相対速度は一見、光速×2倍のように思えるが、光速度以上の速度はないので、相対速度も光速でOK？？\n\n[T2 / Assistant / Target]\n二つの意味を分ける必要があります。\n地上の観測者から見れば、二つの光の間隔は毎秒2cで縮みます。\nこれは接近速度であり、一つの光が2cで運動しているという意味ではありません。\n一方の光から見た他方の速度は、光の静止系を作れないため通常の相対速度として定義できません。\n\n[T3 / User]\n2cになるのは距離の縮み方であって、光そのものの速度ではないのですね。\n光については「波であり粒子である」とも言いますが、実際には波でも粒子でもないのでしょうか。\n\n## 質問対象\n\n毎秒2cで縮みます\n\n## 質問\n\nじゃあ最初に私が言っていた「相対速度も光速でOK」は、どこが違うの？"
+      }
+    ]
+  },
+  "automatic": {
+    "system_user_only": true,
+    "old_history_not_sent_as_messages": true,
+    "turn_order_preserved": true,
+    "target_turn_included_exactly_once": true,
+    "marker_unique_in_target": true,
+    "marker_included": true,
+    "question_included": true,
+    "fixed_settings": true,
+    "no_automatic_retry": true,
+    "no_production_db_write": true
+  },
+  "human_review": "pending",
+  "temporary_conversation_id": "1decdb3e-4d40-4e5c-9947-b5c87dbe0bd2",
+  "request_sha256": "3fa20b5e25f554fbd367d018219b53f1c965fcb8467877930791f06da1794ef0",
+  "model": "google/gemma-4-12b-qat",
+  "temperature": 0,
+  "max_tokens": 2048,
+  "started_at": "2026-10-01T12:11:25.223Z",
+  "completed_at": "2026-10-01T12:14:06.634Z",
+  "elapsed_ms": 161411,
+  "finish_reason": "stop",
+  "answer_chars": 770,
+  "reasoning_chars": 4080,
+  "response": "ご質問の「相対速度も光速でOK」という言葉と、提示された回答の「2c」との違いは、**「どの視点から見た、どの速度を指しているか」という定義の使い分け**にあります。\n\n具体的には、以下の2つの概念を区別する必要があります。\n\n### 1. 接近速度（Closing Speed）の場合\n*   **視点：** 地上の観測者（第三者）\n*   **内容：** 「2つの光の間の距離が、毎秒どれくらい縮んでいるか」という変化の割合。\n*   **結論：** この場合、速度は**2c**になります。\n*   **あなたの「光速でOK」との違い：** あなたの考えは「物体が空間を移動する速度の限界」を正しく捉えていますが、この現象は「物体が移動する速度」ではなく「距離の縮み方の計算」であるため、2cという数値が正しくなります。\n\n### 2. 相対速度（Relative Velocity）の場合\n*   **視点：** 一方の光の視点（光の静止系）\n*   **内容：** 「一方の光から見て、もう一方の光がどれくらいの速度で動いているか」という速度。\n*   **結論：** 光には静止系を作れないため、通常の相対速度としては**定義できません**。\n*   **あなたの「光速でOK」との違い：** あなたの考えは「光速を超えられない」という物理的な制約を正しく捉えていますが、この視点においては「計算式を適用すること自体が不可能」であるため、単に「cになる」と断定することはできません。\n\n### まとめ\nあなたの「相対速度も光速でOK」という言葉は、**「物体が空間を移動する速度の限界」を正しく捉えていますが、今回の文脈（地上の観測者が見る現象）では、「距離の縮み方の計算（接近速度）」と混同してしまっている点**が異なります。",
+  "diagnostics": {
+    "finish_reason": "stop",
+    "completion_tokens": null,
+    "prompt_tokens": null,
+    "total_tokens": null,
+    "content_chars": 770,
+    "reasoning_chars": 4080,
+    "duration_ms": 161406,
+    "terminal_chunk_received": true
+  },
+  "error": null
+}

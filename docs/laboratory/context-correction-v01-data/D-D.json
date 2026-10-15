@@ -1,0 +1,73 @@
+{
+  "experiment": "context-correction-v0.1",
+  "fixture_version": "physics-40-v1",
+  "marker": "D",
+  "condition": "D",
+  "source_turn": "T36",
+  "included_turn_ids": [
+    "T30",
+    "T31",
+    "T32",
+    "T33",
+    "T34",
+    "T35",
+    "T36"
+  ],
+  "context_utf16": 742,
+  "input_utf16": 888,
+  "source_text": "この量は小さい",
+  "question": "これはどういう意味ですか？",
+  "anchor": {
+    "highlight_id": "D",
+    "turn_id": "T36",
+    "start_offset": 56,
+    "end_offset": 63,
+    "source_text": "この量は小さい",
+    "target_text": "この量は小さい",
+    "color": "yellow",
+    "note": "",
+    "created_at": "2026-09-29T00:00:00Z",
+    "updated_at": "2026-09-29T00:00:00Z",
+    "status": "resolved",
+    "reason": null
+  },
+  "local_range": null,
+  "request": {
+    "model": "unsloth/gemma-4-12b-it-qat",
+    "temperature": 0,
+    "max_tokens": 2048,
+    "stream": true,
+    "messages": [
+      {
+        "role": "system",
+        "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+      },
+      {
+        "role": "user",
+        "content": "[参照文脈]\n[T30 assistant]\n固定端の変分からd/dt(∂L/∂速度)−∂L/∂位置=0が得られます。L=m速度²/2−Vならm加速度=−dV/d位置となり、ニュートンの運動方程式へ戻ります。\n\n[T31 user]\n自由粒子で確認したいです。VがゼロならLは運動エネルギーだけですか。\n\n[T32 assistant]\nその設定でL=m速度²/2です。位置がLに明示的に現れないため、∂L/∂速度=m速度が一定になります。これは保存されます。ここでは自由粒子の運動量を指します。\n\n[T33 user]\n自由粒子で運動量一定になることは理解しました。次はばねの近くで小さい量を扱う近似を知りたいです。\n\n[T34 assistant]\n平衡点近くの滑らかな位置エネルギーをテイラー展開します。平衡点で一次項が消え、安定な極小なら二次項の係数が正です。高次項が十分小さい範囲で調和振動の近似になります。\n\n[T35 user]\n小さいというとエネルギーがゼロに近い意味ですか。位置エネルギーの基準値は任意だと理解しています。無次元量やテイラー展開は分かります。\n\n[T36 assistant]\nこの近似では、平衡点からの変位xをポテンシャルが変化する代表的な長さℓと比較します。比ε=|x|/ℓを見ており、この量は小さい、というのが近似の条件です。絶対的なエネルギーの値が小さいという意味ではありません。基準エネルギーを定数だけずらしても運動は変わらないからです。ただし小さい比だけで全ての系に誤差保証ができるわけではなく、高次項の係数が極端に大きくないことや二次項が消えないことも必要です。実際には三次以上の項と二次項の大きさを比較し、目的とする精度の範囲で省略可能かを見ます。\n\n[Marker Focus]\nこの量は小さい\n\n[質問]\nこれはどういう意味ですか？"
+      }
+    ]
+  },
+  "automatic": {
+    "marker_match": true,
+    "no_future_turns": true
+  },
+  "human_review": "pending",
+  "provider_base_url": "http://127.0.0.1:1234/v1",
+  "request_sha256": "0b65239f00065393bbaedbe50a309f768b297e60a3925164c11c53ebf0cd4b3f",
+  "started": "2026-09-29T05:27:30.382Z",
+  "finished": "2026-09-29T05:27:46.276Z",
+  "answer": "「この量は小さい」とは、平衡点からの変位 $x$ と、ポテンシャルが変化する代表的な長さ $\\ell$ の比である $\\epsilon = |x|/\\ell$ が小さいことを意味しています。\n\nこれは絶対的なエネルギーの値が小さいという意味ではありません。基準エネルギーを定数だけずらしても運動は変わらないため、近似の条件となるのは「変位 $x$ が代表的な長さ $\\ell$ に対して十分に小さい」という相対的な比率です。",
+  "output_utf16": 212,
+  "diagnostics": {
+    "finish_reason": "stop",
+    "completion_tokens": null,
+    "prompt_tokens": null,
+    "total_tokens": null,
+    "content_chars": 212,
+    "reasoning_chars": 2543,
+    "duration_ms": 15894,
+    "terminal_chunk_received": true
+  },
+  "error": null
+}

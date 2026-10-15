@@ -65,3 +65,13 @@ npm.cmd run build
 - [Phase 0結果](docs/phase0-results.md)
 
 詳細は [Phase 3B-2分岐設計・snapshot](docs/phase3b2-design.md) と [検証結果](docs/phase3b2-results.md) を参照してください。[Phase 3B-1設計](docs/phase3b1-design.md)・[検証結果](docs/phase3b1-results.md)、[Phase 3A設計](docs/phase3a-design.md)・[結果](docs/phase3a-results.md) は基準記録です。正式Mode B、miniMAP、複合エクスポート、複数マーカー質問は含みません。Phase 3B-2で停止しています。
+
+## ライセンス
+
+Att-Chat本体は [MIT License](LICENSE) で提供します。Electron、Chromium、Node.js、npm依存、EJDict-hand、およびMarker基盤の一部へ選択的に改変継承したRpenProof由来コードには、それぞれのライセンスが適用されます。
+
+- [第三者コンポーネントとライセンス](THIRD_PARTY_NOTICES.md)
+- [LGPL/MPL対象ソースの提供方法](SOURCE_AVAILABILITY.md)
+- [RpenProof由来コードの技術的な追跡記録](docs/rpenproof-contribution-trace.md)
+
+Quick辞書はPublic Domain / CC0のEJDict-handを利用します。配布版と取得元は [EJDict-hand README](public/dictionaries/ejdict-hand/README.md) と [SOURCE.json](public/dictionaries/ejdict-hand/SOURCE.json) に記録しています。

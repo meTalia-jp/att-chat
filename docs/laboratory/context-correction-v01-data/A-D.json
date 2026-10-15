@@ -1,0 +1,73 @@
+{
+  "experiment": "context-correction-v0.1",
+  "fixture_version": "physics-40-v1",
+  "marker": "A",
+  "condition": "D",
+  "source_turn": "T8",
+  "included_turn_ids": [
+    "T2",
+    "T3",
+    "T4",
+    "T5",
+    "T6",
+    "T7",
+    "T8"
+  ],
+  "context_utf16": 633,
+  "input_utf16": 782,
+  "source_text": "これは保存されます。",
+  "question": "これはどういう意味ですか？",
+  "anchor": {
+    "highlight_id": "A",
+    "turn_id": "T8",
+    "start_offset": 62,
+    "end_offset": 72,
+    "source_text": "これは保存されます。",
+    "target_text": "これは保存されます。",
+    "color": "yellow",
+    "note": "",
+    "created_at": "2026-09-29T00:00:00Z",
+    "updated_at": "2026-09-29T00:00:00Z",
+    "status": "resolved",
+    "reason": null
+  },
+  "local_range": null,
+  "request": {
+    "model": "unsloth/gemma-4-12b-it-qat",
+    "temperature": 0,
+    "max_tokens": 2048,
+    "stream": true,
+    "messages": [
+      {
+        "role": "system",
+        "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+      },
+      {
+        "role": "user",
+        "content": "[参照文脈]\n[T2 assistant]\nまず一定質量の粒子なら運動量p=mv、運動方程式はdp/dt=Fです。力は運動量の変化率です。この関係を複数粒子へ広げ、系全体の量を考えましょう。\n\n[T3 user]\n単一粒子のF=maは分かります。二つの台車が衝突すると、一方の運動量は変わりますよね。\n\n[T4 assistant]\nはい。二台を一つの系とすると内部の作用反作用の力が打ち消し合います。総運動量P=p1+p2の変化は、系に働く外力の合計で決まります。\n\n[T5 user]\nベクトルの足し算と作用反作用は分かりました。床の摩擦を無視し、二台全体を系に取ります。\n\n[T6 assistant]\nその条件なら水平方向の外力はゼロです。衝突中に各台車の運動量が変わっても、二台の総運動量の時間微分はゼロになります。\n\n[T7 user]\n運動量保存は理解しました。各台車の速度が同じという意味ではないですね。式を最初からやり直さず、まとめの表現を確認したいです。\n\n[T8 assistant]\n二台の総運動量Pを見ています。各台車の速度は衝突で変わってよく、同じ速度になる必要もありません。外力の合計がゼロである限り、これは保存されます。ここで変わらないのは二台を合わせたベクトル量で、個別の速さでも運動エネルギーでもありません。非弾性衝突でも総運動量は保存できますが、運動エネルギーの一部は内部エネルギーへ移ります。系をどこまで含めたかを先に決めることが大切です。\n\n[Marker Focus]\nこれは保存されます。\n\n[質問]\nこれはどういう意味ですか？"
+      }
+    ]
+  },
+  "automatic": {
+    "marker_match": true,
+    "no_future_turns": true
+  },
+  "human_review": "pending",
+  "provider_base_url": "http://127.0.0.1:1234/v1",
+  "request_sha256": "93b3246cbb0561a89b4b59172c91926b2e2a6bc00e5cfc185d94232ff32d29a8",
+  "started": "2026-09-29T05:24:04.322Z",
+  "finished": "2026-09-29T05:24:16.417Z",
+  "answer": "「これは保存されます」とは、二台の台車を一つの系として考えたときの**「総運動量P」**が、時間経過によって変化しない（一定に保たれる）という意味です。\n\n文脈から以下のことがわかります：\n*   **条件：** 系に働く外力の合計がゼロである場合（例：床の摩擦を無視する場合）。\n*   **内容：** 衝突によって各台車の速度が変わったり、運動エネルギーの一部が内部エネルギーへ移ったりしても、二台を合わせたベクトル量としての総運動量は変わらないことを指しています。",
+  "output_utf16": 235,
+  "diagnostics": {
+    "finish_reason": "stop",
+    "completion_tokens": null,
+    "prompt_tokens": null,
+    "total_tokens": null,
+    "content_chars": 235,
+    "reasoning_chars": 1675,
+    "duration_ms": 12095,
+    "terminal_chunk_received": true
+  },
+  "error": null
+}

@@ -14,6 +14,14 @@ test('Electron Skeleton uses isolated ports and database without changing browse
   assert.equal(config.frontendPort, 5186);
   assert.equal(config.backendPort, 5187);
   assert.match(config.databasePath.replaceAll('\\','/'), /\.cache\/electron-skeleton-v01\.sqlite$/);
+  assert.match(config.settingsPath.replaceAll('\\','/'), /\.cache\/electron-settings-v1\.json$/);
+  assert.notEqual(config.settingsPath, resolve('data/settings.json'));
+  assert.equal(config.collectionsPath, resolve('.cache/electron-collections-v1.json'));
+  assert.notEqual(config.collectionsPath, resolve('data/collections.json'));
+  assert.equal(runtime.createElectronRuntime(resolve('.'), {ATTCHAT_ELECTRON_COLLECTIONS:'custom-collections.json'}).collectionsPath, resolve('custom-collections.json'));
+  assert.match(readFileSync('electron/main.mjs','utf8'), /ATTCHAT_COLLECTIONS: runtime.collectionsPath/);
+  assert.equal(runtime.createElectronRuntime(resolve('.'), {ATTCHAT_ELECTRON_SETTINGS:'custom-settings.json'}).settingsPath, resolve('custom-settings.json'));
+  assert.match(readFileSync('electron/main.mjs','utf8'), /ATTCHAT_SETTINGS: runtime.settingsPath/);
   const packageJson = JSON.parse(readFileSync('package.json', 'utf8'));
   assert.equal(packageJson.scripts.dev, 'vite --host 127.0.0.1 --port 5180 --strictPort');
   assert.equal(packageJson.scripts.server, 'node --experimental-strip-types src/server/main.ts');

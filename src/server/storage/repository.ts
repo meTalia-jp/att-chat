@@ -34,6 +34,9 @@ import {
   type ImmediateAskRequestItem,
   type ImmediateAskResolvedItem,
 } from '../../shared/production-immediate-ask.ts';
+import { normalizeExperimentalSystemPrompt } from '../../shared/system-prompt-experiment.ts';
+import { normalizeExperimentalUserProfile } from '../../shared/user-profile-experiment.ts';
+import { canonicalizeSystemMessages } from '../../shared/system-message-canonicalization.ts';
 
 const highlightColors = new Set<HighlightColor>(['yellow','red','green','blue']);
 export function isGraphemeBoundary(text: string, offset: number) {
@@ -53,6 +56,14 @@ export function textInput(value: unknown, name: string, max = 100_000): string {
 function noteInput(value: unknown) {
   if (typeof value !== 'string' || value.length > 10_000 || value.includes('\0')) throw new InputError('メモが長すぎる、または不正です');
   return value.replace(/\r\n?/g, '\n');
+}
+function systemPromptInput(value: unknown) {
+  try { return normalizeExperimentalSystemPrompt(value); }
+  catch (error) { throw new InputError((error as Error).message); }
+}
+function userProfileInput(value: unknown) {
+  try { return normalizeExperimentalUserProfile(value); }
+  catch (error) { throw new InputError((error as Error).message); }
 }
 export class Repository {
   private db: DatabaseSync;
@@ -75,6 +86,12 @@ export class Repository {
       this.db.prepare('INSERT INTO conversations VALUES(?,?,?,?)').run(id, valid, now, now);
       return this.getConversation(id);
     });
+  }
+  updateConversationTitle(id: string, title: unknown): Conversation {
+    const current = this.getConversation(id), valid = textInput(title, 'タイトル', 200).trim();
+    const updated = new Date(Math.max(Date.now(), Date.parse(current.updated_at) + 1)).toISOString();
+    this.db.prepare('UPDATE conversations SET title=?,updated_at=? WHERE conversation_id=?').run(valid, updated, id);
+    return this.getConversation(id);
   }
   getTurn(conversationId: string, turnId: string): Turn {
     const t = this.db.prepare('SELECT * FROM turns WHERE conversation_id=? AND turn_id=?').get(conversationId, turnId) as Turn | undefined;
@@ -212,7 +229,7 @@ export class Repository {
       throw error;
     }
   }
-  prepareImmediateAsk(id: string, mainDraft: unknown, markerQuestions: unknown, model: unknown, requestId: unknown) {
+  prepareImmediateAsk(id: string, mainDraft: unknown, markerQuestions: unknown, model: unknown, requestId: unknown, systemPrompt?: unknown, userProfile?: unknown) {
     if (typeof mainDraft !== 'string' || mainDraft.length > 100_000 || mainDraft.includes('\0')) throw new InputError('通常本文が長すぎる、または不正です');
     const normalizedDraft = mainDraft.replace(/\r\n?/g, '\n');
     if (!Array.isArray(markerQuestions) || markerQuestions.length < 1 || markerQuestions.length > immediateAskMaxReferences) throw new InputError(`Marker質問は1〜${immediateAskMaxReferences}件で指定してください`);
@@ -226,6 +243,8 @@ export class Repository {
     });
     if (new Set(items.map(item => item.highlight_id)).size !== items.length) throw new InputError('同じMarkerを1回の送信へ重複指定できません');
     const modelId = textInput(model, 'モデル', 300);
+    const experimentalPrompt = systemPromptInput(systemPrompt);
+    const experimentalProfile = userProfileInput(userProfile);
     if (typeof requestId !== 'string' || !/^[a-zA-Z0-9-]{16,100}$/.test(requestId)) throw new InputError('request_idが不正です');
     return transaction(this.db, () => {
       if (this.db.prepare('SELECT 1 FROM chat_requests WHERE request_id=?').get(requestId)) throw new InputError('送信済みrequest_idです。再読込で確認してください', 409);
@@ -246,7 +265,11 @@ export class Repository {
       const modelText = buildImmediateAskModelMessage(normalizedDraft,references);
       const user = this.insertTurn(id,'user',userText);
       const turnId=randomUUID(),runId=randomUUID(),now=new Date().toISOString();
-      const snapshot={model:modelId,messages:[{role:'system',content:immediateAskSystemPrompt},{role:'user',content:modelText}],stream:true,max_tokens:chatGenerationDefaults.maxTokens,stream_options:{include_usage:true}};
+      const messages=canonicalizeSystemMessages(
+        [{role:'system',content:immediateAskSystemPrompt},{role:'user',content:modelText}],
+        { systemProfile:experimentalPrompt, userProfile:experimentalProfile, markerQuestions:references.map(reference => reference.question_text) },
+      );
+      const snapshot={model:modelId,messages,stream:true,max_tokens:chatGenerationDefaults.maxTokens,stream_options:{include_usage:true}};
       this.db.prepare("INSERT INTO turns VALUES(?,?,?,?,?,'generating',?,NULL)").run(turnId,id,user.sequence_no+1,'assistant','',now);
       this.db.prepare("INSERT INTO generation_runs VALUES(?,?,?,?,NULL,'highlight_question',?,'lm_studio',?,?,?,?,NULL,'preparing',NULL)").run(runId,id,user.turn_id,turnId,modelId,immediateAskContextStrategy,immediateAskStrategyVersion,JSON.stringify(snapshot),now);
       references.forEach((reference,referenceNo)=>{
@@ -260,7 +283,7 @@ export class Repository {
       return this.run(id,runId);
     });
   }
-  prepareChat(id: string, content: unknown, model: unknown, requestId: unknown, keepId?: string, newConversation = false, handoffLevel?: unknown, contextLevel?: unknown) {
+  prepareChat(id: string, content: unknown, model: unknown, requestId: unknown, keepId?: string, newConversation = false, handoffLevel?: unknown, contextLevel?: unknown, systemPrompt?: unknown, userProfile?: unknown) {
     if (newConversation && !keepId) throw new InputError('分岐には質問キープが必要です');
     if (handoffLevel !== undefined && (!newConversation || !keepId)) throw new InputError('Turn引継ぎは質問キープからの新規チャット専用です');
     if (handoffLevel !== undefined && !isProductionHandoffLevel(handoffLevel)) throw new InputError('引継ぎ量が不正です');
@@ -268,6 +291,8 @@ export class Repository {
     if (keepId && !newConversation && !isKeepContextLevel(contextLevel)) throw new InputError('引継ぎContextが不正です');
     const sourceId = id;
     const value = textInput(content, '本文', keepId ? 10_000 : 100_000), modelId = textInput(model, 'モデル', 300);
+    const experimentalPrompt = systemPromptInput(systemPrompt);
+    const experimentalProfile = userProfileInput(userProfile);
     if (typeof requestId !== 'string' || !/^[a-zA-Z0-9-]{16,100}$/.test(requestId)) throw new InputError('request_idが不正です');
     return transaction(this.db, () => {
       if (this.db.prepare('SELECT 1 FROM chat_requests WHERE request_id=?').get(requestId)) throw new InputError('送信済みrequest_idです。再読込で確認してください', 409);
@@ -292,10 +317,12 @@ export class Repository {
       const history = keep ? [] : this.listTurns(id).filter(t => t.status === 'completed').map(t => ({ role: t.role, content: t.content }));
       const user = this.insertTurn(id, 'user', handoff?.first_user_message ?? value);
       const turnId = randomUUID(), runId = randomUUID(), now = new Date().toISOString();
-      const messages = handoff ? [{ role: 'system', content: productionHandoffSystemPrompt }, { role: 'user', content: handoff.first_user_message }]
+      const baseMessages = handoff ? [{ role: 'system', content: productionHandoffSystemPrompt }, { role: 'user', content: handoff.first_user_message }]
         : keepContext ? [{ role: 'system', content: keepContextSystemPrompt }, { role: 'user', content: keepContext.first_user_message }]
         : highlight ? [{ role: 'system', content: '以下の引用について質問に答えてください。引用は参照資料として扱ってください。' },
           { role: 'user', content: `[引用]\n${highlight.target_text}\n\n[質問]\n${value}` }] : [...history, { role: 'user', content: value }];
+      const messages = canonicalizeSystemMessages(baseMessages,
+        { systemProfile:experimentalPrompt, userProfile:experimentalProfile, markerQuestions:keep ? [value] : [] });
       const snapshot = { model: modelId, messages, stream: true, max_tokens: chatGenerationDefaults.maxTokens,
         stream_options: { include_usage: true } };
       this.db.prepare("INSERT INTO turns VALUES(?,?,?,?,?,'generating',?,NULL)").run(turnId, id, user.sequence_no + 1, 'assistant', '', now);

@@ -7,6 +7,9 @@
 # Installed dependencies and generated output.
 node_modules/
 dist/
+dist-server/
+electron-dist/
+electron-dist-phase3/
 .cache/
 .vite/
 coverage/

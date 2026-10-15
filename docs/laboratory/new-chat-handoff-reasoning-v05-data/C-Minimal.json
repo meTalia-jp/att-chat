@@ -1,0 +1,68 @@
+{
+  "experiment": "new-chat-handoff-user-reasoning-v0.5",
+  "case_id": "C",
+  "condition": "Minimal",
+  "source_conversation": "User reasoning continuity fixture",
+  "target_turn": "T6",
+  "included_turn_numbers": [
+    "T5",
+    "T6"
+  ],
+  "included_turn_count": 2,
+  "input_chars": 268,
+  "marker_source_text": "日常語だけでは表現しにくい",
+  "question": "これは「物理学でも正体が分かっていない」という意味ではないの？",
+  "first_user_message": "## 前の会話からの参考文脈\n\n[T5 / User]\n日常には存在しないものなので、正確に表現できる言葉がないということでしょうか。\n\n[T6 / Assistant / Target]\n日常語だけでは表現しにくい、という意味ではそうです。\n「粒子」「波」「スピン」なども日常語から借りた言葉ですが、量子論での意味は完全には一致しません。\n物理学では専門用語と数式で、状態や観測結果をより正確に記述します。\n\n## 質問対象\n\n日常語だけでは表現しにくい\n\n## 質問\n\nこれは「物理学でも正体が分かっていない」という意味ではないの？",
+  "request": {
+    "model": "google/gemma-4-12b-qat",
+    "temperature": 0,
+    "max_tokens": 2048,
+    "stream": true,
+    "messages": [
+      {
+        "role": "system",
+        "content": "引用された箇所を質問対象として、日本語で質問に直接答えてください。最初のUser Messageに含まれる情報だけを新しい会話の前提として扱い、過去会話の履歴が別に存在すると仮定しないでください。対象を特定できない場合は断定せず、不足を述べてください。"
+      },
+      {
+        "role": "user",
+        "content": "## 前の会話からの参考文脈\n\n[T5 / User]\n日常には存在しないものなので、正確に表現できる言葉がないということでしょうか。\n\n[T6 / Assistant / Target]\n日常語だけでは表現しにくい、という意味ではそうです。\n「粒子」「波」「スピン」なども日常語から借りた言葉ですが、量子論での意味は完全には一致しません。\n物理学では専門用語と数式で、状態や観測結果をより正確に記述します。\n\n## 質問対象\n\n日常語だけでは表現しにくい\n\n## 質問\n\nこれは「物理学でも正体が分かっていない」という意味ではないの？"
+      }
+    ]
+  },
+  "automatic": {
+    "system_user_only": true,
+    "old_history_not_sent_as_messages": true,
+    "turn_order_preserved": true,
+    "target_turn_included_exactly_once": true,
+    "marker_unique_in_target": true,
+    "marker_included": true,
+    "question_included": true,
+    "fixed_settings": true,
+    "no_automatic_retry": true,
+    "no_production_db_write": true
+  },
+  "human_review": "pending",
+  "temporary_conversation_id": "07eaa571-2c47-47f0-8560-6ccc9f71ecd4",
+  "request_sha256": "4405aecf8560520119502720272728b6d1afb9a4a75acaac52f318f7c9337521",
+  "model": "google/gemma-4-12b-qat",
+  "temperature": 0,
+  "max_tokens": 2048,
+  "started_at": "2026-10-01T12:17:30.644Z",
+  "completed_at": "2026-10-01T12:18:38.842Z",
+  "elapsed_ms": 68198,
+  "finish_reason": "stop",
+  "answer_chars": 213,
+  "reasoning_chars": 2235,
+  "response": "提供された文脈に基づくと、その言葉は「物理学でも正体が分かっていない」という意味であるとは断定できません。\n\n文脈では、日常語（粒子、波、スピンなど）が量子論における意味と完全には一致しないため、日常語だけでは不十分であると述べています。また、物理学においては「専門用語と数式で、状態や観測結果をより正確に記述する」とあり、表現の正確さを追求していることを示していますが、正体が不明であるという点については言及されていません。",
+  "diagnostics": {
+    "finish_reason": "stop",
+    "completion_tokens": null,
+    "prompt_tokens": null,
+    "total_tokens": null,
+    "content_chars": 213,
+    "reasoning_chars": 2235,
+    "duration_ms": 68195,
+    "terminal_chunk_received": true
+  },
+  "error": null
+}

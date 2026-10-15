@@ -1,0 +1,11 @@
+import { rm } from 'node:fs/promises';
+import { resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { spawnSync } from 'node:child_process';
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const output = resolve(root, 'dist-server');
+if (dirname(output) !== root) throw new Error('Unsafe build output');
+await rm(output, { recursive: true, force: true });
+const result = spawnSync(process.execPath, [resolve(root, 'node_modules/typescript/bin/tsc'), '-p', resolve(root, 'tsconfig.server-build.json')], { cwd:root, stdio:'inherit', windowsHide:true });
+if (result.error) throw result.error;
+process.exitCode = result.status ?? 1;

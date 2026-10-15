@@ -1,0 +1,68 @@
+{
+  "experiment": "new-chat-handoff-user-reasoning-v0.5",
+  "case_id": "B",
+  "condition": "Minimal",
+  "source_conversation": "User reasoning continuity fixture",
+  "target_turn": "T4",
+  "included_turn_numbers": [
+    "T3",
+    "T4"
+  ],
+  "included_turn_count": 2,
+  "input_chars": 329,
+  "marker_source_text": "波でも粒子でもない",
+  "question": "私が考えた「波でも粒子でもない」という言い方でもよいの？",
+  "first_user_message": "## 前の会話からの参考文脈\n\n[T3 / User]\n2cになるのは距離の縮み方であって、光そのものの速度ではないのですね。\n光については「波であり粒子である」とも言いますが、実際には波でも粒子でもないのでしょうか。\n\n[T4 / Assistant / Target]\n光は古典的な波にも古典的な粒子にも完全には一致しません。\n干渉や回折では波のような性質が現れ、検出では一個ずつ局所的に現れます。\n「波でもあり粒子でもある」は両方の特徴が現れるという意味で、\n「波でも粒子でもない」はどちらの古典概念にも完全には収まらないという意味です。\n\n## 質問対象\n\n波でも粒子でもない\n\n## 質問\n\n私が考えた「波でも粒子でもない」という言い方でもよいの？",
+  "request": {
+    "model": "google/gemma-4-12b-qat",
+    "temperature": 0,
+    "max_tokens": 2048,
+    "stream": true,
+    "messages": [
+      {
+        "role": "system",
+        "content": "引用された箇所を質問対象として、日本語で質問に直接答えてください。最初のUser Messageに含まれる情報だけを新しい会話の前提として扱い、過去会話の履歴が別に存在すると仮定しないでください。対象を特定できない場合は断定せず、不足を述べてください。"
+      },
+      {
+        "role": "user",
+        "content": "## 前の会話からの参考文脈\n\n[T3 / User]\n2cになるのは距離の縮み方であって、光そのものの速度ではないのですね。\n光については「波であり粒子である」とも言いますが、実際には波でも粒子でもないのでしょうか。\n\n[T4 / Assistant / Target]\n光は古典的な波にも古典的な粒子にも完全には一致しません。\n干渉や回折では波のような性質が現れ、検出では一個ずつ局所的に現れます。\n「波でもあり粒子でもある」は両方の特徴が現れるという意味で、\n「波でも粒子でもない」はどちらの古典概念にも完全には収まらないという意味です。\n\n## 質問対象\n\n波でも粒子でもない\n\n## 質問\n\n私が考えた「波でも粒子でもない」という言い方でもよいの？"
+      }
+    ]
+  },
+  "automatic": {
+    "system_user_only": true,
+    "old_history_not_sent_as_messages": true,
+    "turn_order_preserved": true,
+    "target_turn_included_exactly_once": true,
+    "marker_unique_in_target": true,
+    "marker_included": true,
+    "question_included": true,
+    "fixed_settings": true,
+    "no_automatic_retry": true,
+    "no_production_db_write": true
+  },
+  "human_review": "pending",
+  "temporary_conversation_id": "4b4d1baf-20dc-4483-a9ee-44a78f06cc61",
+  "request_sha256": "a97e21d89c0f064064d6ffae5b1af19f94bc2d78263d9e21783dfb698ebf68ab",
+  "model": "google/gemma-4-12b-qat",
+  "temperature": 0,
+  "max_tokens": 2048,
+  "started_at": "2026-10-01T12:14:06.635Z",
+  "completed_at": "2026-10-01T12:15:04.384Z",
+  "elapsed_ms": 57749,
+  "finish_reason": "stop",
+  "answer_chars": 126,
+  "reasoning_chars": 2013,
+  "response": "はい、その言い方でも問題ありません。\n\n提供された文脈によれば、「波でも粒子でもある」という言葉が両方の特徴が現れることを意味するのに対し、「波でも粒子でもない」という言葉は、光がどちらの古典的な概念にも完全には収まらないということを意味するためです。",
+  "diagnostics": {
+    "finish_reason": "stop",
+    "completion_tokens": null,
+    "prompt_tokens": null,
+    "total_tokens": null,
+    "content_chars": 126,
+    "reasoning_chars": 2013,
+    "duration_ms": 57748,
+    "terminal_chunk_received": true
+  },
+  "error": null
+}

@@ -14,9 +14,17 @@ export function tempArea() {
 
 }
 
-test('Conversation作成・一覧・取得、空タイトル拒否', () => fixture((db, repo) => {
+test('Conversation作成・一覧・取得・タイトル変更、空タイトル拒否', () => fixture((db, repo) => {
   const c = repo.createConversation('保存テスト'); assert.equal(repo.getConversation(c.conversation_id).title, '保存テスト'); assert.equal(repo.listConversations().length, 1); assert.throws(() => repo.createConversation(' '));
+  const renamed=repo.updateConversationTitle(c.conversation_id,'  変更後  ');assert.equal(renamed.title,'変更後');assert.equal(repo.listConversations()[0].title,'変更後');assert.throws(()=>repo.updateConversationTitle(c.conversation_id,'   '));
 }));
+test('Conversation title persists after database reopen', () => {
+  const area=tempArea();
+  try {
+    let db=openDatabase(area.path),repo=new Repository(db);const conversation=repo.createConversation('変更前');repo.updateConversationTitle(conversation.conversation_id,'再起動後の名前');db.close();
+    db=openDatabase(area.path);repo=new Repository(db);assert.equal(repo.getConversation(conversation.conversation_id).title,'再起動後の名前');db.close();
+  } finally { area.clean(); }
+});
 test('Turn保存、LF正規化、sequence_no順序、絵文字保持', () => fixture((db, repo) => {
   const c = repo.createConversation('c'); const a = repo.addUserTurn(c.conversation_id, '一行\r\n😀e\u0301\r末尾'); const b = repo.addUserTurn(c.conversation_id, '二番目');
   assert.equal(a.content, '一行\n😀e\u0301\n末尾'); assert.equal(a.sequence_no, 0); assert.equal(b.sequence_no, 1); assert.deepEqual(repo.listTurns(c.conversation_id).map(t => t.turn_id), [a.turn_id, b.turn_id]);

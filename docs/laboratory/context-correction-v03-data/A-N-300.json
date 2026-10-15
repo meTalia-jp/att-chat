@@ -1,0 +1,84 @@
+{
+  "experiment": "context-correction-v0.3",
+  "fixture_version": "physics-long-32-v2",
+  "marker": "A",
+  "mode": "N",
+  "level": 300,
+  "condition": "N-300",
+  "source_turn": "T20",
+  "source_utf16": 2650,
+  "source_text": "これは保存されます。",
+  "question": "質問です。これはどういう意味ですか？",
+  "anchor": {
+    "highlight_id": "A",
+    "turn_id": "T20",
+    "start_offset": 510,
+    "end_offset": 520,
+    "source_text": "これは保存されます。",
+    "target_text": "これは保存されます。",
+    "color": "yellow",
+    "note": "",
+    "created_at": "2026-09-29T00:00:00Z",
+    "updated_at": "2026-09-29T00:00:00Z",
+    "status": "resolved",
+    "reason": null
+  },
+  "local_range": {
+    "start": 360,
+    "end": 670
+  },
+  "context_utf16": 310,
+  "included_percentage": 11.69811320754717,
+  "history_turn_ids": [],
+  "included_turn_ids": [
+    "T20"
+  ],
+  "history_utf16": 0,
+  "input_utf16": 480,
+  "request": {
+    "model": "google/gemma-4-12b-qat",
+    "temperature": 0,
+    "max_tokens": 2048,
+    "stream": true,
+    "messages": [
+      {
+        "role": "system",
+        "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+      },
+      {
+        "role": "user",
+        "content": "[参照文脈]\nの性質です。観測者を取り替えた数値が等しいという意味ではありません。レールの目盛りの原点を変える操作と、観測者の速度を変える操作も区別してください。\n\n【運動量の局所例】二台を合わせた水平方向の総運動量Pを考えます。内部のばねの力は二台に逆向きに働き、和では消えます。外力の水平成分の合計がゼロなら、【選択箇所開始】これは保存されます。【選択箇所終了】ここで「これ」は総運動量Pです。各台車の速度が一定だという主張ではありません。ばねが伸び縮みして一方が加速しても、他方の変化と合わせて総和が一定になります。単位はkg m/sであり、後で扱うエネルギーの単位Jとは違います。\n\nこの例で系を片方の台車だけへ変更すると、もう片方から受ける力は外力になりま\n\n[Marker Focus]\nこれは保存されます。\n\n[質問]\n質問です。これはどういう意味ですか？"
+      }
+    ]
+  },
+  "automatic": {
+    "marker_match": true,
+    "window_boundaries": true,
+    "source_only": true,
+    "marker_contained": true,
+    "no_future_turns": true,
+    "mode_match": true,
+    "level_match": true
+  },
+  "human_review": "pending",
+  "escalation_candidate": false,
+  "escalation_evidence": [],
+  "escalation_method": "literal-screen-v1; review for false positives/negatives; no retry",
+  "provider_base_url": "http://127.0.0.1:1234/v1",
+  "request_sha256": "effafc07c80ad35b627b8f2e019f3584f3b1a4fdfec7063872626c1be685c84b",
+  "started": "2026-09-30T03:34:45.604Z",
+  "finished": "2026-09-30T03:36:08.077Z",
+  "answer": "ここでの「これは保存されます」とは、二台の台車を合わせた水平方向の**総運動量$P$が、変化せずに一定に保たれる**という意味です。\n\n文脈から、以下のことがわかります。\n\n*   **「これ」が指すもの：** 二台の台車を合わせた水平方向の総運動量$P$のことです。\n*   **保存される条件：** 外力の水平成分の合計がゼロである場合です。\n*   **注意点：** これは「各台車の速度が一定である」という意味ではありません。ばねの力によって一方が加速したとしても、もう一方の変化と合わせて、全体の合計である総運動量$P$は一定のまま維持されることを指しています。",
+  "output_utf16": 286,
+  "diagnostics": {
+    "finish_reason": "stop",
+    "completion_tokens": null,
+    "prompt_tokens": null,
+    "total_tokens": null,
+    "content_chars": 286,
+    "reasoning_chars": 2274,
+    "duration_ms": 82469,
+    "terminal_chunk_received": true
+  },
+  "error": null
+}

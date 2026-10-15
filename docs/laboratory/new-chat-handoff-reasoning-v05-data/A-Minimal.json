@@ -1,0 +1,68 @@
+{
+  "experiment": "new-chat-handoff-user-reasoning-v0.5",
+  "case_id": "A",
+  "condition": "Minimal",
+  "source_conversation": "User reasoning continuity fixture",
+  "target_turn": "T2",
+  "included_turn_numbers": [
+    "T1",
+    "T2"
+  ],
+  "included_turn_count": 2,
+  "input_chars": 306,
+  "marker_source_text": "毎秒2cで縮みます",
+  "question": "じゃあ最初に私が言っていた「相対速度も光速でOK」は、どこが違うの？",
+  "first_user_message": "## 前の会話からの参考文脈\n\n[T1 / User]\n対向する光の相対速度は一見、光速×2倍のように思えるが、光速度以上の速度はないので、相対速度も光速でOK？？\n\n[T2 / Assistant / Target]\n二つの意味を分ける必要があります。\n地上の観測者から見れば、二つの光の間隔は毎秒2cで縮みます。\nこれは接近速度であり、一つの光が2cで運動しているという意味ではありません。\n一方の光から見た他方の速度は、光の静止系を作れないため通常の相対速度として定義できません。\n\n## 質問対象\n\n毎秒2cで縮みます\n\n## 質問\n\nじゃあ最初に私が言っていた「相対速度も光速でOK」は、どこが違うの？",
+  "request": {
+    "model": "google/gemma-4-12b-qat",
+    "temperature": 0,
+    "max_tokens": 2048,
+    "stream": true,
+    "messages": [
+      {
+        "role": "system",
+        "content": "引用された箇所を質問対象として、日本語で質問に直接答えてください。最初のUser Messageに含まれる情報だけを新しい会話の前提として扱い、過去会話の履歴が別に存在すると仮定しないでください。対象を特定できない場合は断定せず、不足を述べてください。"
+      },
+      {
+        "role": "user",
+        "content": "## 前の会話からの参考文脈\n\n[T1 / User]\n対向する光の相対速度は一見、光速×2倍のように思えるが、光速度以上の速度はないので、相対速度も光速でOK？？\n\n[T2 / Assistant / Target]\n二つの意味を分ける必要があります。\n地上の観測者から見れば、二つの光の間隔は毎秒2cで縮みます。\nこれは接近速度であり、一つの光が2cで運動しているという意味ではありません。\n一方の光から見た他方の速度は、光の静止系を作れないため通常の相対速度として定義できません。\n\n## 質問対象\n\n毎秒2cで縮みます\n\n## 質問\n\nじゃあ最初に私が言っていた「相対速度も光速でOK」は、どこが違うの？"
+      }
+    ]
+  },
+  "automatic": {
+    "system_user_only": true,
+    "old_history_not_sent_as_messages": true,
+    "turn_order_preserved": true,
+    "target_turn_included_exactly_once": true,
+    "marker_unique_in_target": true,
+    "marker_included": true,
+    "question_included": true,
+    "fixed_settings": true,
+    "no_automatic_retry": true,
+    "no_production_db_write": true
+  },
+  "human_review": "pending",
+  "temporary_conversation_id": "0c12fc52-b4be-4c22-a0df-f5d15f3262bf",
+  "request_sha256": "5d3427a998bf34bb767fbb51e5d77278374a05810f9165f92e555917c3ddcf96",
+  "model": "google/gemma-4-12b-qat",
+  "temperature": 0,
+  "max_tokens": 2048,
+  "started_at": "2026-10-01T12:06:27.493Z",
+  "completed_at": "2026-10-01T12:08:56.510Z",
+  "elapsed_ms": 149017,
+  "finish_reason": "stop",
+  "answer_chars": 862,
+  "reasoning_chars": 3800,
+  "response": "ご質問の「相対速度も光速でOK」という考え方と、引用された「毎秒2cで縮みます」という記述の主な違いは、**「どの視点（系）から、何を測っているか」**という点にあります。\n\n具体的には以下の2つの違いがあります。\n\n### 1. 「速度」と「距離の変化率」の違い\n*   **あなたの考え（相対速度＝c）：**\n    これは「ある物体（光）が、別の物体（もう一方の光）に対して、**どれくらいの速さで動いているか**」という、物体そのものの運動の性質を指しています。特殊相対性理論では、どの慣性系から見ても光の速度は常に $c$ であるため、この視点では「光速を超えることはない」というあなたの認識は正しいです。\n*   **引用の記述（毎秒2cで縮む）：**\n    これは「第三者の観測者（地上など）から見て、**二つの物体の間の距離がどれくらいの速さで変化しているか**」という、距離の変化率（接近速度）を指しています。\n\n### 2. 観測者の視点の違い\n*   **あなたの考え（相対速度＝c）：**\n    これは（理論上は不可能ですが）「光の視点」に近い考え方です。光の視点から見れば、相手の光も $c$ で動いているように見えるはずだ、という推論に基づいています。\n*   **引用の記述（毎秒2cで縮む）：**\n    これは「地上の観測者」の視点です。地上に止まっている人が、互いに反対方向に進む二つの光を見ている場合、その間の距離は（地上の観測者の基準では）毎秒 $2c$ の速さで縮んでいくように見えます。\n\n### まとめ\n*   **あなたの「光速でOK」：** 「物体が移動する速度の限界」について述べています。\n*   **引用の「2cで縮む」：** 「第三者が見たときの、二つの物体の距離の変化の速さ」を述べています。\n\nしたがって、あなたの考えは「光の速度の性質」を正しく捉えていますが、引用の箇所は「第三者から見た距離の変化」を説明しているため、別の事象を指していることになります。",
+  "diagnostics": {
+    "finish_reason": "stop",
+    "completion_tokens": null,
+    "prompt_tokens": null,
+    "total_tokens": null,
+    "content_chars": 862,
+    "reasoning_chars": 3800,
+    "duration_ms": 149018,
+    "terminal_chunk_received": true
+  },
+  "error": null
+}

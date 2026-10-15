@@ -1,0 +1,65 @@
+{
+  "experiment": "context-correction-v0.1",
+  "fixture_version": "physics-40-v1",
+  "marker": "D",
+  "condition": "A",
+  "source_turn": "T36",
+  "included_turn_ids": [],
+  "context_utf16": 0,
+  "input_utf16": 148,
+  "source_text": "この量は小さい",
+  "question": "これはどういう意味ですか？",
+  "anchor": {
+    "highlight_id": "D",
+    "turn_id": "T36",
+    "start_offset": 56,
+    "end_offset": 63,
+    "source_text": "この量は小さい",
+    "target_text": "この量は小さい",
+    "color": "yellow",
+    "note": "",
+    "created_at": "2026-09-29T00:00:00Z",
+    "updated_at": "2026-09-29T00:00:00Z",
+    "status": "resolved",
+    "reason": null
+  },
+  "local_range": null,
+  "request": {
+    "model": "unsloth/gemma-4-12b-it-qat",
+    "temperature": 0,
+    "max_tokens": 2048,
+    "stream": true,
+    "messages": [
+      {
+        "role": "system",
+        "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+      },
+      {
+        "role": "user",
+        "content": "[参照文脈]\nなし\n\n[Marker Focus]\nこの量は小さい\n\n[質問]\nこれはどういう意味ですか？"
+      }
+    ]
+  },
+  "automatic": {
+    "marker_match": true,
+    "no_future_turns": true
+  },
+  "human_review": "pending",
+  "provider_base_url": "http://127.0.0.1:1234/v1",
+  "request_sha256": "e5c39ec6b72a9eac9c00b604aa381c79779f492ab12f9a2ce95380919ff3726b",
+  "started": "2026-09-29T05:26:50.175Z",
+  "finished": "2026-09-29T05:26:58.939Z",
+  "answer": "「この量は小さい」という言葉は、対象となっているものの量や分量が少ないこと、あるいは規模が小さいことを意味します。\n\nただし、参照文脈がないため、具体的に「何」の量が小さいのかについては不明です。",
+  "output_utf16": 98,
+  "diagnostics": {
+    "finish_reason": "stop",
+    "completion_tokens": null,
+    "prompt_tokens": null,
+    "total_tokens": null,
+    "content_chars": 98,
+    "reasoning_chars": 1389,
+    "duration_ms": 8764,
+    "terminal_chunk_received": true
+  },
+  "error": null
+}

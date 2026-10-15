@@ -1,0 +1,69 @@
+{
+  "experiment": "context-correction-v0.2",
+  "fixture_version": "physics-long-32-v2",
+  "marker": "D",
+  "condition": "A",
+  "source_turn": "T20",
+  "source_utf16": 2650,
+  "source_text": "この比を十分小さくします。",
+  "question": "質問です。これはどういう意味ですか？",
+  "anchor": {
+    "highlight_id": "D",
+    "turn_id": "T20",
+    "start_offset": 2128,
+    "end_offset": 2141,
+    "source_text": "この比を十分小さくします。",
+    "target_text": "この比を十分小さくします。",
+    "color": "yellow",
+    "note": "",
+    "created_at": "2026-09-29T00:00:00Z",
+    "updated_at": "2026-09-29T00:00:00Z",
+    "status": "resolved",
+    "reason": null
+  },
+  "local_range": null,
+  "context_utf16": 0,
+  "included_percentage": 0,
+  "input_utf16": 159,
+  "included_turn_ids": [],
+  "request": {
+    "model": "unsloth/gemma-4-12b-it-qat",
+    "temperature": 0,
+    "max_tokens": 2048,
+    "stream": true,
+    "messages": [
+      {
+        "role": "system",
+        "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+      },
+      {
+        "role": "user",
+        "content": "[参照文脈]\nなし\n\n[Marker Focus]\nこの比を十分小さくします。\n\n[質問]\n質問です。これはどういう意味ですか？"
+      }
+    ]
+  },
+  "automatic": {
+    "marker_match": true,
+    "window_boundaries": true,
+    "source_only": true,
+    "no_future_turns": true
+  },
+  "human_review": "pending",
+  "provider_base_url": "http://127.0.0.1:1234/v1",
+  "request_sha256": "1d31fd062546823955577c68d8910c4525be6efd727ff20f96f77ee45045fc44",
+  "started": "2026-09-29T11:46:26.221Z",
+  "finished": "2026-09-29T11:46:39.488Z",
+  "answer": "この文は、**「ある2つの数値の比（割合）を、目的を達成するために必要な程度まで小さくする」**という意味です。\n\n具体的には、以下のようなニュアンスが含まれています。\n\n1.  **「この比」**: 文脈によりますが、計算式や現象において比較されている2つの値の比率を指します。\n2.  **「十分小さくする」**: 単に「小さくする」だけでなく、「（無視できるほど、あるいは目的を達成するのに支障がないほど）十分に小さい状態にする」という意図があります。\n\n**補足：**\n具体的な「どの比」を指しているのかについては、参照文脈がないため不明です。数学や物理学などの文脈では、誤差を無視できる程度に小さくしたり、ある現象の影響を最小限に抑えたりする際に使われる表現です。",
+  "output_utf16": 337,
+  "diagnostics": {
+    "finish_reason": "stop",
+    "completion_tokens": null,
+    "prompt_tokens": null,
+    "total_tokens": null,
+    "content_chars": 337,
+    "reasoning_chars": 1816,
+    "duration_ms": 13267,
+    "terminal_chunk_received": true
+  },
+  "error": null
+}

@@ -1,0 +1,84 @@
+{
+  "experiment": "context-correction-v0.3",
+  "fixture_version": "physics-long-32-v2",
+  "marker": "D",
+  "mode": "N",
+  "level": 300,
+  "condition": "N-300",
+  "source_turn": "T20",
+  "source_utf16": 2650,
+  "source_text": "この比を十分小さくします。",
+  "question": "質問です。これはどういう意味ですか？",
+  "anchor": {
+    "highlight_id": "D",
+    "turn_id": "T20",
+    "start_offset": 2128,
+    "end_offset": 2141,
+    "source_text": "この比を十分小さくします。",
+    "target_text": "この比を十分小さくします。",
+    "color": "yellow",
+    "note": "",
+    "created_at": "2026-09-29T00:00:00Z",
+    "updated_at": "2026-09-29T00:00:00Z",
+    "status": "resolved",
+    "reason": null
+  },
+  "local_range": {
+    "start": 1978,
+    "end": 2291
+  },
+  "context_utf16": 313,
+  "included_percentage": 11.81132075471698,
+  "history_turn_ids": [],
+  "included_turn_ids": [
+    "T20"
+  ],
+  "history_utf16": 0,
+  "input_utf16": 486,
+  "request": {
+    "model": "google/gemma-4-12b-qat",
+    "temperature": 0,
+    "max_tokens": 2048,
+    "stream": true,
+    "messages": [
+      {
+        "role": "system",
+        "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+      },
+      {
+        "role": "user",
+        "content": "[参照文脈]\n、ポテンシャルが変化する代表長さℓからε=abs(x)/ℓを作ります。ここで小さくする対象は時間間隔ではなく、代表長さに対する変位の比です。これは無次元量なので、長さの単位をmからcmへ変えても値は変わりません。ただし長さの規約を分子だけ変えれば誤った値になります。\n\n空間近似で見ているεについて、【選択箇所開始】この比を十分小さくします。【選択箇所終了】これにより平衡点の近くに運動を限定しますが、高次項の係数が大きい場合や二次項が消える場合は別の検討が必要です。滑らかなポテンシャルでも、無条件に二次式だけでよいとは限りません。実際には省略する三次以上の項を残す二次項と比較します。ここでの「小さい」は前の時間分解能のΔとは違う量を指します。\n\n【別の\n\n[Marker Focus]\nこの比を十分小さくします。\n\n[質問]\n質問です。これはどういう意味ですか？"
+      }
+    ]
+  },
+  "automatic": {
+    "marker_match": true,
+    "window_boundaries": true,
+    "source_only": true,
+    "marker_contained": true,
+    "no_future_turns": true,
+    "mode_match": true,
+    "level_match": true
+  },
+  "human_review": "pending",
+  "escalation_candidate": false,
+  "escalation_evidence": [],
+  "escalation_method": "literal-screen-v1; review for false positives/negatives; no retry",
+  "provider_base_url": "http://127.0.0.1:1234/v1",
+  "request_sha256": "4de4e73d3237ddf84369595204740e97fd5034e5cc7d32fc6e39f087423c4b88",
+  "started": "2026-09-30T04:04:49.331Z",
+  "finished": "2026-09-30T04:06:07.935Z",
+  "answer": "この文脈における「この比」とは、変位の絶対値 $|x|$ をポテンシャルが変化する代表長さ $\\ell$ で割った無次元量 $\\epsilon = |x|/\\ell$ のことを指します。\n\n「この比を十分小さくする」とは、変位を代表長さに対して十分に小さく保つことを意味します。これにより、解析の対象となる運動を平衡点の近くの範囲に限定することができます。\n\nなお、ここでの「小さい」という言葉は、時間分解能（$\\Delta$）のことではなく、空間的な比率のことを指している点に注意が必要です。",
+  "output_utf16": 247,
+  "diagnostics": {
+    "finish_reason": "stop",
+    "completion_tokens": null,
+    "prompt_tokens": null,
+    "total_tokens": null,
+    "content_chars": 247,
+    "reasoning_chars": 2278,
+    "duration_ms": 78610,
+    "terminal_chunk_received": true
+  },
+  "error": null
+}

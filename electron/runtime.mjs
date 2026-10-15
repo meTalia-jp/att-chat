@@ -14,17 +14,23 @@ function parsePort(value, fallback, name) {
   return port;
 }
 
-export function createElectronRuntime(root, env = process.env) {
+export function createElectronRuntime(root, env = process.env, { distributionDataDirectory } = {}) {
   const frontendPort = parsePort(env.ATTCHAT_ELECTRON_FRONTEND_PORT, electronSkeletonDefaults.frontendPort, 'ATTCHAT_ELECTRON_FRONTEND_PORT');
   const backendPort = parsePort(env.ATTCHAT_ELECTRON_BACKEND_PORT, electronSkeletonDefaults.backendPort, 'ATTCHAT_ELECTRON_BACKEND_PORT');
   if (frontendPort === backendPort) throw new Error('Electron frontend and backend ports must differ');
-  const databasePath = resolve(root, env.ATTCHAT_ELECTRON_DB ?? electronSkeletonDefaults.database);
+  const storagePath = (filename, override, fallback) => distributionDataDirectory
+    ? resolve(distributionDataDirectory, filename)
+    : resolve(root, override ?? fallback);
+  const databasePath = storagePath('attchat.sqlite', env.ATTCHAT_ELECTRON_DB, electronSkeletonDefaults.database);
   return {
     root,
     host: electronSkeletonDefaults.host,
     frontendPort,
     backendPort,
     databasePath,
+    settingsPath: storagePath('settings.json', env.ATTCHAT_ELECTRON_SETTINGS, '.cache/electron-settings-v1.json'),
+    collectionsPath: storagePath('collections.json', env.ATTCHAT_ELECTRON_COLLECTIONS, '.cache/electron-collections-v1.json'),
+    quickMemoPath: storagePath('quick-memo.md', env.ATTCHAT_ELECTRON_QUICK_MEMO, '.cache/electron-quick-memo.md'),
     frontendUrl: `http://${electronSkeletonDefaults.host}:${frontendPort}/`,
     backendUrl: `http://${electronSkeletonDefaults.host}:${backendPort}`,
   };

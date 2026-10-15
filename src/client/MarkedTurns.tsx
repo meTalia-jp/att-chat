@@ -7,9 +7,10 @@ import { QuestionKeeps } from './QuestionKeeps.tsx';
 import { RelatedTurns } from './RelatedTurns.tsx';
 import { ContextCompare } from './ContextCompare.tsx';
 import { MarkerDetailAdapter, type ImmediateAskDraft } from './MarkerDetailAdapter.tsx';
+import { turnContentForDisplay } from './HandoffPresentation.tsx';
 
 // Att-Chat composition: optional experiments do not belong to MarkerCore.
-export function MarkedTurns({ conversationId, turns, reloadToken, runs, onAsk, sending, onRelatedJump, onImmediatePrepared, onKeepCreated, markerJump, onMarkerJumpResult, compact = false }: {
+export function MarkedTurns({ conversationId, turns, reloadToken, runs, onAsk, sending, onRelatedJump, onImmediatePrepared, onKeepCreated, markerJump, onMarkerJumpResult, compact = false, minimapHost, minimapMode, onMinimapModeChange, showMarkerManagement = true, onQuickMemo, onQuickDictionary }: {
   compact?: boolean;
   conversationId: string;
   turns: Turn[];
@@ -22,12 +23,18 @@ export function MarkedTurns({ conversationId, turns, reloadToken, runs, onAsk, s
   onKeepCreated?: (keep: QuestionKeep) => void;
   markerJump?: { highlightId: string; request: number } | null;
   onMarkerJumpResult?: (found: boolean) => void;
+  minimapHost?: HTMLElement | null;
+  minimapMode?: 'detail' | 'overview';
+  onMinimapModeChange?: (mode: 'detail' | 'overview') => void;
+  showMarkerManagement?: boolean;
+  onQuickMemo?: (text: string) => void | Promise<void>;
+  onQuickDictionary?: (text: string) => void | Promise<void>;
 }) {
   const [keepTarget, setKeepTarget] = useState<Highlight | null>(null);
   const [compareId, setCompareId] = useState<string | null>(null);
   useEffect(() => { setKeepTarget(null); setCompareId(null); }, [conversationId, reloadToken]);
 
-  return <MarkerCore conversationId={conversationId} turns={turns} reloadToken={reloadToken} showTurnIds={!compact} presentation={compact ? 'conversation' : 'full'} externalJump={markerJump} onExternalJumpResult={onMarkerJumpResult}
+  return <MarkerCore conversationId={conversationId} turns={turns} reloadToken={reloadToken} showTurnIds={!compact} presentation={compact ? 'conversation' : 'full'} externalJump={markerJump} onExternalJumpResult={onMarkerJumpResult} minimapHost={minimapHost} minimapMode={minimapMode} onMinimapModeChange={onMinimapModeChange} showMarkerManagement={showMarkerManagement} turnContent={compact ? turn => turnContentForDisplay(turn, runs) : undefined} onQuickMemo={onQuickMemo} onQuickDictionary={onQuickDictionary}
     renderEditorExtras={context => <>
       {compact && <MarkerDetailAdapter conversationId={conversationId} turns={turns} context={context} sending={sending} onImmediatePrepared={onImmediatePrepared ?? (() => {})} onKeepCreated={onKeepCreated ?? (() => {})} />}
       {!compact && context.editing && onRelatedJump && <details><summary>Related Turns</summary><RelatedTurns key={context.editing.highlight_id} conversationId={conversationId} highlight={context.editing} onJump={onRelatedJump} sending={sending} /></details>}

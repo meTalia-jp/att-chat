@@ -1,0 +1,69 @@
+{
+  "experiment": "context-correction-v0.2",
+  "fixture_version": "physics-long-32-v2",
+  "marker": "C",
+  "condition": "A",
+  "source_turn": "T20",
+  "source_utf16": 2650,
+  "source_text": "これは保存されます。",
+  "question": "質問です。これはどういう意味ですか？",
+  "anchor": {
+    "highlight_id": "C",
+    "turn_id": "T20",
+    "start_offset": 1584,
+    "end_offset": 1594,
+    "source_text": "これは保存されます。",
+    "target_text": "これは保存されます。",
+    "color": "yellow",
+    "note": "",
+    "created_at": "2026-09-29T00:00:00Z",
+    "updated_at": "2026-09-29T00:00:00Z",
+    "status": "resolved",
+    "reason": null
+  },
+  "local_range": null,
+  "context_utf16": 0,
+  "included_percentage": 0,
+  "input_utf16": 156,
+  "included_turn_ids": [],
+  "request": {
+    "model": "unsloth/gemma-4-12b-it-qat",
+    "temperature": 0,
+    "max_tokens": 2048,
+    "stream": true,
+    "messages": [
+      {
+        "role": "system",
+        "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+      },
+      {
+        "role": "user",
+        "content": "[参照文脈]\nなし\n\n[Marker Focus]\nこれは保存されます。\n\n[質問]\n質問です。これはどういう意味ですか？"
+      }
+    ]
+  },
+  "automatic": {
+    "marker_match": true,
+    "window_boundaries": true,
+    "source_only": true,
+    "no_future_turns": true
+  },
+  "human_review": "pending",
+  "provider_base_url": "http://127.0.0.1:1234/v1",
+  "request_sha256": "75e2a0ce76c7a18c75ec33a2d0c62413c7806aa83c93f4451a01f80a02acd2a9",
+  "started": "2026-09-29T11:45:25.162Z",
+  "finished": "2026-09-29T11:45:36.485Z",
+  "answer": "「これは保存されます。」という言葉は、直訳すると「この内容やデータが、システムや記憶装置などに記録され、後で再び利用できる状態になる」という意味です。\n\n具体的な文脈（何が保存されるのか、どこに保存されるのかなど）が提供されていないため、正確な対象を特定することはできませんが、一般的には情報の保持を指します。",
+  "output_utf16": 155,
+  "diagnostics": {
+    "finish_reason": "stop",
+    "completion_tokens": null,
+    "prompt_tokens": null,
+    "total_tokens": null,
+    "content_chars": 155,
+    "reasoning_chars": 1590,
+    "duration_ms": 11322,
+    "terminal_chunk_received": true
+  },
+  "error": null
+}

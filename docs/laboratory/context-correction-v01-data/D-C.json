@@ -1,0 +1,69 @@
+{
+  "experiment": "context-correction-v0.1",
+  "fixture_version": "physics-40-v1",
+  "marker": "D",
+  "condition": "C",
+  "source_turn": "T36",
+  "included_turn_ids": [
+    "T34",
+    "T35",
+    "T36"
+  ],
+  "context_utf16": 438,
+  "input_utf16": 584,
+  "source_text": "この量は小さい",
+  "question": "これはどういう意味ですか？",
+  "anchor": {
+    "highlight_id": "D",
+    "turn_id": "T36",
+    "start_offset": 56,
+    "end_offset": 63,
+    "source_text": "この量は小さい",
+    "target_text": "この量は小さい",
+    "color": "yellow",
+    "note": "",
+    "created_at": "2026-09-29T00:00:00Z",
+    "updated_at": "2026-09-29T00:00:00Z",
+    "status": "resolved",
+    "reason": null
+  },
+  "local_range": null,
+  "request": {
+    "model": "unsloth/gemma-4-12b-it-qat",
+    "temperature": 0,
+    "max_tokens": 2048,
+    "stream": true,
+    "messages": [
+      {
+        "role": "system",
+        "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+      },
+      {
+        "role": "user",
+        "content": "[参照文脈]\n[T34 assistant]\n平衡点近くの滑らかな位置エネルギーをテイラー展開します。平衡点で一次項が消え、安定な極小なら二次項の係数が正です。高次項が十分小さい範囲で調和振動の近似になります。\n\n[T35 user]\n小さいというとエネルギーがゼロに近い意味ですか。位置エネルギーの基準値は任意だと理解しています。無次元量やテイラー展開は分かります。\n\n[T36 assistant]\nこの近似では、平衡点からの変位xをポテンシャルが変化する代表的な長さℓと比較します。比ε=|x|/ℓを見ており、この量は小さい、というのが近似の条件です。絶対的なエネルギーの値が小さいという意味ではありません。基準エネルギーを定数だけずらしても運動は変わらないからです。ただし小さい比だけで全ての系に誤差保証ができるわけではなく、高次項の係数が極端に大きくないことや二次項が消えないことも必要です。実際には三次以上の項と二次項の大きさを比較し、目的とする精度の範囲で省略可能かを見ます。\n\n[Marker Focus]\nこの量は小さい\n\n[質問]\nこれはどういう意味ですか？"
+      }
+    ]
+  },
+  "automatic": {
+    "marker_match": true,
+    "no_future_turns": true
+  },
+  "human_review": "pending",
+  "provider_base_url": "http://127.0.0.1:1234/v1",
+  "request_sha256": "e7fcd62f6013b824c1fea824f5747d6e34b9d85359370c104de5ebf6d0356557",
+  "started": "2026-09-29T05:27:14.228Z",
+  "finished": "2026-09-29T05:27:30.381Z",
+  "answer": "「この量は小さい」とは、直前の文で示されている**比 $\\epsilon = |x|/\\ell$ が小さいこと**を意味しています。\n\n具体的には以下の内容を指しています。\n\n*   **$x$（変位）**: 平衡点からどれだけ離れているかという距離。\n*   **$\\ell$（代表的な長さ）**: ポテンシャルエネルギーが変化する際の基準となるスケール。\n\nつまり、このフレーズは「絶対的なエネルギーの値や変位の大きさがゼロに近い」という意味ではなく、**「ポテンシャルの変化を捉えるための基準となる長さ $\\ell$ に対して、実際の変位 $x$ が十分に小さいこと」**を近似の条件として述べています。この比が小さいことで、テイラー展開における高次項の影響を無視でき、調和振動の近似が成り立つようになります。",
+  "output_utf16": 358,
+  "diagnostics": {
+    "finish_reason": "stop",
+    "completion_tokens": null,
+    "prompt_tokens": null,
+    "total_tokens": null,
+    "content_chars": 358,
+    "reasoning_chars": 2294,
+    "duration_ms": 16153,
+    "terminal_chunk_received": true
+  },
+  "error": null
+}

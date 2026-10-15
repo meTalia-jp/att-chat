@@ -1,0 +1,76 @@
+{
+  "experiment": "context-correction-v0.2",
+  "fixture_version": "physics-long-32-v2",
+  "marker": "A",
+  "condition": "C",
+  "source_turn": "T20",
+  "source_utf16": 2650,
+  "source_text": "これは保存されます。",
+  "question": "質問です。これはどういう意味ですか？",
+  "anchor": {
+    "highlight_id": "A",
+    "turn_id": "T20",
+    "start_offset": 510,
+    "end_offset": 520,
+    "source_text": "これは保存されます。",
+    "target_text": "これは保存されます。",
+    "color": "yellow",
+    "note": "",
+    "created_at": "2026-09-29T00:00:00Z",
+    "updated_at": "2026-09-29T00:00:00Z",
+    "status": "resolved",
+    "reason": null
+  },
+  "local_range": {
+    "context_start_offset": 110,
+    "highlight_start_offset": 510,
+    "highlight_end_offset": 520,
+    "context_end_offset": 920
+  },
+  "context_utf16": 810,
+  "included_percentage": 30.566037735849058,
+  "input_utf16": 980,
+  "included_turn_ids": [
+    "T20"
+  ],
+  "request": {
+    "model": "unsloth/gemma-4-12b-it-qat",
+    "temperature": 0,
+    "max_tokens": 2048,
+    "stream": true,
+    "messages": [
+      {
+        "role": "system",
+        "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+      },
+      {
+        "role": "user",
+        "content": "[参照文脈]\n電荷でも熱量でもありません。摩擦と空気抵抗を無視し、ばねは理想的で、外部の手が仕事をしない区間だけを比較します。質量は一定です。あなたはベクトル、F=ma、運動量保存を理解しているので、それらの定義を一から説明し直さず、量の区別と条件を整理します。\n\n【慣性系】まず実験室を慣性系と近似します。一定速度で動く観測者へ移っても加速度は変わりませんが、速度と運動エネルギーの数値は変わります。したがって異なる観測者の測定値を同じ表へ無条件に足してはいけません。保存とは同じ慣性系で異なる時刻を比較したときの性質です。観測者を取り替えた数値が等しいという意味ではありません。レールの目盛りの原点を変える操作と、観測者の速度を変える操作も区別してください。\n\n【運動量の局所例】二台を合わせた水平方向の総運動量Pを考えます。内部のばねの力は二台に逆向きに働き、和では消えます。外力の水平成分の合計がゼロなら、【選択箇所開始】これは保存されます。【選択箇所終了】ここで「これ」は総運動量Pです。各台車の速度が一定だという主張ではありません。ばねが伸び縮みして一方が加速しても、他方の変化と合わせて総和が一定になります。単位はkg m/sであり、後で扱うエネルギーの単位Jとは違います。\n\nこの例で系を片方の台車だけへ変更すると、もう片方から受ける力は外力になります。その台車単独の運動量は保存しません。同じ図を見ていても境界の取り方を変えると条件が変わります。ばねの質量は無視する理想化ですが、質量を持たせたモデルならばね自身の運動量も計上する必要があります。条件を省略した「いつも保存」という表現は避け、何を系へ含めたかを確認してから式を使いましょう。\n\n【時間分解能】次は保存則と独立した測定の注意です。ここだけで使うΔは、カメラの連続フレーム間隔を台車とばねの振動周期で割った比と定義します。Δは位置の誤差でもエネルギー変化でもありません。たとえば周期一秒\n\n[Marker Focus]\nこれは保存されます。\n\n[質問]\n質問です。これはどういう意味ですか？"
+      }
+    ]
+  },
+  "automatic": {
+    "marker_match": true,
+    "window_boundaries": true,
+    "source_only": true,
+    "no_future_turns": true
+  },
+  "human_review": "pending",
+  "provider_base_url": "http://127.0.0.1:1234/v1",
+  "request_sha256": "5f1597b0fead0fbd8b794ee58c0213d70d4c511474edb515cddde9cd7169d464",
+  "started": "2026-09-29T11:43:20.746Z",
+  "finished": "2026-09-29T11:43:34.948Z",
+  "answer": "ここでの「これは保存されます」という言葉は、**二台を合わせた水平方向の総運動量$P$**が一定に保たれることを意味しています。\n\n文脈に基づくと、以下の条件と内容が含まれています。\n\n*   **条件：** 外力の水平成分の合計がゼロであること。\n*   **内容：** ばねの力が各台車に逆向きに働いて一方が加速しても、もう一方の変化と合わせて総和（総運動量$P$）は一定になります。これは「各台車の速度が一定である」という意味ではなく、系全体の運動量の合計が変わらないことを指しています。",
+  "output_utf16": 247,
+  "diagnostics": {
+    "finish_reason": "stop",
+    "completion_tokens": null,
+    "prompt_tokens": null,
+    "total_tokens": null,
+    "content_chars": 247,
+    "reasoning_chars": 2047,
+    "duration_ms": 14201,
+    "terminal_chunk_received": true
+  },
+  "error": null
+}

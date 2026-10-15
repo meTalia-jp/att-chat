@@ -1,0 +1,198 @@
+[
+  {
+    "run": "A-N-1500",
+    "literal_escalation_candidate": false,
+    "escalation_candidate": false,
+    "evidence": [],
+    "method": "Codex first review; not an escalation decision; raw run unchanged",
+    "human_review": "pending"
+  },
+  {
+    "run": "A-N-300",
+    "literal_escalation_candidate": false,
+    "escalation_candidate": false,
+    "evidence": [],
+    "method": "Codex first review; not an escalation decision; raw run unchanged",
+    "human_review": "pending"
+  },
+  {
+    "run": "A-N-800",
+    "literal_escalation_candidate": false,
+    "escalation_candidate": false,
+    "evidence": [],
+    "method": "Codex first review; not an escalation decision; raw run unchanged",
+    "human_review": "pending"
+  },
+  {
+    "run": "A-S-1500",
+    "literal_escalation_candidate": false,
+    "escalation_candidate": false,
+    "evidence": [],
+    "method": "Codex first review; not an escalation decision; raw run unchanged",
+    "human_review": "pending"
+  },
+  {
+    "run": "A-S-300",
+    "literal_escalation_candidate": false,
+    "escalation_candidate": false,
+    "evidence": [],
+    "method": "Codex first review; not an escalation decision; raw run unchanged",
+    "human_review": "pending"
+  },
+  {
+    "run": "A-S-800",
+    "literal_escalation_candidate": false,
+    "escalation_candidate": false,
+    "evidence": [],
+    "method": "Codex first review; not an escalation decision; raw run unchanged",
+    "human_review": "pending"
+  },
+  {
+    "run": "B-N-1500",
+    "literal_escalation_candidate": false,
+    "escalation_candidate": false,
+    "evidence": [],
+    "method": "Codex first review; not an escalation decision; raw run unchanged",
+    "human_review": "pending"
+  },
+  {
+    "run": "B-N-300",
+    "literal_escalation_candidate": false,
+    "escalation_candidate": false,
+    "evidence": [],
+    "method": "Codex first review; not an escalation decision; raw run unchanged",
+    "human_review": "pending"
+  },
+  {
+    "run": "B-N-800",
+    "literal_escalation_candidate": false,
+    "escalation_candidate": false,
+    "evidence": [],
+    "method": "Codex first review; not an escalation decision; raw run unchanged",
+    "human_review": "pending"
+  },
+  {
+    "run": "B-S-1500",
+    "literal_escalation_candidate": false,
+    "escalation_candidate": false,
+    "evidence": [],
+    "method": "Codex first review; not an escalation decision; raw run unchanged",
+    "human_review": "pending"
+  },
+  {
+    "run": "B-S-300",
+    "literal_escalation_candidate": false,
+    "escalation_candidate": false,
+    "evidence": [],
+    "method": "Codex first review; not an escalation decision; raw run unchanged",
+    "human_review": "pending"
+  },
+  {
+    "run": "B-S-800",
+    "literal_escalation_candidate": false,
+    "escalation_candidate": false,
+    "evidence": [],
+    "method": "Codex first review; not an escalation decision; raw run unchanged",
+    "human_review": "pending"
+  },
+  {
+    "run": "C-N-1500",
+    "literal_escalation_candidate": false,
+    "escalation_candidate": false,
+    "evidence": [],
+    "method": "Codex first review; not an escalation decision; raw run unchanged",
+    "human_review": "pending"
+  },
+  {
+    "run": "C-N-300",
+    "literal_escalation_candidate": false,
+    "escalation_candidate": false,
+    "evidence": [],
+    "method": "Codex first review; not an escalation decision; raw run unchanged",
+    "human_review": "pending"
+  },
+  {
+    "run": "C-N-800",
+    "literal_escalation_candidate": false,
+    "escalation_candidate": true,
+    "evidence": [
+      "どの量を合計し、どの区間に条件を限定したかについては、最初の約束（定義）を参照する必要があります"
+    ],
+    "method": "Codex first review; not an escalation decision; raw run unchanged",
+    "human_review": "pending"
+  },
+  {
+    "run": "C-S-1500",
+    "literal_escalation_candidate": false,
+    "escalation_candidate": false,
+    "evidence": [],
+    "method": "Codex first review; not an escalation decision; raw run unchanged",
+    "human_review": "pending"
+  },
+  {
+    "run": "C-S-300",
+    "literal_escalation_candidate": false,
+    "escalation_candidate": false,
+    "evidence": [],
+    "method": "Codex first review; not an escalation decision; raw run unchanged",
+    "human_review": "pending"
+  },
+  {
+    "run": "C-S-800",
+    "literal_escalation_candidate": false,
+    "escalation_candidate": false,
+    "evidence": [],
+    "method": "Codex first review; not an escalation decision; raw run unchanged",
+    "human_review": "pending"
+  },
+  {
+    "run": "D-N-1500",
+    "literal_escalation_candidate": true,
+    "escalation_candidate": true,
+    "evidence": [
+      "いずれか"
+    ],
+    "method": "Codex first review; not an escalation decision; raw run unchanged",
+    "human_review": "pending"
+  },
+  {
+    "run": "D-N-300",
+    "literal_escalation_candidate": false,
+    "escalation_candidate": false,
+    "evidence": [],
+    "method": "Codex first review; not an escalation decision; raw run unchanged",
+    "human_review": "pending"
+  },
+  {
+    "run": "D-N-800",
+    "literal_escalation_candidate": false,
+    "escalation_candidate": false,
+    "evidence": [],
+    "method": "Codex first review; not an escalation decision; raw run unchanged",
+    "human_review": "pending"
+  },
+  {
+    "run": "D-S-1500",
+    "literal_escalation_candidate": false,
+    "escalation_candidate": false,
+    "evidence": [],
+    "method": "Codex first review; not an escalation decision; raw run unchanged",
+    "human_review": "pending"
+  },
+  {
+    "run": "D-S-300",
+    "literal_escalation_candidate": false,
+    "escalation_candidate": false,
+    "evidence": [],
+    "method": "Codex first review; not an escalation decision; raw run unchanged",
+    "human_review": "pending"
+  },
+  {
+    "run": "D-S-800",
+    "literal_escalation_candidate": false,
+    "escalation_candidate": false,
+    "evidence": [],
+    "method": "Codex first review; not an escalation decision; raw run unchanged",
+    "human_review": "pending"
+  }
+]

@@ -1,0 +1,84 @@
+{
+  "experiment": "context-correction-v0.3",
+  "fixture_version": "physics-long-32-v2",
+  "marker": "B",
+  "mode": "N",
+  "level": 300,
+  "condition": "N-300",
+  "source_turn": "T20",
+  "source_utf16": 2650,
+  "source_text": "この比を十分小さくします。",
+  "question": "質問です。これはどういう意味ですか？",
+  "anchor": {
+    "highlight_id": "B",
+    "turn_id": "T20",
+    "start_offset": 1208,
+    "end_offset": 1221,
+    "source_text": "この比を十分小さくします。",
+    "target_text": "この比を十分小さくします。",
+    "color": "yellow",
+    "note": "",
+    "created_at": "2026-09-29T00:00:00Z",
+    "updated_at": "2026-09-29T00:00:00Z",
+    "status": "resolved",
+    "reason": null
+  },
+  "local_range": {
+    "start": 1058,
+    "end": 1371
+  },
+  "context_utf16": 313,
+  "included_percentage": 11.81132075471698,
+  "history_turn_ids": [],
+  "included_turn_ids": [
+    "T20"
+  ],
+  "history_utf16": 0,
+  "input_utf16": 486,
+  "request": {
+    "model": "google/gemma-4-12b-qat",
+    "temperature": 0,
+    "max_tokens": 2048,
+    "stream": true,
+    "messages": [
+      {
+        "role": "system",
+        "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+      },
+      {
+        "role": "user",
+        "content": "[参照文脈]\nが流れるため、フレーム間隔だけで観測精度を保証することはできません。照明の不足や読み出しの遅延も別の要因です。ここではそれらを十分に小さくして、時間方向の標本間隔だけを議論しているものとします。測定値の補間で滑らかな曲線を描けても、観測していない急激な変化まで確実に復元できるわけではありません。\n\n【選択箇所開始】この比を十分小さくします。【選択箇所終了】そうすると一周期の間に多くの測定点が得られ、速い動きの取りこぼしを減らせます。これは測定上の条件であって、物体の運動そのものを弱める操作ではありません。小さいという言葉だけを見て振幅や力を小さくする指示と取り違えないでください。具体的な必要点数は求める精度や運動に含まれる周波数によります。一定の点数\n\n[Marker Focus]\nこの比を十分小さくします。\n\n[質問]\n質問です。これはどういう意味ですか？"
+      }
+    ]
+  },
+  "automatic": {
+    "marker_match": true,
+    "window_boundaries": true,
+    "source_only": true,
+    "marker_contained": true,
+    "no_future_turns": true,
+    "mode_match": true,
+    "level_match": true
+  },
+  "human_review": "pending",
+  "escalation_candidate": false,
+  "escalation_evidence": [],
+  "escalation_method": "literal-screen-v1; review for false positives/negatives; no retry",
+  "provider_base_url": "http://127.0.0.1:1234/v1",
+  "request_sha256": "b0c80884773e20b42bcde5df15d724570c132dffcd9fedd349b463153b6f7bfe",
+  "started": "2026-09-30T03:44:23.134Z",
+  "finished": "2026-09-30T03:46:00.018Z",
+  "answer": "この「比」とは、**「測定の間隔（時間方向の標本間隔）」と「物体の運動の周期」の比**を指しています。\n\nしたがって、「この比を十分小さくします」という言葉は、**「物体の動きの一周期に対して、十分な数の測定点が得られるように、測定の間隔を短く設定する」**という意味です。\n\n文脈から以下のことが補足されます。\n\n*   **目的：** 測定の間隔を短くすることで、速い動きの取りこぼしを防ぐためです。\n*   **注意点：** ここで言う「小さくする」とは、測定の頻度（時間間隔）を高くすることを指しており、物体の動きの大きさ（振幅や力）を弱めることではありません。",
+  "output_utf16": 285,
+  "diagnostics": {
+    "finish_reason": "stop",
+    "completion_tokens": null,
+    "prompt_tokens": null,
+    "total_tokens": null,
+    "content_chars": 285,
+    "reasoning_chars": 2743,
+    "duration_ms": 96883,
+    "terminal_chunk_received": true
+  },
+  "error": null
+}

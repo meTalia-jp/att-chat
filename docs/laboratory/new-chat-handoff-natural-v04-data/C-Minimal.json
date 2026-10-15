@@ -1,0 +1,68 @@
+{
+  "experiment": "new-chat-handoff-natural-v0.4",
+  "case_id": "C",
+  "condition": "Minimal",
+  "source_conversation": "Quantum natural conversation fixture",
+  "target_turn": "T6",
+  "included_turn_numbers": [
+    "T5",
+    "T6"
+  ],
+  "included_turn_count": 2,
+  "input_chars": 319,
+  "marker_source_text": "上向きと下向き",
+  "question": "これはそのまま0と1という意味ですか？",
+  "first_user_message": "## 前の会話からの参考文脈\n\n[T5 / User]\n量子コンピュータでは、電子スピンの二つの測定結果を0と1に対応させると聞きました。普通のデジタルビットと同じですか。\n\n[T6 / Assistant / Target]\nある測定軸に沿った電子スピンでは、上向きと下向きという二つの結果を得られ、それぞれを|0⟩と|1⟩へ対応させられます。ただし量子ビットは測定前に、二つの基底状態へ確率振幅を持つ一つの状態を取れます。古典的な0と1が二つ隠れているわけではありません。量子ビットは電子以外にも、超伝導回路、イオン、光子などで実装できます。\n\n## 質問対象\n\n上向きと下向き\n\n## 質問\n\nこれはそのまま0と1という意味ですか？",
+  "request": {
+    "model": "google/gemma-4-12b-qat",
+    "temperature": 0,
+    "max_tokens": 2048,
+    "stream": true,
+    "messages": [
+      {
+        "role": "system",
+        "content": "引用された箇所を質問対象として、日本語で質問に直接答えてください。最初のUser Messageに含まれる情報だけを新しい会話の前提として扱い、過去会話の履歴が別に存在すると仮定しないでください。対象を特定できない場合は断定せず、不足を述べてください。"
+      },
+      {
+        "role": "user",
+        "content": "## 前の会話からの参考文脈\n\n[T5 / User]\n量子コンピュータでは、電子スピンの二つの測定結果を0と1に対応させると聞きました。普通のデジタルビットと同じですか。\n\n[T6 / Assistant / Target]\nある測定軸に沿った電子スピンでは、上向きと下向きという二つの結果を得られ、それぞれを|0⟩と|1⟩へ対応させられます。ただし量子ビットは測定前に、二つの基底状態へ確率振幅を持つ一つの状態を取れます。古典的な0と1が二つ隠れているわけではありません。量子ビットは電子以外にも、超伝導回路、イオン、光子などで実装できます。\n\n## 質問対象\n\n上向きと下向き\n\n## 質問\n\nこれはそのまま0と1という意味ですか？"
+      }
+    ]
+  },
+  "automatic": {
+    "system_user_only": true,
+    "old_history_not_sent_as_messages": true,
+    "turn_order_preserved": true,
+    "target_turn_included_exactly_once": true,
+    "marker_unique_in_target": true,
+    "marker_included": true,
+    "question_included": true,
+    "fixed_settings": true,
+    "no_automatic_retry": true,
+    "no_production_db_write": true
+  },
+  "human_review": "pending",
+  "temporary_conversation_id": "5145b133-3bfc-4823-946b-8337f520645f",
+  "request_sha256": "7bfd78a42b687305edbb5fbac43a97b59471c99e8fd08e89a39c97135aa89d6e",
+  "model": "google/gemma-4-12b-qat",
+  "temperature": 0,
+  "max_tokens": 2048,
+  "started_at": "2026-10-01T11:29:06.105Z",
+  "completed_at": "2026-10-01T11:30:27.004Z",
+  "elapsed_ms": 80899,
+  "finish_reason": "stop",
+  "answer_chars": 114,
+  "reasoning_chars": 2640,
+  "response": "上向きと下向きは、測定結果としてそれぞれ|0⟩と|1⟩に対応させることができます。\n\nただし、古典的な0と1が二つ隠れているわけではなく、量子ビットは測定前に二つの基底状態へ確率振幅を持つ一つの状態を取れるという性質があります。",
+  "diagnostics": {
+    "finish_reason": "stop",
+    "completion_tokens": null,
+    "prompt_tokens": null,
+    "total_tokens": null,
+    "content_chars": 114,
+    "reasoning_chars": 2640,
+    "duration_ms": 80899,
+    "terminal_chunk_received": true
+  },
+  "error": null
+}

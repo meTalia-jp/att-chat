@@ -1,0 +1,72 @@
+{
+  "experiment": "context-correction-v0.1",
+  "fixture_version": "physics-40-v1",
+  "marker": "A",
+  "condition": "B",
+  "source_turn": "T8",
+  "included_turn_ids": [
+    "T8"
+  ],
+  "context_utf16": 204,
+  "input_utf16": 353,
+  "source_text": "これは保存されます。",
+  "question": "これはどういう意味ですか？",
+  "anchor": {
+    "highlight_id": "A",
+    "turn_id": "T8",
+    "start_offset": 62,
+    "end_offset": 72,
+    "source_text": "これは保存されます。",
+    "target_text": "これは保存されます。",
+    "color": "yellow",
+    "note": "",
+    "created_at": "2026-09-29T00:00:00Z",
+    "updated_at": "2026-09-29T00:00:00Z",
+    "status": "resolved",
+    "reason": null
+  },
+  "local_range": {
+    "context_start_offset": 0,
+    "highlight_start_offset": 62,
+    "highlight_end_offset": 72,
+    "context_end_offset": 186
+  },
+  "request": {
+    "model": "unsloth/gemma-4-12b-it-qat",
+    "temperature": 0,
+    "max_tokens": 2048,
+    "stream": true,
+    "messages": [
+      {
+        "role": "system",
+        "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+      },
+      {
+        "role": "user",
+        "content": "[参照文脈]\n[T8 assistant 局所]\n二台の総運動量Pを見ています。各台車の速度は衝突で変わってよく、同じ速度になる必要もありません。外力の合計がゼロである限り、これは保存されます。ここで変わらないのは二台を合わせたベクトル量で、個別の速さでも運動エネルギーでもありません。非弾性衝突でも総運動量は保存できますが、運動エネルギーの一部は内部エネルギーへ移ります。系をどこまで含めたかを先に決めることが大切です。\n\n[Marker Focus]\nこれは保存されます。\n\n[質問]\nこれはどういう意味ですか？"
+      }
+    ]
+  },
+  "automatic": {
+    "marker_match": true,
+    "no_future_turns": true
+  },
+  "human_review": "pending",
+  "provider_base_url": "http://127.0.0.1:1234/v1",
+  "request_sha256": "1292187414843f11cc10f95c8dee2b9c5726b4eb103eb4ac48db223644f549db",
+  "started": "2026-09-29T05:23:36.018Z",
+  "finished": "2026-09-29T05:23:48.740Z",
+  "answer": "「これは保存されます」という言葉は、文脈における**「二台の総運動量P」**のことを指しています。\n\n具体的には、以下の内容を意味しています。\n\n*   **対象**: 二台の台車を合わせたベクトル量としての総運動量です。\n*   **条件**: 外力の合計がゼロである限り、この総運動量は変化しません。\n*   **補足**: 個々の台車の速さや、系全体の運動エネルギーは（衝突によって）変化する可能性がありますが、総運動量だけは保存されるということを説明しています。",
+  "output_utf16": 235,
+  "diagnostics": {
+    "finish_reason": "stop",
+    "completion_tokens": null,
+    "prompt_tokens": null,
+    "total_tokens": null,
+    "content_chars": 235,
+    "reasoning_chars": 1802,
+    "duration_ms": 12723,
+    "terminal_chunk_received": true
+  },
+  "error": null
+}

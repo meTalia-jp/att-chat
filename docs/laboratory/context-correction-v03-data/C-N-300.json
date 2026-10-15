@@ -1,0 +1,84 @@
+{
+  "experiment": "context-correction-v0.3",
+  "fixture_version": "physics-long-32-v2",
+  "marker": "C",
+  "mode": "N",
+  "level": 300,
+  "condition": "N-300",
+  "source_turn": "T20",
+  "source_utf16": 2650,
+  "source_text": "これは保存されます。",
+  "question": "質問です。これはどういう意味ですか？",
+  "anchor": {
+    "highlight_id": "C",
+    "turn_id": "T20",
+    "start_offset": 1584,
+    "end_offset": 1594,
+    "source_text": "これは保存されます。",
+    "target_text": "これは保存されます。",
+    "color": "yellow",
+    "note": "",
+    "created_at": "2026-09-29T00:00:00Z",
+    "updated_at": "2026-09-29T00:00:00Z",
+    "status": "resolved",
+    "reason": null
+  },
+  "local_range": {
+    "start": 1434,
+    "end": 1744
+  },
+  "context_utf16": 310,
+  "included_percentage": 11.69811320754717,
+  "history_turn_ids": [],
+  "included_turn_ids": [
+    "T20"
+  ],
+  "history_utf16": 0,
+  "input_utf16": 480,
+  "request": {
+    "model": "google/gemma-4-12b-qat",
+    "temperature": 0,
+    "max_tokens": 2048,
+    "stream": true,
+    "messages": [
+      {
+        "role": "system",
+        "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+      },
+      {
+        "role": "user",
+        "content": "[参照文脈]\nネルギーが移ります。ばねが戻ると逆の移動が起こります。途中の時刻を二つ選んで比べると、運動エネルギーだけの値は一致しないことがあります。そのことと合計の保存を混同しないでください。位置エネルギーのゼロ点は同じ規約で比較し、時刻ごとに勝手に取り直さないようにします。\n\n冒頭で定義した台帳Qに戻ります。【選択箇所開始】これは保存されます。【選択箇所終了】意味は各項が固定されるということではなく、項の間の移し替えがあっても合計を維持するということです。途中の説明で使った撮影間隔の比や、速度のベクトル和をこの台帳へ代入してはいけません。どの量を合計し、どの区間に条件を限定したかは最初の約束を参照してください。ここでは記号の定義を省略して同じ名前を使って\n\n[Marker Focus]\nこれは保存されます。\n\n[質問]\n質問です。これはどういう意味ですか？"
+      }
+    ]
+  },
+  "automatic": {
+    "marker_match": true,
+    "window_boundaries": true,
+    "source_only": true,
+    "marker_contained": true,
+    "no_future_turns": true,
+    "mode_match": true,
+    "level_match": true
+  },
+  "human_review": "pending",
+  "escalation_candidate": false,
+  "escalation_evidence": [],
+  "escalation_method": "literal-screen-v1; review for false positives/negatives; no retry",
+  "provider_base_url": "http://127.0.0.1:1234/v1",
+  "request_sha256": "c329bd332c0ebc710827df42975e1e1f8fdbfa8f3e003900692622c80f5a8521",
+  "started": "2026-09-30T03:53:58.984Z",
+  "finished": "2026-09-30T03:55:16.239Z",
+  "answer": "「これは保存されます」という言葉は、**「台帳Q」における項の合計が維持されること**を意味しています。\n\n具体的には、以下のことを指しています。\n\n*   **個々の項が固定されるという意味ではない：** 運動エネルギーや位置エネルギーといった個々の項の値が、常に一定であるという意味ではありません。\n*   **合計を維持する：** 項の間でエネルギーの移し替え（変化）が起こったとしても、それらを合計した総量は変わらないということを意味しています。",
+  "output_utf16": 227,
+  "diagnostics": {
+    "finish_reason": "stop",
+    "completion_tokens": null,
+    "prompt_tokens": null,
+    "total_tokens": null,
+    "content_chars": 227,
+    "reasoning_chars": 2320,
+    "duration_ms": 77247,
+    "terminal_chunk_received": true
+  },
+  "error": null
+}

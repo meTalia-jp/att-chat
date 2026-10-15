@@ -1,3 +1,6 @@
+import { isIP } from 'node:net';
+import { lmStudioSimpleBaseUrl } from '../shared/model-connection.ts';
+
 export class ProviderError extends Error {}
 
 export type GenerationDiagnostics = {
@@ -11,13 +14,46 @@ export type GenerationDiagnostics = {
   terminal_chunk_received: boolean;
 };
 
+function isPrivateIpv4(hostname: string) {
+  const octets = hostname.split('.').map(Number);
+  if (octets.length !== 4 || octets.some(value => !Number.isInteger(value) || value < 0 || value > 255)) return false;
+  return octets[0] === 10
+    || octets[0] === 127
+    || (octets[0] === 169 && octets[1] === 254)
+    || (octets[0] === 172 && octets[1] >= 16 && octets[1] <= 31)
+    || (octets[0] === 192 && octets[1] === 168);
+}
+
+function isPrivateIpv6(hostname: string) {
+  const value = hostname.toLowerCase();
+  return value === '::1' || /^(?:fc|fd)/.test(value) || /^fe[89ab]/.test(value);
+}
+
+function isLanHostname(hostname: string) {
+  const label = '[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?';
+  return new RegExp(`^${label}$`, 'i').test(hostname)
+    || new RegExp(`^(?:${label}\\.)+(?:local|lan|home\\.arpa)$`, 'i').test(hostname);
+}
+
+export function normalizeLMStudioBaseUrl(baseUrl: string) {
+  let url: URL;
+  try { url = new URL(baseUrl); }
+  catch { throw new Error('LM Studio Base URLが不正です'); }
+  const hostname = url.hostname.replace(/^\[|\]$/g, '').toLowerCase();
+  const addressKind = isIP(hostname);
+  const localTarget = hostname === 'localhost'
+    || (addressKind === 4 && isPrivateIpv4(hostname))
+    || (addressKind === 6 && isPrivateIpv6(hostname))
+    || (addressKind === 0 && isLanHostname(hostname));
+  if (url.protocol !== 'http:' || !localTarget || !url.hostname || !url.port || url.username || url.password || url.search || url.hash) {
+    throw new Error('LM Studioはportを含むローカル/LAN HTTP接続先を指定してください');
+  }
+  return url.toString().replace(/\/$/, '');
+}
+
 export class LMStudioProvider {
   readonly baseUrl: string;
-  constructor(baseUrl = process.env.LM_STUDIO_BASE_URL ?? 'http://127.0.0.1:1234/v1') {
-    const url = new URL(baseUrl);
-    if (url.protocol !== 'http:' || !['127.0.0.1','localhost','[::1]'].includes(url.hostname) || url.username || url.password || url.search || url.hash) throw new Error('LM StudioはローカルHTTP接続先を指定してください');
-    this.baseUrl = baseUrl.replace(/\/$/, '');
-  }
+  constructor(baseUrl = process.env.LM_STUDIO_BASE_URL ?? lmStudioSimpleBaseUrl) { this.baseUrl = normalizeLMStudioBaseUrl(baseUrl); }
   async models(): Promise<string[]> {
     try {
       const res = await fetch(`${this.baseUrl}/models`, { signal: AbortSignal.timeout(10000), redirect: 'error' });

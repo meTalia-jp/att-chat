@@ -1,0 +1,39 @@
+{
+  "experiment": "new-chat-handoff-turn-stability-v0.3",
+  "reviewer": "Codex first observation",
+  "reviews": [
+    {
+      "condition": "OFF",
+      "result": "既存比較基準。最終回答がないため質問対象の解釈は評価不能。",
+      "target_identification": "not_assessable",
+      "unnecessary_inference": "not_assessable",
+      "topic_drift": "not_assessable",
+      "human_review": "pending"
+    },
+    {
+      "condition": "Minimal",
+      "result": "最終回答へ到達。説明が入力に含まれないと判断し、根拠のない好意表現の由来を生成しなかった。",
+      "target_identification": "partial",
+      "unnecessary_inference": "low",
+      "topic_drift": "not_observed",
+      "human_review": "pending"
+    },
+    {
+      "condition": "Standard",
+      "result": "最終回答へ到達。T25を対象として明示したが、前Turnの文化的連想を用いて質問へ回答するところまでは進まなかった。",
+      "target_identification": "partial",
+      "unnecessary_inference": "low",
+      "topic_drift": "not_observed",
+      "human_review": "pending"
+    },
+    {
+      "condition": "Wide",
+      "result": "最終回答へ到達しT25の内容を具体的に識別。質問と無関係なExperimental等の記述にも触れ、Target Turn由来のノイズ候補が見られた。",
+      "target_identification": "clear",
+      "unnecessary_inference": "low",
+      "topic_drift": "noise_candidate",
+      "human_review": "pending"
+    }
+  ],
+  "human_review": "pending"
+}

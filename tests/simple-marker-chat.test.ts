@@ -52,8 +52,8 @@ test('Simple Marker Chat composes existing Chat: stream, stop, reload, no extens
     const settle=async(fn:()=>void)=>{await act(async()=>{fn();await new Promise(r=>setTimeout(r,20));});};
     const button=(name:string)=>{const result=Array.from(container.querySelectorAll('button')).find(b=>b.textContent===name);assert.ok(result,name);return result;};
     await settle(()=>root!.render(createElement(SimpleMarkerChat)));
-    await settle(()=>{});
-    const select=container.querySelector('select')!;
+    await act(async()=>{for(let attempt=0;attempt<20;attempt+=1){await new Promise(resolve=>setTimeout(resolve,10));if(container.querySelector('option[value="fake"]'))break}});
+    const select=container.querySelector<HTMLSelectElement>('[aria-label="モデル"]')!;
     await settle(()=>{select.value='fake';select.dispatchEvent(new dom.window.Event('change',{bubbles:true}));});
     const input=container.querySelector('textarea')!;
     await settle(()=>{
@@ -66,7 +66,7 @@ test('Simple Marker Chat composes existing Chat: stream, stop, reload, no extens
     assert.equal(button('fixture').disabled,true);
     assert.equal(button('送信').disabled,true);
     await settle(()=>button('停止').click());
-    assert.ok(container.textContent!.includes('cancelled'));
+    assert.ok(container.textContent!.includes('キャンセルしました'));
     assert.equal(button('fixture').disabled,false);
     assert.equal(container.querySelector('article small'),null);
     await settle(()=>button('再読込').click());

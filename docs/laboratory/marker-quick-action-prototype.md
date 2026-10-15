@@ -2,11 +2,19 @@
 
 ## Current State
 
+最新実験: [Context Correction v0.3 — Same / New](context-correction-v03-report.md)（2026-09-30）。v0.2固定fixtureで履歴T1〜T20あり/なし×局所300/800/1500の24 Run Pilotを完了。24 stop、0 error、自動照合・Codex一次評価済み、Human review pending。500/1100は未実行、最適window・引継ぎ量は未決定。
+
+前回実験: [Context Correction v0.2 — Long Source](context-correction-v02-report.md)（2026-09-29）。2650 UTF-16のT20、局所300/800対全文、4 Marker×4条件を実行。15 stop/1 length、一次評価済み、Human review pending。最適windowは未決定。
+
+最新実験追記: [Context Correction v0.1 Report](context-correction-v01-report.md)（2026-09-29）。40 Turn物理fixture、4 Marker×4条件のPreviewとLM Studio初回回答16件を保存。自動照合とCodex一次評価済み、Human review pending。本番Question Keep/Chatへ未接続。今回だけLab専用CLIからモデル生成を行い、既存UIのAI送信禁止境界は維持する。
+
+最新UI追記: Question Box → New Chat Handoff Prototype v0.1（2026-09-30）。「新規チャット」をLab専用Setup／memory-only Previewへ接続。Conversation作成・保存・モデル送信は未接続、末尾参照。
+
 照合日: 2026-09-26。Repositoryのdirty working treeを根拠とする要約。以下のPhase履歴は当時の記録として保持する。実装完了・技術検証・ユーザー評価・本番採用は別の判定。
 
 - Catalog ID: `marker-quick-action-prototype`
 - Catalog status: `TESTING`
-- Current phase: External Data Asset対応 / Phase 0.7 Quick Dictionary Prototype v0.1（Catalog version 0.7）。履歴は初期Marker → Detail/Signal比較 → 0.4.1 → Memo 0.5 → Direction Menu 0.6 → Dictionary 0.7。
+- Current phase: Question Box Sidebar v0.2 Conversation折りたたみ整理（2026-09-28、末尾参照）。前段: Question Box Sidebar Prototype v0.1（2026-09-28、末尾参照）。前段: Immediate / Deferred二択試験（2026-09-28、末尾参照）。前段: Marker Immediate Ask Composer v0.2（2026-09-28、末尾参照）。前段: Marker Immediate Ask Handoff最小Lab試験（2026-09-27、末尾参照）。既存Catalogを継続し新規Experiment登録なし。前段: External Data Asset対応 / Phase 0.7 Quick Dictionary Prototype v0.1（Catalog version 0.7）。履歴は初期Marker → Detail/Signal比較 → 0.4.1 → Memo 0.5 → Direction Menu 0.6 → Dictionary 0.7。
 - Implemented through: implementation complete（0.7範囲）。D2初期表示、左▽Detail・中央4色Marker・右▷Menu。Signalは選択終端寄せ/下側優先、下端で上反転。Menuは通常右、右端で左反転。現在はQuick Memo / Dictionaryの2項目。
 - Technical validation: 0.7に自動テスト/typecheck/buildと実pointer drag検証の記録あり。lazy load再利用・古い応答破棄は自動テスト確認で、実ブラウザの取得回数・初回時間は未実測。今回の再検証は自動のみ。
 - User evaluation: 未完了。操作方向・距離、D2外観、辞書訳の読みやすさ、Sidebar配分についてuser evaluation pending。0.4.1のUI検証完了とは別。
@@ -459,3 +467,246 @@ EJDict-hand本体をRepository必須資産から任意配置のExternal Data Ass
 - 同じ未配置workspaceのbuildを専用Labサーバーで配信し、入口HTTP 200と実HTTP経由のDictionary missing-assetを確認。終了後サーバーを停止。
 - UIテストで配置案内とpathを確認し、既存Quick Memo/Marker/Signal/Menu・他Labの回帰もPASS。実ブラウザでの追加目視確認は今回行っていない。
 - 元の辞書を移動・削除せず、JSONのみignore対象であることを確認。README/SOURCEは除外しない。実行時のハッシュ強制検査や自動downloadは追加していない。
+
+
+## Marker Immediate Ask Handoff — 最小Lab試験（2026-09-27）
+
+### Purpose / Marker as active reference
+Markerを質問対象の座標として保持し、Detailから通常Chat入力欄相当へ短い質問を渡せるか確認する。既存Quick Action Experimentの継続。React memory-onlyのpreparationとactiveReferenceを分離し、markerId / turnId / turnNumber / sourceTextを保持する。本番Chat・MarkerCore・API・DB・Keep・ContextBuilderへ接続しない。
+
+### Immediate Ask flow / Visible intent prefixes / Short input behavior
+「質問受け渡しfixtureを準備（T10 / T25）」で同じ「月がきれいですね」を持つ2つの既設Markerを用意する。Marker → 左▽ → すぐ質問 → 1行入力 → 明示的な「入力欄へ」で転送。質問・しかし…・意見はそれぞれ「質問です。 」「ただ、疑問が残ります。 」「私の考えでは、」を入力末尾へ挿入し、通常の文字として編集可能。参考メモ・Attention・色変更・削除は保持。Detailが高くなった場合は内部scrollする。
+
+### Draft handoff / Reference indicator / Reference clear behavior
+確定でDetailとbrowser selectionを閉じ、Lab Chat draftへfocusする。表示は「T10 のMarkerを参照中」等のみで内部IDを出さない。×は参照だけ解除し本文を保持。Escape・外クリックは準備を破棄し転送しない。送信ボタン・モデル呼出しは実装していない。転送済み参照のMarkerを削除した場合も参照だけ解除して本文を保持する。
+
+### Existing draft behavior / Multiple Marker behavior
+既存draftがあれば改行を挟んで追記する暫定仕様。空の準備を確定した場合も既存本文は保持し参照だけ設定できる。Bを準備している間は確定済みA参照を保持し、Bの確定時だけ置換。引用文字列比較でMarkerを決めない。元の7段落は既存単一Turn fixture（T1）として扱い、追加2段落はT10/T25。汎用handoff framework・Equipmentではない。
+
+### Browser observations / Observed issues
+実ブラウザでT10 → 質問prefix →「質問です。なぜですか？」→ 転送とT10表示を確認。本文追記後の×で本文が残り、同じ本文のT25から確定すると既存文章に追記してT25表示へ切り替わった。T10を再準備してEscapeした場合はT25参照・draftとも保持された。操作はブラウザのキーボード操作と入力APIで確認し、マウスdragの再検証は行っていない。外クリック未転送、3prefix、Marker編集・削除とQuick Memo/Dictionary回帰は自動testでも確認。
+
+入力fixtureは本文末尾にあるため転送時に視点が移動する。追記文は過去Marker向けの質問も含み得る一方、active referenceは最新1件だけであり、混乱しないかは人間評価が必要。既存Attention欄を残しているためDetailが長くなる。Vite単独のLab記録APIエラーは既知の起動制約で、このmemory-only導線には影響しない。
+
+### Validation / User evaluation pending
+npm test: 267件、265 PASS / 0 FAIL / 2 SKIP。typecheck / build PASS。最初のtest実行では追加fixtureによる段落数と合成selectionの後処理に起因する2件を修正し再実行。既存入力の無言削除なし、参照解除後本文保持、同文別Turn、未確定close、送信呼出しなしを検証。導線の自然さ・prefixの必要性・1行入力・参照表示・追記方式はuser evaluation pending。AI品質評価・本番採用判断は行わない。
+
+
+## Marker Immediate Ask Composer v0.2（2026-09-28）
+
+### Purpose / Composer separation / Immediate-question state
+通常本文mainDraftとimmediateQuestions（markerId / turnId / turnNumber / sourceText / questionText）を別stateに保持するLab試験。再質問がある場合だけ本文直上に薄い背景・dividerで表示し、共通の送信Previewボタンを1つ置く。前Phaseの単一active referenceと本文への追記を置き換える。Catalog追加なし。本番接続・API・DB・モデル通信なし。
+
+### Main draft independence / Multiple Marker questions
+最新Assistant fixtureはT25でA/Bの2段落、過去T10にC。いずれも同じ引用「月がきれいですね」でIDによる区別を試す。準備ボタンでMarkerを作成し、A/Bからすぐ質問→既存prefix→1行入力→入力欄へで再質問だけ追加。本文の内容は追加・削除・編集で一切変更しない。準備のEscape/外クリックは追加しない。
+
+### Read-only quote / Editable question / Removal / Duplicate
+引用はq要素によるread-only表示、質問は編集可能なinput。×は該当再質問のみ削除しMarker・本文を保持。0件で再質問領域を除去し、同じ本文textareaを維持する（上の領域が縮む分の垂直位置移動はある）。同一Marker再追加は無視し、既存質問を上書きしない。確定時にDetailを閉じ通常本文へfocusする。Marker本体を後から削除しても既に準備した再質問snapshotは保持する。
+
+### Latest-Turn restriction / Model-facing formatting / Send preview
+T25の単一段落内Markerのみ対象。過去Cおよび旧7段落のすぐ質問はdisabled。旧Quick Memo/Dictionary/Marker編集は維持。Send Preview押下時だけ「## 回答への再質問」「・『引用』に相当するかぎ括弧引用＋質問」「## メッセージ」へ整形する。内部ID/offset/Turn IDは出力しない。Markdownをparseしてstateを復元しない。本文空でも再質問ありならPreview可、両方空ならdisabled。編集で古いPreviewを消し、次回押下で更新する。Previewは検証用で本番UI候補ではない。
+
+### Browser observations / Observed issues / User evaluation pending
+実ブラウザの入力・キーボード操作で、本文先行→A追加→B追加→質問文編集→並列2件Previewを確認。Aだけ削除してB・通常本文・Marker3件が残り、全削除で再質問領域が消え本文が維持された。Cのすぐ質問disabledを確認。同文同Turnの2引用は見た目が同じなので質問文で区別する必要がある。項目増加時の高さ、全削除時の縦移動、無視される重複操作の分かりやすさは評価課題。外枠の一体感・並列表現・引用read-onlyの安心感はuser evaluation pending。回答品質は未評価。
+
+### Validation
+npm test: 267件、265 PASS / 0 FAIL / 2 SKIP。typecheck / build / git diff --check PASS。0/1/複数、本文保持、削除、重複無視、過去Turn除外、prefix、未確定close、Previewと内部ID非混入、通信呼出し増加なしを既存Lab回帰に加えて検証。通常本文空のPreview可否は自動testで確認。本番移植なし、commit/push/tagなし。
+
+
+## Marker Question Final Design / Immediate・Deferred二択試験（2026-09-28）
+
+### Purpose / Immediate vs Deferred semantics / Exclusive choice UI
+MarkerはHuman Attentionかつ質問対象の座標であり、質問を作らなくても存在する。左▽に大きめの「今すぐ質問」「後で質問」を配置し、aria-pressedで排他的選択を示す。下のprefix・1行入力・確定は共通。切替時は入力を保持するが、close時は準備を破棄する。参考メモ/Attentionは折りたたみの既存Markerメモ内へ退避し、保存済み値と編集を維持。削除は最下部。
+
+### Latest-Turn restriction / Deferred-question positioning
+fixtureのcompleted Assistant最終TurnはT25（A/B）、過去T10（C）と旧本文T1。今すぐ質問はT25の単一段落Markerだけ有効。過去Turnはdisabledと補足を表示し、後で質問は可能。実Conversationのlatest completed Turn算出は本番接続時に必要で、今回は固定fixtureに限定。
+DeferredはLab内memory stateにkeepId / markerId / turnId / turnNumber / sourceText / question_draft / conversationId / start / end / createdAtを保持。元Markerの座標snapshotを使い文字列検索で再同定しない。空欄保存可、1行、既存Marker.memoや本番Keep.memoは上書きしない。同一MarkerのDeferredは既存Keep 1:Nに倣い複数保留可。本番DB/APIと接続せず、reloadで消える。
+
+### Confirm / Cancel / Marker persistence / Question-state badge
+明示的な確定だけでImmediateをComposerへ、DeferredをLab Keepへ追加。自動送信なし。Escape/枠外クリックは入力破棄、Marker/座標/既存Composer/既存Keepは保持。二択選択だけでは追加しない。Immediateの重複抑止・mainDraft独立はv0.2を維持。
+ComposerまたはKeepに載るMarkerに同じ小dotをCSS疑似要素で表示し、選択対象のtextContentへ記号を混入させない。無質問Markerは無印。Composerから項目を除去しKeepもなければdotは消える。Marker本体削除時は対応Deferredを除去し、既に準備したImmediate snapshotは前Phaseどおり保持する。
+
+### Context correction concept / Experimental parameters
+文脈補正は将来の「後で質問」実行時の内部処理。保存時に補正文脈を固定しない。今回のDeferredは保存・一覧だけで、補正戦略を実行経路に埋め込まない。設定画面や補正Preview自体は未実装。
+再利用候補は src/mode-b-poc/context-builder.ts の純粋関数。quote_only / same_turn_context、300/600/1000 UTF-16予算、5:5/6:4/7:3、grapheme境界検証を持つ。自由なbefore_chars / after_charsではないので変換できない条件を黙って丸めない。
+src/context-preview/service.ts はSQLite/ RetrievalService依存。A（local）/A+B（local+前後Turn）、前後0〜3、上限20000 UTF-16。memory fixtureへ直接持ち込まず、将来取得済みTurnを受けるadapterか独立比較で再利用を検討する。Source Turn全文など全候補は既存戦略と同一ではない。UTF-16文字予算とモデルtoken予算も区別する。
+将来Experimental設定はstrategy / before_chars / after_chars / previous_turns / next_turns / max_budget / unit / versionを明示し、要求値と端部・grapheme処理後の実効範囲を記録する。「中」だけで記録しない。今回のUIでは露出しない。
+
+### Future Run recording / Production connection
+request_snapshotは実際のモデルrequestを保持し、内部offset/IDをmessagesへ混ぜない。reference_snapshotには元座標・source textと、補正strategy/parameters/version/取得Turnと実効範囲を記録する案。既存GenerationRunにcontext_strategy/strategy_version、参照JSONがあるので新列を前提としない。ただし006_branch_questions.sqlのtriggerはstrategy_version 1/2とsource整合を検証しており、JSON拡張だけで新戦略が動くとは限らない。型・validation・旧snapshot互換を別Phaseで設計する。KeepなしImmediate Runの現行keep_id必須制約も未解決のまま、本番変更しない。
+Question Keep→質問する/新規チャットの両方で補正builderを共有する方向。新規の引継ぎなしはFocus+質問のみ、ありは明示戦略で文脈を搬送する将来比較条件。今回実装しない。
+
+### Browser observations / Observed issues / User evaluation pending
+実ブラウザでA→今すぐ→prefix/入力→確定→Composer、B→後で→一言→確定→T25 Keepを確認。Cは今すぐdisabled/後でenabled。Cに入力して本文への外クリックでキャンセルし、再open時空欄・Marker3件保持・通常本文保持・Keep追加なしを確認。A/Bにdot、Cは無印をDOMと画面で確認。操作はkeyboardと入力/クリックAPIで検証し、drag再検証はしていない。
+小dotは背景や拡大率で見落としやすく、二択の理解・共通入力・取消時破棄・保留一覧の場所はuser evaluation pending。Context品質評価・本番採用なし。Lab Keepの復帰/送信操作は未実装。Vite単独の記録APIエラーは既知の別制限。
+
+### Validation
+npm test 267件: 265 PASS / 0 FAIL / 2 SKIP。typecheck / build / git diff --check PASS。二択排他、過去Turn、Immediate/Deferred、空欄保留、キャンセル、Marker保持、dot有無、本文保持と既存Lab回帰を確認。本番コード・DB/API・migration・Run schema変更なし。commit/push/tagなし。
+
+## Question Box Sidebar Prototype v0.1（2026-09-28）
+
+### Purpose / Question Box semantics
+質問文ではなく「疑問が生まれた場所」の一覧として、保留したMarkerから元Conversation / Turn / Markerへ戻れるかを試す。既存Quick Actionの継続Phase。実装・技術検証は完了、user evaluation pending。本番採用なし。
+
+### Chat / Question Box switch / Keep read model
+Lab専用左Sidebarにチャット / 質問箱を配置し、初期値はチャット。既存memory-only Deferredを共通stateとして使い、keepId / markerId / conversationId / turnId / turnNumber / sourceText / question_draft / start / end / createdAt、fixture用unresolvedを保持する。本番schemaではない。
+一覧は追加順の逆順。T番号は1始まり、会話名を小さく、Marker抜粋は最大70文字、一言メモは非空時のみ表示。元へ戻るだけを明示ボタンにし、行全体click・削除・質問する・新規チャットは追加しない。
+
+### Cross-conversation list / Turn-number display
+「質問箱fixtureを準備（会話A/B・未解決）」でA/T10 Marker C、A/T25 Marker B、B/T8 Marker D、B/T9 unresolvedの4件を準備する。繰り返し準備してもKeepは重複追加せず、既存ユーザー作成Keepを新しい側に保つ。Aの既存本文・Composer・Quick Memo等のstateは会話切替で保持する。Bは復帰試験専用のread-only fixtureで、通常Chat機能の複製ではない。
+
+### Return-to-source flow / Marker pulse behavior / Unresolved behavior
+会話IDで表示を切替後、Turn ID内のMarker IDを探す。Aでは保存済みsource textと範囲snapshotも照合し、同文検索による再anchorはしない。解決済みMarkerをviewport中央へscrollしてfocus、約1.8秒outline/pulse（reduced motionではanimationなし）。チャットタブへ戻す。
+未解決は元Turnへscrollし、一時outlineと「Marker位置を確認できません」を表示する。同じ文章を持つ他Markerには移動しない。元Turn自体がない場合も案内に留める。
+
+### New Keep reflection
+Marker → 左▽ → 後で質問 → 確定で同じKeep stateへ追加し、質問箱の先頭へ即時反映する。既存質問情報dotをそのまま使用。Keep一覧から削除する機能はない。既存Marker削除時のLab側処理は維持する。
+
+### Browser observations / Observed issues
+実ブラウザで質問箱切替、新着順、同文のA/T25 Bへの正確な復帰、別会話B/T8 Dへの復帰・dot・pulse、B/T9未解決のTurn fallbackと案内を確認した。T10から新規「後で質問」を保存し、一覧の先頭反映も確認。操作はキーボードactivationと入力/クリックAPIで行い、drag再検証はしていない。
+左幅210pxの小さな一覧として表示する。外側のLab Catalogと内側の試験Sidebarが並ぶため、本番の有効本文幅とは異なる。狭幅の最終設計や多数Keep時の評価は未完了。Vite単独起動の既知の記録APIエラーは本Phaseの対象外。非表示BのMarkerが旧テストの全DOM検索に混入したため、stateを持たないBは表示時だけ描画する。
+
+### Validation / User evaluation pending
+npm test: 267件中265 PASS / 0 FAIL / 2 SKIP。質問箱の新着順、二重seed抑止、同文Marker区別、会話横断復帰、未解決fallback、pulse終了、dot、追加即時反映、Composer保持を既存Quick Action回帰に追加。typecheck / build / git diff --check PASS。
+一覧の抜粋長・一言メモ・会話名の情報量・元へ戻るの自然さは人間評価待ち。Allowed scopeはLab専用Sidebar / fixture / CSS / tests / 本記録。Excluded scopeは本番Chat・MarkerCore・DB/API・Study・文脈補正・モデル送信・Run・質問実行・新規チャット・Keep削除。commit / push / tagなし。
+## Question Box Sidebar v0.2 — Conversation折りたたみ整理（2026-09-28）
+
+### Conversation grouping / Keep-only conversation filtering
+質問箱をConversation→Keepの階層へ変更。Keepが存在する会話だけ表示し、名称はチャット一覧と同じLab会話データを参照する。独自の名称snapshot・保存schemaは追加しない。見出しに件数を表示する。
+
+### Latest-conversation initial expansion / Group ordering / Keep ordering
+質問箱タブに入るたび、最新Keepを含むConversationだけ展開する。createdAtの降順でKeepを並べ、同時刻なら追加順の新しい側を優先する。グループも内部の最新Keep順。開いている間は個別開閉を保持し、新規Keep反映だけで手動の折りたたみを解除しない。
+
+### Collapse-all behavior / Chat list role separation
+「すべて閉じる」は全グループを閉じる。各見出しは独立開閉のみで、会話を開く操作ではない。チャットタブは全会話を探す入口、質問箱はKeepのある会話を分類する入口。項目のT番号・70文字抜粋・任意メモ・unresolved・元へ戻るを維持。操作行に余白を設けたが、将来用メニュー・質問実行・新規チャットは実装しない。
+
+### Fixture / Browser observations
+新規Runで「質問箱fixtureを準備（会話A/B/C・未解決）」を押すとA 3件・B 2件・C 1件を作成。KeepなしDはチャットにのみ表示。Cは最新Keepを持つ未解決位置のread-only fixture。既存A/Bの復帰ロジックを変更せず、Cにも元Turnの表示だけを用意した。
+実ブラウザでCのみ初期展開、グループ順C→B→A、A/Bの個別開閉、全閉じ、内部新着順、D非表示を確認。B/T8の正確なMarker・dot・pulse、B/T9の未解決案内、A/T25復帰も確認。操作はkeyboard activation中心で、ドラッグ検証は今回の対象外。
+
+### Validation / User evaluation pending
+grouping・件数・初期展開・並び順・個別開閉・全閉じ・Keepなし非表示の自動検証を既存Quick Actionテストへ追加。元へ戻る・同文Marker区別・unresolved・新規Keep反映の回帰を維持する。
+折りたたみにより見通しは短くなったが、項目到達に開閉が1操作増える。毎回最新グループだけ開く挙動と情報量はuser evaluation pending。大量Keep・狭幅の最終UX判断は未完了。本番コード・DB/API・Marker処理・文脈補正・質問実行・新規チャットを変更しない。commit/push/tagなし。
+検証結果: npm test 267件（265 PASS / 0 FAIL / 2 SKIP）、npm run typecheck / npm run build / git diff --check PASS。
+
+### Return action inline text / Txx same-line layout（2026-09-29）
+20件fixtureで、下部の枠付き「元へ戻る」をT番号の右へ移動。見た目は下線付きテキスト操作、意味は既存buttonのままでEnter/Space操作と復帰handlerを維持する。右操作群をflexにし、将来の小操作を隣接できる構造だけ残した。メニューは実装しない。
+
+### Vertical-density / Narrow-sidebar observation
+独立した下部操作行を除去し、見出し行を24pxに収めた。通常Sidebar幅210pxでサンプル項目は122px、メモなしunresolved項目は100px。高さは本文の折り返しに依存する。viewport幅520px・Sidebar幅150pxでもT番号と操作は同じ行に収まり、重なりなし。既存Conversation見出しは狭幅で折り返すが今回変更しない。
+下線を常時表示し、hoverでは色・背景、focus-visibleでは2px輪郭を指定。実ブラウザでキーボードfocusの輪郭とEnter復帰を確認。hoverはCSS定義確認までで、ポインタhoverの実機目視は未確認。
+resolved B/T8のMarker復帰、unresolved B/T9のTurn復帰と案内、メモあり・なしを確認。質問箱のgroup/Keep順・開閉・保存・Marker処理は変更なし。
+
+### Validation / User evaluation pending
+npm test 267件（265 PASS / 0 FAIL / 2 SKIP）、typecheck / build / git diff --check PASS。密度と操作の見つけやすさの採否はuser evaluation pending。本番移植・commit/push/tagなし。
+
+## Question Box Sidebar v0.3 — 主要操作＋ellipsis menu（2026-09-29）
+
+- Primary action remains visible: T番号の右にテキスト操作「元へ戻る」を維持。復帰handler・Marker pulse・unresolvedのTurn復帰は従来どおり。
+- Secondary actions / Future extensibility: 24px幅の「…」を追加。専用の小さな操作領域に「質問する」「新規チャット」を表示し、選択時はT番号付きの「未実装」案内だけを出す。Keep・Conversation・Composer・DB/APIには接続しない。追加候補を置ける構造のみで汎用frameworkなし。
+- Menu open / close / One-menu-at-a-time: Keep IDを1件保持。同じ入口で閉じ、別入口で置換、枠外pointerdown・Escape・タブ切替で閉じる。Escapeは入口へfocusを戻す。Tab/Enterで候補を操作できる通常button群として実装。
+- Conversation-collapse interaction: 対象グループを閉じる／すべて閉じるでmenuも閉じる。見出し操作は会話遷移しない。
+- Narrow-sidebar behavior: Menuは入口直下の通常レイアウト内に右寄せ表示し、開いている1項目だけ高さが増える。浮動配置による画面外はみ出しを避ける最小構成。viewport520px・Sidebar150pxで横scrollなし（clientWidth = scrollWidth = 134px）、T21・元へ戻る・…の同一行とfocusを画面確認。
+- Browser observations: 20件fixtureのF/Eでopen・同時1件・別Keep切替・Escape・枠外クリック・グループclose・全close、未実装案内を確認。B/T8 resolved、B/T9 unresolvedの復帰も確認。別入口のpointerdownで旧menuを先に閉じるとclick前に行位置が動くため、入口同士の切替はclickでまとめて処理する。
+- User evaluation pending: 補助操作の発見しやすさ、展開による縦方向の移動量は人間評価待ち。本番移植なし。
+- Validation: npm test 267件（265 PASS / 2 SKIP / 0 FAIL）、typecheck / build / git diff --check。commit / push / tagなし。
+
+## Context Correction Experiment v0.1（2026-09-29）
+
+- Purpose / Hypothesis: Question Keepから将来質問する際、過去のSource以前の文脈量で最初の回答の対象特定・既知前提・説明開始レベルが変わるかを調べる。
+- 実験入口: Run上部の送信前Preview。固定40 Turn物理会話、4 Marker、A補正なし/B局所300 UTF-16/C直前2 Turn/D直前6 Turn。既存Mode Bの純粋builderとLMStudioProviderを再利用し、本番Question Keep・API・DB・Run schemaは変更しない。
+- Results: 独立した初回回答16件を取得。投入request、SHA、回答、診断を保存。Automatic checksとCodex first reviewを分離した[評価レポート](context-correction-v01-report.md)と[全回答](context-correction-v01-data/responses.md)を参照。
+- Observed issues: 曖昧語の対象特定には差があったが、B/C/Dの差が小さい例もある。作用の説明に残る精度問題は文脈追加だけでは解消しない。Sourceが短くBに全文が入り、長文局所windowの効果は未評価。
+- Validation: npm test 268件（266 PASS / 2 SKIP / 0 FAIL）、typecheck/build/diff check、保存16 requestとPreview一致。実ブラウザでMarker/条件切替と投入全文表示を確認。
+- Human review: pending、全Run未採用。質問する・新規チャット・本番ContextBuilder接続へ進まない。
+
+## Context Correction v0.2 — Long Source / Local Window（2026-09-29）
+
+- Purpose: 長いSource内部の局所切り出しで対象・前提・冗長性が変わるか。前後Turnは加えない。
+- Fixture / Window: 固定32 Turn、T20は2650 UTF-16、同文を異なるoffsetで選ぶ4 Marker。Bは前後計300、Cは800（Marker別枠）、D全文。grapheme境界を保持するLab wrapper、既存builderは変更なし。
+- Preview / Runs: Run上部にv0.2 Preview。範囲・使用率・全文を確認可能。独立16 Runを既存LM Studio providerで取得し、request SHAと自動照合を保存。
+- Findings: 局所で足りる例、冒頭定義がFullで補える例の両方を観察。Fullで二つの解釈を候補化してlength終了した1件も無修正で残した。[一次評価](context-correction-v02-report.md)、[投入量・全回答](context-correction-v02-data/responses.md)参照。
+- Validation: npm test 270件（268 PASS / 2 SKIP / 0 FAIL）、typecheck/build/diff check。全16 request/Preview一致、境界/割合の検証。ブラウザでA/補正なし→B/800切替と範囲808–1621、813文字/30.68%を確認。
+- Human review: pending。DB/API、本番Chat/Question Keep、Run schema変更なし。引継ぎ実験・本番採用・commit/push/tagへ進まない。
+
+## Context Correction v0.3 — Same Chat / New Chat Handoff（2026-09-30）
+
+- Purpose: 同一会話相当の履歴がある場合と履歴ゼロで、必要な局所文脈量・対象特定が変わるかを比較する。
+- Fixture / Conditions: v0.2の32 Turn・T20=2650 UTF-16・4 Markerを再利用。生成前に24 Run Pilot（300/800/1500）を選択し記録。500/1100未実行。Sameは完了T1〜T20、Newは履歴なし。Source後のTurnと前Run回答は混ぜない。
+- Model: 旧unsloth IDが利用不可のためgoogle/gemma-4-12b-qatへ変更し、全24件で固定。旧実験との因果的な直接比較はしない。
+- Preview / Results: Lab Runのv0.3 PreviewでMode/Level・範囲・履歴・投入messagesを確認。24 stop / 0 error、全request/Preview・境界・SHA照合PASS。[一次評価](context-correction-v03-report.md)、[全回答とAutomatic表](context-correction-v03-data/responses.md)、[Escalation一次レビュー](context-correction-v03-data/reviews.json)。
+- Observations: Cの独自定義はSameで保持され、New1500でも局所範囲外。D/New1500では同文二候補化を観察。Aでは増量の改善が乏しい。一次評価であって人間の採用判断ではない。
+- Escalation: literal候補1件、読解追加候補1件を分離保存。追加問い合わせなし。自動Escalation未実装。
+- Validation: npm test 272件（270 PASS / 2 SKIP / 0 FAIL）、typecheck/build、git diff --check。ブラウザでSame300/New1500 Previewの履歴・文字数切替を確認。UI-only起動の既存記録APIエラーはPreview検証と区別する。
+- Human review: 全24件pending。最適値決定、本番Question Box/新規Chat接続、DB/API/Run schema変更、SOULへ進まない。commit/push/tagなし。
+
+## Question Box → New Chat Handoff Prototype v0.1（2026-09-30）
+
+### Purpose / UI flow
+
+Question BoxのQuestion Keepから `… → 新規チャット` を選び、即作成・即送信せずに `New Chat Handoff Setup` を開く。通常UIは「引継ぎ する／しない」と「少なめ／標準／多め」のみ。初期値はON・標準。`キャンセル`はKeep・会話・draftを変更せず閉じ、`準備`はLab memory内の `Draft New Conversation` Previewだけを生成する。「質問する」は従来どおり未実装表示で、本Phaseでは接続しない。
+
+### Handoff ON/OFF / presets
+
+- ON: 300／800／1500 UTF-16を少なめ／標準／多めへ対応。Markerより前側を指定量、後側は通常0。Marker本文はrangeへ完全包含し、最初のUser messageを「前提文脈／参照箇所／質問」に分ける。
+- OFF: Marker Focusと保存済みquestion draftだけ。過去履歴・周辺文脈を入れない。draftが空でも補完文を生成しない。
+- Levelは文脈の採用値ではなく操作試験用。標準800を初期表示にするが最適値とは判断しない。
+
+### Experimental Future Context / boundary
+
+Experimental内だけPast 300／500／800／1100／1500、Future OFF／300／800を直接変更できる。通常presetはPastだけを操作する。rangeはSource Turn内のUTF-16 half-open、Marker offsetを構造化保持し、開始・終了をgrapheme境界へ内側に丸める。端では実際に取得できた文字数をPreviewへ表示する。DB全文検索、遠いTurn検索、要約、Semantic Searchは行わない。
+
+### Preview format / unresolved behavior
+
+PreviewはSource Conversation／Turn、Marker ID／本文、question draft、Handoff ON/OFF、Level、実Past／Future文字数、range `[start, end)`、最初のUser messageを表示する。resolvedでも保存座標・source text・grapheme境界が一致しなければ生成停止。unresolvedのONは「Marker位置未解決」で停止し、自動re-anchorしない。OFFは保存済みMarker本文があればPreview可能だが、rangeを未解決と明示する。
+
+### Browser observation
+
+- Conversation A / T25で初期ON・標準を開き、Past 800、Future 0、range `[896, 1704)`、Marker IDとquestion draft、引継ぎmessageを確認。
+- OFFでPast/Future 0となり、messageから前提文脈が消えることを確認。少なめ／標準／多めは実Past 300／800／1500へ切り替わった。
+- Experimental Past 1100 / Future 300でrange `[596, 2004)`、各実文字数を確認。
+- unresolved T9はON Previewを停止し、自動re-anchorなしの案内を表示。OFFでは空draftを空のまま、保存Marker本文だけでPreviewを表示。
+- 520px幅でもSetup・preset・Experimental・Previewに横方向の破綻なし。長いPreviewはdialog内の1本の縦scrollを使う。通常幅では背面Question Boxを残した中央overlay。準備後もConversation作成・ネットワーク送信なし。
+
+### Automatic checks / Human evaluation pending
+
+ON/OFF、3 preset、Past 1100＋Future 300、Marker完全包含、UTF-16/grapheme境界、Source端、unresolved、空draft、Previewと内部stateを専用helper/testで確認。既存Question Box統合テストでmenuからSetup、キャンセル、Previewを検証。本番Chat、Question Keep、DB/API、Run schema、既存MarkerCoreを変更しない。
+
+操作語の分かりやすさ、標準800の見せ方、Experimentalの必要性、overlayの大きさはHuman evaluation pending。引継ぎ量を採用決定せず、本番新規Conversation・モデル送信・自動Escalation・SOULへ進まない。commit/push/tagなし。
+
+### Vertical density adjustment（2026-10-01）
+
+New Chat Handoff Setupの機能・state・文言・Preview内容を維持し、Lab専用CSSの縦余白だけを縮小した。Setup内padding、fieldset / section間margin、legend周辺、Experimental、操作ボタン、Preview見出し・定義一覧・入力欄ラベルの余白を調整。ラジオlabelは通常選択で28px、3 presetで34px以上の高さを残し、横配置とfont-sizeは変更しない。
+
+実ブラウザの同じConversation A / T25・ON・標準Previewで、内容全高は約1104pxから847px、Previewは約673pxから501px、10項目のdefinition listは335pxから207pxへ短縮した。Previewは1項目1行と2列配置を維持。In-app Browserではブラウザ倍率を数値取得できないため、通常1101×884pxから150%相当の有効表示領域756×589pxへ一時変更して確認し、横overflowなし、T25 / Marker ID / question draft / 800 UTF-16 / range等の行対応、ラジオ選択、dialog内scrollに破綻なし。確認後は通常viewportへ戻した。読みやすさと密度の最終採否はHuman evaluation pending。
+
+## Question Box → New Chat Handoff Prototype v0.2 — Real Model Send（2026-10-01）
+
+- Purpose / UI flow: v0.1 Previewの最初のUser Messageを編集可能にし、明示的な「新規チャットとして送信」後だけLab専用endpointからLM Studioへ送る。「戻る」は設定へ戻り、自動送信なし。
+- Memory-only boundary: requestは固定system + 編集済みuserの2件だけ。旧会話履歴0件。本番Conversation / Question Keep / GenerationRun / SQLiteへ保存せず、UI stateと実験専用JSONだけにtemporary conversation・応答・diagnosticsを保持する。
+- Fixture / Preview: 局所で理解しやすいCase 1と、前提を要するCase 2の2 Keep。OFF / 300 / 800 / 1500、Future 0の8独立PreviewとAutomatic checksはPASS。
+- Model / execution: `google/gemma-4-12b-qat`をmodel一覧で確認し、temperature 0 / max_tokens 2048でCase 1 / OFFを実行。236秒後に`length`、本文0、reasoning 8028文字で終了し、空回答失敗として保存した。
+- Stop boundary: 自動再生成禁止と既存Lab方針に従い、残り7件は未実行。回答差・Noise・不足Contextの一次評価は成立していない。[v0.2 Report](new-chat-handoff-v02-report.md)を正本とする。全件Human review pending、本番接続・自動Escalation・SOULへ進まない。
+
+## New Chat Handoff — Turn-based Stability Experiment v0.3（2026-10-01）
+
+- Purpose: Case 1 / OFFの既存失敗を再実行せず、Target T25全文と直前1／3／5 Turn（Wideのみ後1 Turn）を最初のUser Message内へ加え、同じ生成設定で最終回答へ到達するかを確認した。
+- Contract: 各Runは独立したsystem + userの2 messages。Turnは元順序、Target全文は1回、内部ID／offsetなし。model `google/gemma-4-12b-qat`、temperature 0、max_tokens 2048を固定し、自動retry・本番DB書込みなし。
+- Results: Minimal / Standard / Wideは全件`stop`で最終回答へ到達。回答59／88／116文字、reasoning 2077／2120／2235文字、所要73.5／71.7／76.5秒。既存OFFは`length`、本文0、reasoning 8028文字、236秒。
+- Observation: 少量Turn Contextで正常終了した可能性はあるが、3条件とも好意表現の由来を実質的には説明せず、Targetに説明がないとして回答を控えた。WideはTarget内のExperimental等へ触れ、人工的な長いTarget由来のノイズ候補がある。因果・最適Turn数は断定しない。
+- Record: [v0.3 Report](new-chat-handoff-turn-v03-report.md)、[Previewと実Run](new-chat-handoff-turn-v03-data/preview.json)、[Codex一次観察](new-chat-handoff-turn-v03-data/reviews.json)。全件Human review pending。本番接続・自動Escalation・設定変更へ進まない。
+
+## New Chat Handoff — Natural Conversation Experiment v0.4（2026-10-01）
+
+- Purpose / Fixture: 量子力学・LLM数値量子化・量子コンピュータの近い語が続く自然な8 Turn会話を固定し、3 Marker × Minimal／Standard／Wideの9独立New Chatで対象理解を比較した。
+- Contract: v0.3と同じsystem prompt、`google/gemma-4-12b-qat`、temperature 0、max_tokens 2048。system + userの2 messagesだけで、Turnは最初のUser Message内に元順序で含めた。自動retry・本番DB書込みなし。
+- Results: 全9件`stop`、errorなし。Case AはStandardがMarkerをLLMの工学処理として直接特定し、Wideは後続の量子コンピュータ話題を比較対象にして取り違えるノイズ候補。Case Bの干渉説明とCase Cの古典bit区別はMinimalで成立した。
+- Observation: 固定の最適Turn数は示されず、Target内の説明完結度と近接する同形語によって必要量が変わる可能性がある。[v0.4 Report](new-chat-handoff-natural-v04-report.md)、[9 Run Preview](new-chat-handoff-natural-v04-data/preview.json)、[Codex一次観察](new-chat-handoff-natural-v04-data/reviews.json)。全件Human review pending、本番実装・自動Escalationへ進まない。
+
+## New Chat Handoff — User Reasoning Continuity Experiment v0.5（2026-10-01）
+
+- Purpose / Fixture: 対向光の相対速度についての初期誤解、AIの訂正、ユーザー自身の言い換え、波粒子・日常語・数式への抽象化を含む固定8 Turnを使い、4 Marker × Minimal／Standard／Wideの12独立New Chatで reasoning continuityを観察した。
+- Contract: v0.4と同じsystem prompt、`google/gemma-4-12b-qat`、temperature 0、max_tokens 2048。system + userの2 messagesだけで、Turnは最初のUser Message内に元順序で含めた。自動retry・本番DB書込みなし。
+- Results: 全12件`stop`、errorなし。Case AのT1–T2だけでは接近速度と相対速度の区別が一部不安定で、ユーザー自身の修正理解T3を含むWideでは区別が明確になった。Case B–Dは直前User Turnを含むMinimalで主要な回答が成立した。
+- Observation: ユーザー発言をAI自身の発言へ明確に取り違えた例はなかった。C-Wideではfixture外の一般例と長文化が増えた。各Caseで直前User Turnが含まれる設計、AのMinimal / Standardが同一入力になる会話端条件は比較上の制限。[v0.5 Report](new-chat-handoff-reasoning-v05-report.md)、[12 Run Preview](new-chat-handoff-reasoning-v05-data/preview.json)、[Codex一次観察](new-chat-handoff-reasoning-v05-data/reviews.json)。本番実装・自動Context拡張へ進まない。
+- Human review: User自身の誤解・言い換え・理解更新と、User / Assistantの往復を「思考の軌跡」として扱う価値を解釈記録として追加した。「思考の節目」は仮説であり、自動判定や実装仕様にはしていない。詳細は[v0.5 ReportのHuman Review](new-chat-handoff-reasoning-v05-report.md#human-review2026-10-01)を参照。

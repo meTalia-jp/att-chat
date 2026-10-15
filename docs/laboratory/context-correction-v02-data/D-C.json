@@ -1,0 +1,76 @@
+{
+  "experiment": "context-correction-v0.2",
+  "fixture_version": "physics-long-32-v2",
+  "marker": "D",
+  "condition": "C",
+  "source_turn": "T20",
+  "source_utf16": 2650,
+  "source_text": "この比を十分小さくします。",
+  "question": "質問です。これはどういう意味ですか？",
+  "anchor": {
+    "highlight_id": "D",
+    "turn_id": "T20",
+    "start_offset": 2128,
+    "end_offset": 2141,
+    "source_text": "この比を十分小さくします。",
+    "target_text": "この比を十分小さくします。",
+    "color": "yellow",
+    "note": "",
+    "created_at": "2026-09-29T00:00:00Z",
+    "updated_at": "2026-09-29T00:00:00Z",
+    "status": "resolved",
+    "reason": null
+  },
+  "local_range": {
+    "context_start_offset": 1728,
+    "highlight_start_offset": 2128,
+    "highlight_end_offset": 2141,
+    "context_end_offset": 2541
+  },
+  "context_utf16": 813,
+  "included_percentage": 30.67924528301887,
+  "input_utf16": 986,
+  "included_turn_ids": [
+    "T20"
+  ],
+  "request": {
+    "model": "unsloth/gemma-4-12b-it-qat",
+    "temperature": 0,
+    "max_tokens": 2048,
+    "stream": true,
+    "messages": [
+      {
+        "role": "system",
+        "content": "引用を質問対象として、日本語で質問に直接答えてください。参照文脈は会話の記録です。学習者が明示した理解状態があれば尊重してください。文脈から特定できない対象は断定せず、不明と述べてください。"
+      },
+      {
+        "role": "user",
+        "content": "[参照文脈]\nの定義を省略して同じ名前を使っています。\n\n実際の装置で摩擦が大きいと、ばねと台車の見える運動だけでは説明できない変化が起きます。温度や音への移動まで含めた全エネルギーの議論と、選んだ力学的な量の議論は分けて扱います。測定した差をすぐに法則の破れと判断せず、系の境界、外部からの仕事、測定誤差を順番に調べます。この段落は理想条件を外したときの補足であり、先ほど設定した理想実験に新たな摩擦を追加する指示ではありません。\n\n【空間の近似】最後に、撮影とは別の解析上の尺度を使います。平衡点からの変位xと、ポテンシャルが変化する代表長さℓからε=abs(x)/ℓを作ります。ここで小さくする対象は時間間隔ではなく、代表長さに対する変位の比です。これは無次元量なので、長さの単位をmからcmへ変えても値は変わりません。ただし長さの規約を分子だけ変えれば誤った値になります。\n\n空間近似で見ているεについて、【選択箇所開始】この比を十分小さくします。【選択箇所終了】これにより平衡点の近くに運動を限定しますが、高次項の係数が大きい場合や二次項が消える場合は別の検討が必要です。滑らかなポテンシャルでも、無条件に二次式だけでよいとは限りません。実際には省略する三次以上の項を残す二次項と比較します。ここでの「小さい」は前の時間分解能のΔとは違う量を指します。\n\n【別の保存量】自由粒子だけを取り出し外力をなくした別の設定なら、その粒子の運動量が一定になります。ここでも、これは保存されます、と言えますが、同じ語句が出たからといって冒頭の台帳Qと同じ量を指すわけではありません。設定が切り替わったことを見出しと直前の名詞で確認します。語句だけの検索では複数の場所が一致するので、どの段落の引用なのかが大切です。\n\n【読み方のまとめ】長い説明を読むときは、まず系の境界、次に対象量、最後にその主張が成立する条件を確認してください。保存、近似、測定は関係する場面もありますが\n\n[Marker Focus]\nこの比を十分小さくします。\n\n[質問]\n質問です。これはどういう意味ですか？"
+      }
+    ]
+  },
+  "automatic": {
+    "marker_match": true,
+    "window_boundaries": true,
+    "source_only": true,
+    "no_future_turns": true
+  },
+  "human_review": "pending",
+  "provider_base_url": "http://127.0.0.1:1234/v1",
+  "request_sha256": "d2f0dfaee036254969e5f556804d8d39b2fb0dbf6d053f3dfd2b68beb9df1ff6",
+  "started": "2026-09-29T11:47:00.085Z",
+  "finished": "2026-09-29T11:47:16.647Z",
+  "answer": "「この比」とは、直前の段落で定義された**$\\epsilon = |x|/\\ell$**（平衡点からの変位 $x$ と、ポテンシャルが変化する代表長さ $\\ell$ の比）を指します。\n\nこれを十分小さくするということは、以下のことを意味しています。\n\n1.  **運動の限定**: 系の運動を平衡点の近くに限定することです。\n2.  **空間的な近似**: これは時間間隔に関するものではなく、代表長さに対する変位の比という「空間的な尺度」における近似を行っていることを示しています。\n\nなお、この文脈での「小さい」は、前の段落で言及された時間分解能 $\\Delta$ とは異なる量を指している点に注意が必要です。",
+  "output_utf16": 308,
+  "diagnostics": {
+    "finish_reason": "stop",
+    "completion_tokens": null,
+    "prompt_tokens": null,
+    "total_tokens": null,
+    "content_chars": 308,
+    "reasoning_chars": 2272,
+    "duration_ms": 16561,
+    "terminal_chunk_received": true
+  },
+  "error": null
+}
