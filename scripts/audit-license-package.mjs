@@ -50,7 +50,21 @@ assert.match(electronLicense, /Electron contributors/i);
 assert.notEqual(attChatLicense, electronLicense, 'Att-Chat license must not overwrite Electron LICENSE');
 assert.equal(rpenProofLicense, await readFile(resolve('licenses/RpenProof-MIT.txt'), 'utf8'));
 for (const term of ['Electron', 'Chromium', 'Node.js', 'EJDict-hand', 'RpenProof', 'LGPL', 'MPL', 'Frontend npm dependencies']) assert.match(notices, new RegExp(term, 'i'));
-for (const term of ['125a6b94c9b01340d193d6863d60ad8531b690a3b273129837102ac855ea34c9', expected.executable, expected.ffmpeg, 'public Release URL does not exist yet']) assert.match(availability, new RegExp(term, 'i'));
+for (const term of ['125a6b94c9b01340d193d6863d60ad8531b690a3b273129837102ac855ea34c9', expected.executable, expected.ffmpeg]) assert.match(availability, new RegExp(term, 'i'));
+for (const url of [
+  'https://github.com/meTalia-jp/att-chat/releases/download/v1.0.0/Att-Chat-v1.0-runtime-source.zip',
+  'https://github.com/meTalia-jp/att-chat/releases/download/v1.0.0/Att-Chat-v1.0-win-x64.zip',
+  'https://github.com/meTalia-jp/att-chat/releases/download/v1.0.0/SHA256SUMS.txt',
+]) assert.ok(availability.includes(url), `SOURCE_AVAILABILITY.md missing planned asset URL: ${url}`);
+for (const statement of [
+  'v1.0.0 GitHub Releaseはまだ公開されていません',
+  'Release公開までは解決しない場合があり',
+  '現時点でdownload可能であることを意味しません',
+  'binary、対応source、checksumを同じGitHub Releaseへ添付',
+]) assert.ok(availability.includes(statement), `SOURCE_AVAILABILITY.md missing publication contract: ${statement}`);
+for (const falseClaim of ['currently downloadable', 'available now', '現在downloadできます']) {
+  assert.doesNotMatch(availability, new RegExp(falseClaim, 'i'), `SOURCE_AVAILABILITY.md falsely claims publication: ${falseClaim}`);
+}
 
 const packageMetadata = JSON.parse(await readFile(file('resources/app/package.json'), 'utf8'));
 assert.equal(packageMetadata.license, 'MIT');
@@ -75,5 +89,5 @@ for (const path of [
 console.log(JSON.stringify({
   status: 'PASS', distribution, sourceZip,
   hashes: expected,
-  note: 'Release publication remains pending; SOURCE_AVAILABILITY.md intentionally does not claim a public asset URL.',
+  note: 'Release publication remains pending; planned v1.0.0 asset URLs and non-availability language verified.',
 }, null, 2));
