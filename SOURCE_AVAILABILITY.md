@@ -8,15 +8,19 @@ Corresponding source asset name: `Att-Chat-v1.0-runtime-source.zip`
 
 ## Publication status
 
-`Att-Chat-v1.0-runtime-source.zip` はこの作業で生成・検査済みですが、**まだ公開されていません**。現在のrepositoryにはGit remoteが設定されておらず、この作業ではcommit / push / tag / GitHub Release作成を行っていません。したがって、未公開assetを「現在download可能」とは表示しません。
+`Att-Chat-v1.0-runtime-source.zip` は生成・検査済みですが、**v1.0.0 GitHub Releaseはまだ公開されていません**。以下のURLは公開時の正式取得先です。Release公開までは解決しない場合があり、現時点でdownload可能であることを意味しません。
 
-公開時は `Att-Chat-v1.0-win-x64.zip` と同じGitHub Releaseへ、次の完全一致assetを添付してください。binaryだけを先に公開しないでください。
+公開時はbinary、対応source、checksumを同じGitHub Releaseへ添付し、binaryだけを先に公開しないでください。
+
+- Runtime source: <https://github.com/meTalia-jp/att-chat/releases/download/v1.0.0/Att-Chat-v1.0-runtime-source.zip>
+- Windows binary: <https://github.com/meTalia-jp/att-chat/releases/download/v1.0.0/Att-Chat-v1.0-win-x64.zip>
+- Checksums: <https://github.com/meTalia-jp/att-chat/releases/download/v1.0.0/SHA256SUMS.txt>
 
 | Asset | Size | SHA-256 | Current location / URL |
 |---|---:|---|---|
-| `Att-Chat-v1.0-runtime-source.zip` | 1,829,801,983 bytes | `125a6b94c9b01340d193d6863d60ad8531b690a3b273129837102ac855ea34c9` | Generated locally at `.cache/license-v1/release-assets/`; public Release URL does not exist yet |
+| `Att-Chat-v1.0-runtime-source.zip` | 1,829,801,983 bytes | `125a6b94c9b01340d193d6863d60ad8531b690a3b273129837102ac855ea34c9` | Generated locally at `.cache/license-v1/release-assets/`; planned URL: <https://github.com/meTalia-jp/att-chat/releases/download/v1.0.0/Att-Chat-v1.0-runtime-source.zip> |
 
-公開後、この行を同じReleaseのimmutable asset URLへ更新し、downloadしたassetのhashを再確認してください。
+公開後は同じReleaseからassetを再downloadし、この文書および `SHA256SUMS.txt` のhashと一致することを確認してください。
 
 ## Distributed native files
 

@@ -9,7 +9,7 @@ Ver1.0の公開前packagingとして、Att-Chat本体のMIT明示、RpenProof由
 
 ローカルの配布内容・hash・manifestを照合する `npm run audit:license-package` はPASSした。`Att-Chat-v1.0-runtime-source.zip` にはElectron、Chromium、Chromium FFmpeg forkの固定source archiveそのものが入り、Electron patch、DEPS、GN設定、FFmpeg生成config、代表的なBlink/MPL pathも検査用に抽出している。
 
-Git remoteは現在設定されておらず、この工程ではcommit / push / tag / Release作成を禁止されている。このため公開URLは存在せず、`SOURCE_AVAILABILITY.md` はsourceを「download可能」と記載していない。公開完了の判定は、同じGitHub Releaseへbinary/sourceの両assetを添付し、公開後に再downloadしてhashを確認した時点で行う。
+repositoryは <https://github.com/meTalia-jp/att-chat> に確定し、初期RC commit `d3fda957e90fa79919c88602045c3df84fe87098` の `master` 初回pushと `v1.0.0` tag作成を完了した。その後、Release公開前の整合性修正として `SOURCE_AVAILABILITY.md` にv1.0.0の最終予定URLを記録し、この文書修正commitを正式な `v1.0.0` tag対象とする。GitHub Release、Draft Release、assetはまだ作成していないため、予定URLを「現在download可能」とは記載していない。公開完了の判定は、同じGitHub Releaseへbinary/source/checksum assetを添付し、公開後に再downloadしてhashを確認した時点で行う。
 
 ## Att-Chat MIT
 
@@ -166,7 +166,7 @@ Att-Chat-v1.0-win-x64.zip
 Att-Chat-v1.0-runtime-source.zip
 ```
 
-公開前にroot `README.md`、`THIRD_PARTY_NOTICES.md`、`SOURCE_AVAILABILITY.md` をRelease説明から参照できるようにする。公開後はsource assetのURLを `SOURCE_AVAILABILITY.md` へ反映し、application staging/ZIPを再生成して文書と実assetを一致させる。
+root `README.md`、`THIRD_PARTY_NOTICES.md`、`SOURCE_AVAILABILITY.md` をRelease説明から参照できるようにする。`SOURCE_AVAILABILITY.md` にはv1.0.0公開時のbinary/source/checksum予定URLを記録済みである。Release公開前にapplication staging/ZIPと外側の `SHA256SUMS.txt` を再生成し、文書と実assetを一致させる。
 
 ## Verification
 
@@ -179,7 +179,7 @@ Att-Chat-v1.0-runtime-source.zip
 | `git diff --check` | PASS; pre-existing CRLF conversion warnings only |
 | Packaged Electron staging smoke | PASS; isolated DB, restart, assets, dictionary, single instance |
 | `npm run audit:license-package` | PASS |
-| commit / push / tag | Not performed |
+| commit / push / tag | Initial RC push/tag completed; source-availability follow-up becomes the final `v1.0.0` tag target; Release publication pending |
 
 `audit:license-package` は、staging必須文書、AttChat.exe/ffmpeg.dll/Electron LICENSE/Chromium notices/EJDict/source kit hash、staging manifest、RpenProof license一致、source kit主要entryを検査する。
 
@@ -196,9 +196,9 @@ Att-Chat-v1.0-runtime-source.zip
 
 ### Pending before public download
 
-1. Git remoteを確定し、binary/sourceの2 assetを同じReleaseへ添付する。
-2. 公開assetを再downloadし、上記SHA-256と照合する。
-3. 実URLを `SOURCE_AVAILABILITY.md` へ反映し、その文書を含むbinary assetを最終再生成する。
+1. 更新済み `SOURCE_AVAILABILITY.md` を含むWindows staging/ZIPと外側の `SHA256SUMS.txt` を再生成する。
+2. binary/source/checksumの3 assetを同じv1.0.0 Releaseへ添付する。
+3. Release公開後に各assetを再downloadし、確定SHA-256と照合する。
 
 ### Explicitly unverified
 
