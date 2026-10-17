@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+// @ts-expect-error The executable license audit is intentionally a plain ESM script.
+import { assertPublishedSourceAvailability, v100Publication } from '../scripts/audit-license-package.mjs';
 
 test('Att-Chat declares MIT without replacing Electron distribution license', async () => {
   const packageJson = JSON.parse(await readFile('package.json', 'utf8'));
@@ -33,7 +35,7 @@ test('notices cover required native, data, provenance, LGPL and MPL components',
   assert.match(notices, /74bf048fddee2d5bad426f81cc2c10374ae7d8007d7f8550bf42d86c61614e2b/i);
 });
 
-test('source availability identifies exact artifacts and does not claim unpublished asset availability', async () => {
+test('source availability identifies exact artifacts and the published v1.0.0 assets', async () => {
   const source = await readFile('SOURCE_AVAILABILITY.md', 'utf8');
   for (const value of [
     'Att-Chat-v1.0-runtime-source.zip',
@@ -44,8 +46,49 @@ test('source availability identifies exact artifacts and does not claim unpublis
     '7728490eb079c19b17baeff2b6590c976f6a928b3c17923aeb4fcf1f1f31d299',
     '125a6b94c9b01340d193d6863d60ad8531b690a3b273129837102ac855ea34c9',
   ]) assert.match(source, new RegExp(value, 'i'));
-  assert.match(source, /まだ公開されていません/);
+  assertPublishedSourceAvailability(source);
   assert.match(source, /successful execution with a modified replacement DLL is \*\*unverified\*\*/i);
+});
+
+test('published source availability rejects stale pre-publication claims', async () => {
+  const source = await readFile('SOURCE_AVAILABILITY.md', 'utf8');
+  for (const staleClaim of [
+    'not yet published',
+    'still unpublished',
+    'pre-publication',
+    'may not resolve',
+    'まだ公開されていません',
+    '未公開',
+  ]) {
+    assert.throws(
+      () => assertPublishedSourceAvailability(`${source}\n${staleClaim}\n`),
+      /stale publication claim/,
+      staleClaim,
+    );
+  }
+});
+
+test('published source availability rejects a wrong Release tag or asset URL', async () => {
+  const source = await readFile('SOURCE_AVAILABILITY.md', 'utf8');
+  assert.throws(
+    () => assertPublishedSourceAvailability(source.replace(v100Publication.release, v100Publication.release.replace('v1.0.0', 'v1.0.1'))),
+    /missing public Release URL|wrong Release tag/,
+  );
+
+  const windowsUrl = v100Publication.assets['Att-Chat-v1.0-win-x64.zip'];
+  assert.throws(
+    () => assertPublishedSourceAvailability(source.replace(windowsUrl, windowsUrl.replace('/v1.0.0/', '/v1.0.1/'))),
+    /must use only the v1\.0\.0 URL/,
+  );
+});
+
+test('published source availability rejects binary and source links from different releases', async () => {
+  const source = await readFile('SOURCE_AVAILABILITY.md', 'utf8');
+  const sourceUrl = v100Publication.assets['Att-Chat-v1.0-runtime-source.zip'];
+  assert.throws(
+    () => assertPublishedSourceAvailability(source.replaceAll(sourceUrl, sourceUrl.replace('/v1.0.0/', '/v1.0.1/'))),
+    /must use only the v1\.0\.0 URL/,
+  );
 });
 
 test('source-kit builder fixes complete source archives and relink evidence', async () => {
