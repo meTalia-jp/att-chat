@@ -207,3 +207,53 @@ root `README.md`、`THIRD_PARTY_NOTICES.md`、`SOURCE_AVAILABILITY.md` をReleas
 - Eigen/gRPC/axe-coreの最終Windows link mapによる含有判定。
 
 これらを実施済みとは記録していない。公開assetの存在を偽らず、現在の完了状態を「ローカルpackaging audit PASS / Release publication pending」とした。
+
+## Public release completion
+
+Release:
+`v1.0.0`
+
+Release commit:
+`d1bb567a67ee5b6c7ca44db2a33944ff20c45d1c`
+
+Repository:
+`https://github.com/meTalia-jp/att-chat`
+
+Public Release:
+`https://github.com/meTalia-jp/att-chat/releases/tag/v1.0.0`
+
+Release date:
+`2026-10-17`
+
+公開asset:
+
+- `Att-Chat-v1.0-win-x64.zip`
+- `Att-Chat-v1.0-runtime-source.zip`
+- `SHA256SUMS.txt`
+
+Windows ZIP SHA-256:
+
+`81e2fe5172d71c7dcc5c61e9244c1c232b004365944777c5b7c5f9d2bded91b4`
+
+Runtime source ZIP SHA-256:
+
+`125a6b94c9b01340d193d6863d60ad8531b690a3b273129837102ac855ea34c9`
+
+SHA256SUMS.txt SHA-256:
+
+`0843931f342aa29a4d09a795bf807fc575af4b14d1083c6823316bf7df4cce0d`
+
+公開後確認:
+
+- public asset 3件の再download完了
+- local / public SHA-256完全一致
+- public SHA256SUMSによる両ZIP検証PASS
+- SOURCE_AVAILABILITY記載URL 3件 HTTP 200
+- Windows ZIP監査PASS
+- runtime source ZIP監査PASS
+- Public license audit PASS
+- HEAD / origin/master / v1.0.0一致
+
+Status:
+
+**Att-Chat Ver1.0.0 public release complete**
