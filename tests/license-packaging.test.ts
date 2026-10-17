@@ -16,6 +16,20 @@ test('Att-Chat declares MIT without replacing Electron distribution license', as
   assert.doesNotMatch(staging, /node_modules\/electron\/dist\/LICENSE[^\n]+ATTCHAT-LICENSE/);
 });
 
+test('root package version is canonical for lockfile and Electron staging', async () => {
+  const [packageJson, packageLock, staging] = await Promise.all([
+    readFile('package.json', 'utf8').then(JSON.parse),
+    readFile('package-lock.json', 'utf8').then(JSON.parse),
+    readFile('scripts/stage-electron.mjs', 'utf8'),
+  ]);
+  assert.equal(packageJson.version, '1.0.0');
+  assert.equal(packageLock.version, packageJson.version);
+  assert.equal(packageLock.packages[''].version, packageJson.version);
+  assert.match(staging, /const appVersion = rootPackage\.version/);
+  assert.match(staging, /version:appVersion/);
+  assert.doesNotMatch(staging, /version\s*:\s*['"]1\.0\.0['"]/);
+});
+
 test('RpenProof license is preserved verbatim in the formal license directory', async () => {
   const [original, formal] = await Promise.all([
     readFile('experiments/selection-poc/LICENSE-RpenProof.txt', 'utf8'),
