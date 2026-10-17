@@ -8,19 +8,22 @@ Corresponding source asset name: `Att-Chat-v1.0-runtime-source.zip`
 
 ## Publication status
 
-`Att-Chat-v1.0-runtime-source.zip` は生成・検査済みですが、**v1.0.0 GitHub Releaseはまだ公開されていません**。以下のURLは公開時の正式取得先です。Release公開までは解決しない場合があり、現時点でdownload可能であることを意味しません。
+Att-Chat v1.0.0は、次のGitHub Releaseで公開済みです。
 
-公開時はbinary、対応source、checksumを同じGitHub Releaseへ添付し、binaryだけを先に公開しないでください。
+- Release: <https://github.com/meTalia-jp/att-chat/releases/tag/v1.0.0>
+- Windows package: <https://github.com/meTalia-jp/att-chat/releases/download/v1.0.0/Att-Chat-v1.0-win-x64.zip>
+- Corresponding runtime source package: <https://github.com/meTalia-jp/att-chat/releases/download/v1.0.0/Att-Chat-v1.0-runtime-source.zip>
+- SHA-256 checksums: <https://github.com/meTalia-jp/att-chat/releases/download/v1.0.0/SHA256SUMS.txt>
 
-- Runtime source: <https://github.com/meTalia-jp/att-chat/releases/download/v1.0.0/Att-Chat-v1.0-runtime-source.zip>
-- Windows binary: <https://github.com/meTalia-jp/att-chat/releases/download/v1.0.0/Att-Chat-v1.0-win-x64.zip>
-- Checksums: <https://github.com/meTalia-jp/att-chat/releases/download/v1.0.0/SHA256SUMS.txt>
+Windows binary、対応source、checksumは同じv1.0.0 Releaseで公開しています。v1.0.0の公開assetはimmutableな歴史的release artifactとして扱い、差し替えていません。このroot文書は現在の公開状態を記録し、将来の保守版を構築する際は更新後の文書を配布物へ含めます。
 
-| Asset | Size | SHA-256 | Current location / URL |
+| Asset | Size | SHA-256 | Public URL |
 |---|---:|---|---|
-| `Att-Chat-v1.0-runtime-source.zip` | 1,829,801,983 bytes | `125a6b94c9b01340d193d6863d60ad8531b690a3b273129837102ac855ea34c9` | Generated locally at `.cache/license-v1/release-assets/`; planned URL: <https://github.com/meTalia-jp/att-chat/releases/download/v1.0.0/Att-Chat-v1.0-runtime-source.zip> |
+| `Att-Chat-v1.0-win-x64.zip` | 484,238,137 bytes | `81e2fe5172d71c7dcc5c61e9244c1c232b004365944777c5b7c5f9d2bded91b4` | <https://github.com/meTalia-jp/att-chat/releases/download/v1.0.0/Att-Chat-v1.0-win-x64.zip> |
+| `Att-Chat-v1.0-runtime-source.zip` | 1,829,801,983 bytes | `125a6b94c9b01340d193d6863d60ad8531b690a3b273129837102ac855ea34c9` | <https://github.com/meTalia-jp/att-chat/releases/download/v1.0.0/Att-Chat-v1.0-runtime-source.zip> |
+| `SHA256SUMS.txt` | 191 bytes | `0843931f342aa29a4d09a795bf807fc575af4b14d1083c6823316bf7df4cce0d` | <https://github.com/meTalia-jp/att-chat/releases/download/v1.0.0/SHA256SUMS.txt> |
 
-公開後は同じReleaseからassetを再downloadし、この文書および `SHA256SUMS.txt` のhashと一致することを確認してください。
+同じReleaseから公開assetを再downloadし、local確定物とのsize・SHA-256一致と、公開された `SHA256SUMS.txt` による両ZIPの検証を完了しています。
 
 ## Distributed native files
 
@@ -130,4 +133,4 @@ Eigen (`d53ac33805ba0a23fa139adaf24227fb6707e6fa`), gRPC (`ff8d12a129eedc58f9602
 
 ## Source asset verification
 
-After downloading the published source asset, compare its SHA-256 with this document, extract it, then verify `SHA256SUMS.txt`. Confirm the manifest revisions and archive hashes before building. If the eventual public asset differs from the generated hash above, update this document and rebuild the binary distribution so its bundled copy points to the actual published asset.
+After downloading the published source asset, compare its SHA-256 with this document, extract it, then verify `SHA256SUMS.txt`. Confirm the manifest revisions and archive hashes before building. The published v1.0.0 asset and the fixed hash above form the release record; a mismatch must be treated as a verification failure rather than silently updating either value.

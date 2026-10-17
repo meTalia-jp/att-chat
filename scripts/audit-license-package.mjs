@@ -4,6 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { createReadStream } from 'node:fs';
 import { readFile, stat } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const distribution = resolve(process.env.ATTCHAT_LICENSE_DIST ?? '.cache/license-v1/distribution/Att-Chat-v1.0-win-x64');
 const sourceZip = resolve(process.env.ATTCHAT_LICENSE_SOURCE_ZIP ?? '.cache/license-v1/release-assets/Att-Chat-v1.0-runtime-source.zip');
@@ -24,6 +25,44 @@ const sha256File = path => new Promise((resolveHash, reject) => {
 });
 const file = path => join(distribution, path);
 
+export const v100Publication = Object.freeze({
+  release: 'https://github.com/meTalia-jp/att-chat/releases/tag/v1.0.0',
+  assets: Object.freeze({
+    'Att-Chat-v1.0-win-x64.zip': 'https://github.com/meTalia-jp/att-chat/releases/download/v1.0.0/Att-Chat-v1.0-win-x64.zip',
+    'Att-Chat-v1.0-runtime-source.zip': 'https://github.com/meTalia-jp/att-chat/releases/download/v1.0.0/Att-Chat-v1.0-runtime-source.zip',
+    'SHA256SUMS.txt': 'https://github.com/meTalia-jp/att-chat/releases/download/v1.0.0/SHA256SUMS.txt',
+  }),
+});
+
+const stalePublicationClaims = [
+  /not yet published/i,
+  /still unpublished/i,
+  /pre-publication/i,
+  /may not resolve/i,
+  /まだ公開されていません/,
+  /未公開/,
+  /Release公開までは解決しない/,
+  /現時点でdownload可能であることを意味しません/i,
+];
+
+export function assertPublishedSourceAvailability(availability) {
+  assert.match(availability, /Att-Chat v1\.0\.0[^\n]*(?:公開済み|publicly available)/i, 'SOURCE_AVAILABILITY.md must state that v1.0.0 is published');
+  assert.ok(availability.includes(v100Publication.release), `SOURCE_AVAILABILITY.md missing public Release URL: ${v100Publication.release}`);
+  const releaseLinks = [...availability.matchAll(/https:\/\/github\.com\/meTalia-jp\/att-chat\/releases\/tag\/([^\s)>]+)/gi)];
+  assert.ok(releaseLinks.length > 0, 'SOURCE_AVAILABILITY.md must identify the v1.0.0 Release');
+  for (const match of releaseLinks) assert.equal(match[1], 'v1.0.0', `SOURCE_AVAILABILITY.md links to wrong Release tag: ${match[1]}`);
+
+  const assetLinks = [...availability.matchAll(/https:\/\/github\.com\/meTalia-jp\/att-chat\/releases\/download\/([^/\s>]+)\/(Att-Chat-v1\.0-win-x64\.zip|Att-Chat-v1\.0-runtime-source\.zip|SHA256SUMS\.txt)/gi)];
+  for (const [name, expectedUrl] of Object.entries(v100Publication.assets)) {
+    const urls = [...new Set(assetLinks.filter(match => match[2].toLowerCase() === name.toLowerCase()).map(match => match[0]))];
+    assert.deepEqual(urls, [expectedUrl], `SOURCE_AVAILABILITY.md must use only the v1.0.0 URL for ${name}`);
+  }
+  assert.match(availability, /Windows binary、対応source、checksumは同じv1\.0\.0 Releaseで公開/i, 'SOURCE_AVAILABILITY.md must state that binary and corresponding source share the v1.0.0 Release');
+  for (const staleClaim of stalePublicationClaims) assert.doesNotMatch(availability, staleClaim, `SOURCE_AVAILABILITY.md contains stale publication claim: ${staleClaim}`);
+}
+
+export async function auditLicensePackage() {
+
 for (const path of [
   'ATTCHAT-LICENSE.txt', 'THIRD_PARTY_NOTICES.md', 'SOURCE_AVAILABILITY.md', 'RpenProof-MIT.txt',
   'LICENSE', 'LICENSES.chromium.html', 'resources/node/LICENSE',
@@ -40,31 +79,22 @@ assert.equal(await sha256File(file('LICENSES.chromium.html')), expected.chromium
 assert.equal(await sha256File(file('resources/frontend/dictionaries/ejdict-hand/ejdict.json')), expected.dictionary);
 assert.equal(await sha256File(sourceZip), expected.sourceZip);
 
-const [attChatLicense, electronLicense, rpenProofLicense, notices, availability] = await Promise.all([
+const [attChatLicense, electronLicense, rpenProofLicense, notices, embeddedAvailability, currentAvailability] = await Promise.all([
   readFile(file('ATTCHAT-LICENSE.txt'), 'utf8'), readFile(file('LICENSE'), 'utf8'),
   readFile(file('RpenProof-MIT.txt'), 'utf8'), readFile(file('THIRD_PARTY_NOTICES.md'), 'utf8'),
   readFile(file('SOURCE_AVAILABILITY.md'), 'utf8'),
+  readFile(resolve('SOURCE_AVAILABILITY.md'), 'utf8'),
 ]);
 assert.match(attChatLicense, /^MIT License/);
 assert.match(electronLicense, /Electron contributors/i);
 assert.notEqual(attChatLicense, electronLicense, 'Att-Chat license must not overwrite Electron LICENSE');
 assert.equal(rpenProofLicense, await readFile(resolve('licenses/RpenProof-MIT.txt'), 'utf8'));
 for (const term of ['Electron', 'Chromium', 'Node.js', 'EJDict-hand', 'RpenProof', 'LGPL', 'MPL', 'Frontend npm dependencies']) assert.match(notices, new RegExp(term, 'i'));
-for (const term of ['125a6b94c9b01340d193d6863d60ad8531b690a3b273129837102ac855ea34c9', expected.executable, expected.ffmpeg]) assert.match(availability, new RegExp(term, 'i'));
-for (const url of [
-  'https://github.com/meTalia-jp/att-chat/releases/download/v1.0.0/Att-Chat-v1.0-runtime-source.zip',
-  'https://github.com/meTalia-jp/att-chat/releases/download/v1.0.0/Att-Chat-v1.0-win-x64.zip',
-  'https://github.com/meTalia-jp/att-chat/releases/download/v1.0.0/SHA256SUMS.txt',
-]) assert.ok(availability.includes(url), `SOURCE_AVAILABILITY.md missing planned asset URL: ${url}`);
-for (const statement of [
-  'v1.0.0 GitHub Releaseはまだ公開されていません',
-  'Release公開までは解決しない場合があり',
-  '現時点でdownload可能であることを意味しません',
-  'binary、対応source、checksumを同じGitHub Releaseへ添付',
-]) assert.ok(availability.includes(statement), `SOURCE_AVAILABILITY.md missing publication contract: ${statement}`);
-for (const falseClaim of ['currently downloadable', 'available now', '現在downloadできます']) {
-  assert.doesNotMatch(availability, new RegExp(falseClaim, 'i'), `SOURCE_AVAILABILITY.md falsely claims publication: ${falseClaim}`);
+for (const term of ['125a6b94c9b01340d193d6863d60ad8531b690a3b273129837102ac855ea34c9', expected.executable, expected.ffmpeg]) {
+  assert.match(embeddedAvailability, new RegExp(term, 'i'));
+  assert.match(currentAvailability, new RegExp(term, 'i'));
 }
+assertPublishedSourceAvailability(currentAvailability);
 
 const packageMetadata = JSON.parse(await readFile(file('resources/app/package.json'), 'utf8'));
 assert.equal(packageMetadata.license, 'MIT');
@@ -89,5 +119,8 @@ for (const path of [
 console.log(JSON.stringify({
   status: 'PASS', distribution, sourceZip,
   hashes: expected,
-  note: 'Release publication remains pending; planned v1.0.0 asset URLs and non-availability language verified.',
+  note: 'Current source availability records the published v1.0.0 Release and its three exact asset URLs; immutable v1.0.0 package hashes and source/relink evidence verified.',
 }, null, 2));
+}
+
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await auditLicensePackage();
