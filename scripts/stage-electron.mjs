@@ -5,15 +5,20 @@ import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const rootPackage = JSON.parse(await readFile(resolve(root, 'package.json'), 'utf8'));
+if (typeof rootPackage.version !== 'string' || !/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/.test(rootPackage.version)) {
+  throw new Error('Root package.json must define a non-empty SemVer version');
+}
+const appVersion = rootPackage.version;
 const nodeVersion = 'v24.19.0';
 const nodeDirectory = process.env.ATTCHAT_DIST_NODE_DIR;
 const dictionary = process.env.ATTCHAT_DIST_EJDICT;
 if (process.platform !== 'win32' || process.arch !== 'x64') throw new Error('Phase 2 staging targets Windows x64');
 if (!nodeDirectory || !dictionary) throw new Error('Set ATTCHAT_DIST_NODE_DIR to the extracted official node-v24.19.0-win-x64 directory (including LICENSE), and ATTCHAT_DIST_EJDICT to the approved ejdict.json. See docs/electron-finalization-phase2.md.');
 const node = resolve(nodeDirectory, 'node.exe');
-const version = spawnSync(node, ['--version'], { encoding: 'utf8', windowsHide: true });
-if (version.error) throw version.error;
-if (version.status !== 0 || version.stdout.trim() !== nodeVersion) throw new Error(`Bundled Node must be ${nodeVersion}`);
+const nodeVersionResult = spawnSync(node, ['--version'], { encoding: 'utf8', windowsHide: true });
+if (nodeVersionResult.error) throw nodeVersionResult.error;
+if (nodeVersionResult.status !== 0 || nodeVersionResult.stdout.trim() !== nodeVersion) throw new Error(`Bundled Node must be ${nodeVersion}`);
 const nodeLicense = await readFile(resolve(nodeDirectory, 'LICENSE'));
 if (!nodeLicense.includes('Node.js')) throw new Error('Node distribution LICENSE is required');
 const source = JSON.parse(await readFile(resolve(root, 'public/dictionaries/ejdict-hand/SOURCE.json'), 'utf8'));
@@ -70,7 +75,7 @@ for (const filename of ['README.md','SOURCE.json']) await cp(resolve(root,'publi
 const appDirectory = join(resources,'app');
 await mkdir(join(appDirectory,'electron'),{recursive:true});
 for (const filename of ['main.mjs','runtime.mjs','lifecycle.mjs','single-instance.mjs','distribution.mjs']) await cp(resolve(root,'electron',filename),join(appDirectory,'electron',filename));
-await writeFile(join(appDirectory,'package.json'),JSON.stringify({name:'att-chat',productName:'Att-Chat',version:'1.0.0',license:'MIT',type:'module',main:'electron/main.mjs'},null,2));
+await writeFile(join(appDirectory,'package.json'),JSON.stringify({name:'att-chat',productName:'Att-Chat',version:appVersion,license:'MIT',type:'module',main:'electron/main.mjs'},null,2));
 // Preserve dependency notices, including licenses for bundled frontend code.
 const lock = JSON.parse(await readFile(resolve(root,'package-lock.json'),'utf8'));
 for (const path of Object.keys(lock.packages).filter(path=>path.startsWith('node_modules/'))) {
