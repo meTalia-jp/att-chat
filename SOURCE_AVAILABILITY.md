@@ -1,29 +1,28 @@
-# Att-Chat 1.0 native runtime source availability
+# Att-Chat 1.0.1 native runtime source availability
 
-対象release: **Att-Chat 1.0.0 for Windows x64**
-Binary asset name: `Att-Chat-v1.0-win-x64.zip`
-Corresponding source asset name: `Att-Chat-v1.0-runtime-source.zip`
+対象release: **Att-Chat 1.0.1 for Windows x64**
+Binary asset name: `Att-Chat-v1.0.1-win-x64.zip`
+Corresponding source asset name: `Att-Chat-v1.0.1-runtime-source.zip`
 
 この文書は、Att-Chatと共に配布するElectron native runtimeに含まれるLGPL/MPL対象について、固定source、変更、build/relink経路、実際に用意したsource assetを対応付けます。Att-Chat本体のMIT sourceと第三者一覧はrootの `LICENSE` と `THIRD_PARTY_NOTICES.md` を参照してください。
 
 ## Publication status
 
-Att-Chat v1.0.0は、次のGitHub Releaseで公開済みです。
+Att-Chat v1.0.1は、次のGitHub Releaseで公開済みです。
 
-- Release: <https://github.com/meTalia-jp/att-chat/releases/tag/v1.0.0>
-- Windows package: <https://github.com/meTalia-jp/att-chat/releases/download/v1.0.0/Att-Chat-v1.0-win-x64.zip>
-- Corresponding runtime source package: <https://github.com/meTalia-jp/att-chat/releases/download/v1.0.0/Att-Chat-v1.0-runtime-source.zip>
-- SHA-256 checksums: <https://github.com/meTalia-jp/att-chat/releases/download/v1.0.0/SHA256SUMS.txt>
+- Release: <https://github.com/meTalia-jp/att-chat/releases/tag/v1.0.1>
+- Windows package: <https://github.com/meTalia-jp/att-chat/releases/download/v1.0.1/Att-Chat-v1.0.1-win-x64.zip>
+- Corresponding runtime source package: <https://github.com/meTalia-jp/att-chat/releases/download/v1.0.1/Att-Chat-v1.0.1-runtime-source.zip>
+- SHA-256 checksums: <https://github.com/meTalia-jp/att-chat/releases/download/v1.0.1/SHA256SUMS.txt>
 
-Windows binary、対応source、checksumは同じv1.0.0 Releaseで公開しています。v1.0.0の公開assetはimmutableな歴史的release artifactとして扱い、差し替えていません。このroot文書は現在の公開状態を記録し、将来の保守版を構築する際は更新後の文書を配布物へ含めます。
+Windows binary、対応source、checksumは同じv1.0.1 Releaseで公開しています。v1.0.0の公開assetはimmutableな歴史的release artifactとして保持し、差し替えていません。
 
-| Asset | Size | SHA-256 | Public URL |
-|---|---:|---|---|
-| `Att-Chat-v1.0-win-x64.zip` | 484,238,137 bytes | `81e2fe5172d71c7dcc5c61e9244c1c232b004365944777c5b7c5f9d2bded91b4` | <https://github.com/meTalia-jp/att-chat/releases/download/v1.0.0/Att-Chat-v1.0-win-x64.zip> |
-| `Att-Chat-v1.0-runtime-source.zip` | 1,829,801,983 bytes | `125a6b94c9b01340d193d6863d60ad8531b690a3b273129837102ac855ea34c9` | <https://github.com/meTalia-jp/att-chat/releases/download/v1.0.0/Att-Chat-v1.0-runtime-source.zip> |
-| `SHA256SUMS.txt` | 191 bytes | `0843931f342aa29a4d09a795bf807fc575af4b14d1083c6823316bf7df4cce0d` | <https://github.com/meTalia-jp/att-chat/releases/download/v1.0.0/SHA256SUMS.txt> |
+対応source packageの確定情報:
 
-同じReleaseから公開assetを再downloadし、local確定物とのsize・SHA-256一致と、公開された `SHA256SUMS.txt` による両ZIPの検証を完了しています。
+- Size: `1,648,492,775 bytes`
+- SHA-256: `50566c7cabe8a581bc622c691e0ae90ab83e758510fe9820feb03caa0f41876a`
+
+Windows packageと対応source packageの外側の確定SHA-256は、同じReleaseの `SHA256SUMS.txt` を正本とします。Windows ZIPはこの文書自体を含むため、自己参照になるWindows ZIP自身のhashをこの文書内へ固定せず、外側のchecksum assetで検証します。
 
 ## Distributed native files
 
@@ -133,4 +132,4 @@ Eigen (`d53ac33805ba0a23fa139adaf24227fb6707e6fa`), gRPC (`ff8d12a129eedc58f9602
 
 ## Source asset verification
 
-After downloading the published source asset, compare its SHA-256 with this document, extract it, then verify `SHA256SUMS.txt`. Confirm the manifest revisions and archive hashes before building. The published v1.0.0 asset and the fixed hash above form the release record; a mismatch must be treated as a verification failure rather than silently updating either value.
+After downloading the published source asset, compare its SHA-256 with this document, extract it, then verify its internal `SHA256SUMS.txt`. Confirm the manifest revisions and archive hashes before building. The published v1.0.1 asset and the fixed hash above form the release record; a mismatch must be treated as a verification failure rather than silently updating either value.

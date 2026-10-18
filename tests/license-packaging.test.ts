@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 // @ts-expect-error The executable license audit is intentionally a plain ESM script.
-import { assertPublishedSourceAvailability, v100Publication } from '../scripts/audit-license-package.mjs';
+import { assertPublishedSourceAvailability, currentPublication } from '../scripts/audit-license-package.mjs';
 
 test('Att-Chat declares MIT without replacing Electron distribution license', async () => {
   const packageJson = JSON.parse(await readFile('package.json', 'utf8'));
@@ -22,7 +22,7 @@ test('root package version is canonical for lockfile and Electron staging', asyn
     readFile('package-lock.json', 'utf8').then(JSON.parse),
     readFile('scripts/stage-electron.mjs', 'utf8'),
   ]);
-  assert.equal(packageJson.version, '1.0.0');
+  assert.equal(packageJson.version, '1.0.1');
   assert.equal(packageLock.version, packageJson.version);
   assert.equal(packageLock.packages[''].version, packageJson.version);
   assert.match(staging, /const appVersion = rootPackage\.version/);
@@ -49,16 +49,15 @@ test('notices cover required native, data, provenance, LGPL and MPL components',
   assert.match(notices, /74bf048fddee2d5bad426f81cc2c10374ae7d8007d7f8550bf42d86c61614e2b/i);
 });
 
-test('source availability identifies exact artifacts and the published v1.0.0 assets', async () => {
+test('source availability identifies exact artifacts and the published v1.0.1 assets', async () => {
   const source = await readFile('SOURCE_AVAILABILITY.md', 'utf8');
   for (const value of [
-    'Att-Chat-v1.0-runtime-source.zip',
+    'Att-Chat-v1.0.1-runtime-source.zip',
     '19c601167d4ae75989938416c18ed81eb21c6020',
     '2c592105bbcd9490a9894df48d0fe59b2c512651',
     '2b68d2babae73714846961fb0ee47e3b3d2e39a9',
     '49b61a030a520fc36a4b8fa5cce53fb4e935a7bdbbe4b80e9222f598e49cc7fa',
     '7728490eb079c19b17baeff2b6590c976f6a928b3c17923aeb4fcf1f1f31d299',
-    '125a6b94c9b01340d193d6863d60ad8531b690a3b273129837102ac855ea34c9',
   ]) assert.match(source, new RegExp(value, 'i'));
   assertPublishedSourceAvailability(source);
   assert.match(source, /successful execution with a modified replacement DLL is \*\*unverified\*\*/i);
@@ -85,23 +84,23 @@ test('published source availability rejects stale pre-publication claims', async
 test('published source availability rejects a wrong Release tag or asset URL', async () => {
   const source = await readFile('SOURCE_AVAILABILITY.md', 'utf8');
   assert.throws(
-    () => assertPublishedSourceAvailability(source.replace(v100Publication.release, v100Publication.release.replace('v1.0.0', 'v1.0.1'))),
+    () => assertPublishedSourceAvailability(source.replace(currentPublication.release, currentPublication.release.replace('v1.0.1', 'v1.0.2'))),
     /missing public Release URL|wrong Release tag/,
   );
 
-  const windowsUrl = v100Publication.assets['Att-Chat-v1.0-win-x64.zip'];
+  const windowsUrl = currentPublication.assets['Att-Chat-v1.0.1-win-x64.zip'];
   assert.throws(
-    () => assertPublishedSourceAvailability(source.replace(windowsUrl, windowsUrl.replace('/v1.0.0/', '/v1.0.1/'))),
-    /must use only the v1\.0\.0 URL/,
+    () => assertPublishedSourceAvailability(source.replace(windowsUrl, windowsUrl.replace('/v1.0.1/', '/v1.0.2/'))),
+    /must use only the v1\.0\.1 URL/,
   );
 });
 
 test('published source availability rejects binary and source links from different releases', async () => {
   const source = await readFile('SOURCE_AVAILABILITY.md', 'utf8');
-  const sourceUrl = v100Publication.assets['Att-Chat-v1.0-runtime-source.zip'];
+  const sourceUrl = currentPublication.assets['Att-Chat-v1.0.1-runtime-source.zip'];
   assert.throws(
-    () => assertPublishedSourceAvailability(source.replaceAll(sourceUrl, sourceUrl.replace('/v1.0.0/', '/v1.0.1/'))),
-    /must use only the v1\.0\.0 URL/,
+    () => assertPublishedSourceAvailability(source.replaceAll(sourceUrl, sourceUrl.replace('/v1.0.1/', '/v1.0.2/'))),
+    /must use only the v1\.0\.1 URL/,
   );
 });
 

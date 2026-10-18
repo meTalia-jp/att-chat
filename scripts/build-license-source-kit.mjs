@@ -6,10 +6,15 @@ import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const cacheRoot = resolve(process.env.ATTCHAT_LICENSE_CACHE ?? join(root, '.cache/license-v1'));
+const rootPackage = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'));
+if (typeof rootPackage.version !== 'string' || !/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/.test(rootPackage.version)) {
+  throw new Error('Root package.json must define a non-empty SemVer version');
+}
+const appVersion = rootPackage.version;
+const cacheRoot = resolve(process.env.ATTCHAT_LICENSE_CACHE ?? join(root, `.cache/license-v${appVersion}`));
 const inputDirectory = resolve(process.env.ATTCHAT_RUNTIME_SOURCE_INPUTS ?? join(cacheRoot, 'source-inputs'));
 const stageRoot = resolve(process.env.ATTCHAT_RUNTIME_SOURCE_STAGE ?? join(cacheRoot, 'runtime-source'));
-const packageName = 'Att-Chat-v1.0-runtime-source';
+const packageName = `Att-Chat-v${appVersion}-runtime-source`;
 const output = join(stageRoot, packageName);
 
 const inputs = [
@@ -141,9 +146,9 @@ const buildInputs = {
 };
 await writeFile(join(output, 'BUILD_INPUTS.json'), `${JSON.stringify(buildInputs, null, 2)}\n`);
 
-const readme = `# Att-Chat 1.0 runtime corresponding source kit
+const readme = `# Att-Chat ${appVersion} runtime corresponding source kit
 
-This package preserves the fixed source inputs used to identify the native Electron runtime distributed with Att-Chat 1.0.0 for Windows x64.
+This package preserves the fixed source inputs used to identify the native Electron runtime distributed with Att-Chat ${appVersion} for Windows x64.
 
 It contains the actual Electron 44.5.1 source archive, the actual Chromium 152.0.7977.130 source archive (including Blink and the listed MPL-covered paths), and the actual Chromium FFmpeg fork source archive. The source archives are retained intact. Selected DEPS, GN arguments, patches, generated FFmpeg configuration, license files, and representative LGPL/MPL paths are also extracted under \`build-evidence/\` for review.
 
@@ -204,7 +209,7 @@ await writeFile(join(output, 'FFMPEG-REPLACEMENT.md'), replacement);
 const manifest = {
   schemaVersion: 1,
   package: packageName,
-  release: 'Att-Chat 1.0.0',
+  release: `Att-Chat ${appVersion}`,
   target: 'win32-x64',
   generatedAt: new Date().toISOString(),
   sourceArchives: manifestInputs,
