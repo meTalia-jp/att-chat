@@ -54,6 +54,7 @@ export function Chat({ generationReady = true, detail, refresh, onBusy, question
   const destination = useRef(detail.conversation.conversation_id);
   const panel = useRef<HTMLElement>(null);
   const composerInput = useRef<HTMLTextAreaElement>(null);
+  const observedTurns = useRef({ conversationId: detail.conversation.conversation_id, count: detail.turns.length });
   const [quote, setQuote] = useState('');
   const [submitted, setSubmitted] = useState('');
   const [handoffLevel, setHandoffLevel] = useState<ProductionHandoffLevel>('standard');
@@ -86,6 +87,17 @@ export function Chat({ generationReady = true, detail, refresh, onBusy, question
     return () => { disposed = true; };
   }, [question, base]);
   useEffect(() => { resizeComposerTextarea(composerInput.current); }, [input, normalLayout]);
+  useEffect(() => {
+    const current = { conversationId: detail.conversation.conversation_id, count: detail.turns.length };
+    const appended = observedTurns.current.conversationId === current.conversationId && current.count > observedTurns.current.count;
+    observedTurns.current = current;
+    if (!normalLayout || !appended) return;
+    const frame = requestAnimationFrame(() => {
+      const main = panel.current?.closest('main');
+      if (main) main.scrollTop = main.scrollHeight;
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [detail.conversation.conversation_id, detail.turns.length, normalLayout]);
   async function prepareHandoff() {
     if (!question?.newConversation || !input.trim() || previewBusy) return;
     setPreviewBusy(true); setError(''); setStatus('Preview確認中');

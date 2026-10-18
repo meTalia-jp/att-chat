@@ -12,7 +12,7 @@ import type { ConversationDetail } from '../src/shared/contracts.ts';
 test('Normal Chat composer reuses send/cancel, preserves partial turn and removes duplicate stream after refresh', async () => {
   const cache=resolve('.cache');await mkdir(cache,{recursive:true});
   const outDir=await mkdtemp(join(cache,'normal-chat-test-'));
-  const dom=new JSDOM('<div id="app"></div>',{url:'http://localhost/'});
+  const dom=new JSDOM('<main><div id="app"></div></main>',{url:'http://localhost/'});
   const keys=['window','document','Node','NodeFilter','Range','HTMLElement','ResizeObserver','requestAnimationFrame','cancelAnimationFrame','IS_REACT_ACT_ENVIRONMENT','fetch'] as const;
   const saved=new Map(keys.map(key=>[key,Object.getOwnPropertyDescriptor(globalThis,key)]));
   let root:ReturnType<typeof CreateRoot>|undefined;
@@ -57,6 +57,7 @@ test('Normal Chat composer reuses send/cancel, preserves partial turn and remove
       throw new Error('Unexpected API '+path);
     }) as typeof fetch;
     const container=dom.window.document.getElementById('app')!;
+    const main=container.closest('main')!;Object.defineProperty(main,'scrollHeight',{configurable:true,value:600});main.scrollTop=0;
     root=createRoot(container);
     const settle=async(fn:()=>void)=>{await act(async()=>{fn();await new Promise(r=>setTimeout(r,20));});};
     const button=(name:string)=>{const result=Array.from(container.querySelectorAll('button')).find(b=>b.textContent===name);assert.ok(result,name);return result;};
@@ -98,6 +99,7 @@ test('Normal Chat composer reuses send/cancel, preserves partial turn and remove
     assert.equal(button('停止').disabled,true);
     assert.equal(container.querySelector('[aria-label="streaming本文"]'),null);
     assert.equal(detail.turns[0].content,'partial');
+    assert.equal(main.scrollTop,600);
     assert.equal(container.querySelector('article small'),null);
     await settle(render);
     assert.equal(detail.runs[0].outcome,'cancelled');
