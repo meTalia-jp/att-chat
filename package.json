@@ -33,6 +33,6 @@
     "jsdom": "^26.1.0",
     "onnxruntime-node": "1.21.0",
     "typescript": "7.0.2",
-    "vite": "8.2.2"
+    "vite": "8.2.4"
   }
 }
